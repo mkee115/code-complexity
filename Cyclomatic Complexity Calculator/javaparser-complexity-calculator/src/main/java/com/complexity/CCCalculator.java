@@ -9,6 +9,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import org.eclipse.jgit.api.Git;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,29 +21,49 @@ import java.util.stream.Stream;
 
 public class CCCalculator
 {
-    private static final String OUTPUT_FILE = "cc_data.csv";
+    private static final String OUTPUT_FILE = ".\\Cyclomatic Complexity Calculator\\analysis\\cc_data.csv";
+    private static final boolean APPEND = false;
 
-    public static int computeCC(MethodDeclaration method)
+    public static void main(String[] args) throws Exception
     {
-        int[] counter = {1};
-        new CyclomaticComplexityVisitor().visit(method, counter);
-        return counter[0];
-    }
+        StaticJavaParser.getParserConfiguration()
+                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
 
-    public static List<File> findJavaFiles(File dir)
-    {
-        List<File> results = new ArrayList<>();
-        for (File f : dir.listFiles())
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("GitHub repo URL: ");
+        String repoUrl = scanner.nextLine().trim();
+        scanner.close();
+
+        String projectName = deriveProjectName(repoUrl);
+        File cloneDir = cloneRepo(repoUrl);
+        File outputFile = new File(OUTPUT_FILE);
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(outputFile, APPEND)))
         {
-            if (f.isDirectory())
-                results.addAll(findJavaFiles(f));
-            else if (f.getName().endsWith(".java"))
-                results.add(f);
+            if (!APPEND || outputFile.length() == 0)
+                out.println("project,class_name,method_name,cc");
+
+            for (File f : findJavaFiles(cloneDir))
+            {
+                try
+                {
+                    processFile(f, projectName, out);
+                }
+                catch (Exception e)
+                {
+                    System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
+                }
+            }
         }
-        return results;
+        finally
+        {
+            deleteRecursively(cloneDir);
+        }
+
+        System.out.println("Done. Project '" + projectName + "' written to: " + outputFile.getAbsolutePath());
     }
 
-    public static void processFile(File file, String projectName, PrintWriter out) throws Exception
+    private static void processFile(File file, String projectName, PrintWriter out) throws Exception
     {
         CompilationUnit cu = StaticJavaParser.parse(file);
 
@@ -61,9 +82,27 @@ public class CCCalculator
         }
     }
 
-    private static String escape(String value)
+    private static int computeCC(MethodDeclaration method)
     {
-        return value.replace("\"", "\"\"");
+        int[] counter = {1};
+        new CyclomaticComplexityVisitor().visit(method, counter);
+        return counter[0];
+    }
+
+    private static List<File> findJavaFiles(File dir)
+    {
+        List<File> results = new ArrayList<>();
+        File[] entries = dir.listFiles();
+        if (entries == null) return results;
+
+        for (File f : entries)
+        {
+            if (f.isDirectory())
+                results.addAll(findJavaFiles(f));
+            else if (f.getName().endsWith(".java"))
+                results.add(f);
+        }
+        return results;
     }
 
     private static File cloneRepo(String repoUrl) throws Exception
@@ -83,9 +122,7 @@ public class CCCalculator
 
     private static void deleteRecursively(File dir) throws Exception
     {
-        if (!dir.exists()) 
-            return;
-
+        if (!dir.exists()) return;
         try (Stream<Path> walk = Files.walk(dir.toPath()))
         {
             walk.sorted(Comparator.reverseOrder())
@@ -97,63 +134,16 @@ public class CCCalculator
     private static String deriveProjectName(String repoUrl)
     {
         String cleaned = repoUrl.trim();
-        if (cleaned.endsWith("/"))
-            cleaned = cleaned.substring(0, cleaned.length() - 1);
-        
-        if (cleaned.endsWith(".git"))
-            cleaned = cleaned.substring(0, cleaned.length() - 4);
-
+        if (cleaned.endsWith("/")) cleaned = cleaned.substring(0, cleaned.length() - 1);
+        if (cleaned.endsWith(".git")) cleaned = cleaned.substring(0, cleaned.length() - 4);
         cleaned = cleaned.replaceFirst("^https?://", "");
         cleaned = cleaned.replaceFirst("^git@", "");
         cleaned = cleaned.replaceFirst("^github\\.com[:/]", "");
-
         return cleaned;
     }
 
-    public static void main(String[] args) throws Exception
+    private static String escape(String value)
     {
-        StaticJavaParser.getParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("GitHub repo URL: ");
-        String repoUrl = scanner.nextLine().trim();
-        scanner.close();
-
-        String projectName = deriveProjectName(repoUrl);
-        File cloneDir = cloneRepo(repoUrl);
-
-        File outputFile = new File(OUTPUT_FILE);
-        boolean writeHeader = !outputFile.exists() || outputFile.length() == 0;
-
-        try (PrintWriter out = new PrintWriter(new java.io.FileWriter(outputFile, false)))
-        {
-            if (writeHeader)
-                out.println("project,class_name,method_name,cc");
-
-            for (File f : findJavaFiles(cloneDir))
-            {
-                try
-                {
-                    processFile(f, projectName, out);
-                }
-                catch (Exception e)
-                {
-                    System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
-                }
-            }
-        }
-        finally
-        {
-            try
-            {
-                deleteRecursively(cloneDir);
-            }
-            catch (Exception e)
-            {
-                System.err.println("Warning: could not delete temp clone dir " + cloneDir);
-            }
-        }
-
-        System.out.println("Done. Project '" + projectName + "' written to: " + outputFile.getAbsolutePath());
+        return value.replace("\"", "\"\"");
     }
 }

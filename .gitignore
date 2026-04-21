@@ -1,1 +1,12 @@
-Cyclomatic Complexity Calculator/Java-master/
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Rapp.history
+
+# R analysis outputs (regenerable)
+output/
+**/*.csv
+**/*.png
+**/*.txt
