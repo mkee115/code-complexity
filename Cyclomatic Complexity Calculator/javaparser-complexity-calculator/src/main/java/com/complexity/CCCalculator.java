@@ -13,54 +13,142 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class CCCalculator
 {
-    private static final String OUTPUT_FILE = ".\\Cyclomatic Complexity Calculator\\analysis\\cc_data.csv";
-    private static final boolean APPEND = false;
+    private static final String  LANGUAGE = "java";
+    private static final Integer MIN_STARS = null;
+    private static final Integer MIN_FORKS = null;
+    private static final Integer MIN_SIZE_KB = null;
+    private static final Integer MAX_SIZE_KB = null;
+    private static final String  CREATED_AFTER = null; // YYYY-MM-DD
+    private static final String  CREATED_BEFORE = null;
+    private static final String  PUSHED_AFTER = null;
+    
+    private static final Integer MIN_COMMITS   = null;
+
+    private static final String OUTPUT_DIR = ".\\Cyclomatic Complexity Calculator\\analysis";
+    private static final String CC_FILE = OUTPUT_DIR + "\\cc_data.csv";
+    private static final String REPOS_FILE = OUTPUT_DIR + "\\repos.csv";
+    private static final String TOKEN_FILE = ".\\Cyclomatic Complexity Calculator\\javaparser-complexity-calculator\\.token";
 
     public static void main(String[] args) throws Exception
     {
-        StaticJavaParser.getParserConfiguration()
-                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+        StaticJavaParser.getParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("GitHub repo URL: ");
-        String repoUrl = scanner.nextLine().trim();
-        scanner.close();
+        String query = buildQuery();
 
-        String projectName = deriveProjectName(repoUrl);
-        File cloneDir = cloneRepo(repoUrl);
-        File outputFile = new File(OUTPUT_FILE);
+        String token = GitHubSearcher.readToken(Paths.get(TOKEN_FILE));
+        GitHubSearcher searcher = new GitHubSearcher(token);
 
-        try (PrintWriter out = new PrintWriter(new FileWriter(outputFile, APPEND)))
+        List<GitHubSearcher.Repo> repos = searcher.search(query);
+        System.out.println("Found " + repos.size() + " repos");
+
+        File ccFile = new File(CC_FILE);
+        File reposFile = new File(REPOS_FILE);
+        boolean writeCcHeader = !ccFile.exists() || ccFile.length() == 0;
+        boolean writeReposHeader = !reposFile.exists() || reposFile.length() == 0;
+        String scrapedAt = LocalDate.now().toString();
+
+        try (PrintWriter ccOut = new PrintWriter(new FileWriter(ccFile, true));
+             PrintWriter reposOut = new PrintWriter(new FileWriter(reposFile, true)))
         {
-            if (!APPEND || outputFile.length() == 0)
-                out.println("project,class_name,method_name,cc");
+            if (writeCcHeader)
+                ccOut.println("project,class_name,method_name,cc");
+            
+            if (writeReposHeader)
+                reposOut.println("full_name,url,scraped_at,language,stars,forks,size_kb,commit_count,java_file_count,created_at,pushed_at");
 
-            for (File f : findJavaFiles(cloneDir))
+            for (GitHubSearcher.Repo repo : repos)
             {
+                File cloneDir = null;
                 try
                 {
-                    processFile(f, projectName, out);
+                    cloneDir = cloneRepo(repo.cloneUrl);
+                    List<File> javaFiles = findJavaFiles(cloneDir);
+
+                    for (File f : javaFiles)
+                    {
+                        try
+                        {
+                            processFile(f, repo.fullName, ccOut);
+                        }
+                        catch (Exception e)
+                        {
+                            System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
+                        }
+                    }
+
+                    writeRepoRow(reposOut, repo, scrapedAt, javaFiles.size());
+                    ccOut.flush();
+                    reposOut.flush();
                 }
                 catch (Exception e)
                 {
-                    System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
+                    System.err.println("Skipping repo " + repo.fullName + ": " + e.getMessage());
+                }
+                finally
+                {
+                    if (cloneDir != null) deleteRecursively(cloneDir);
                 }
             }
         }
-        finally
-        {
-            deleteRecursively(cloneDir);
-        }
 
-        System.out.println("Done. Project '" + projectName + "' written to: " + outputFile.getAbsolutePath());
+        System.out.println("Done.");
+        System.out.println("CC data: " + ccFile.getAbsolutePath());
+        System.out.println("Repo metadata: " + reposFile.getAbsolutePath());
+    }
+
+    private static String buildQuery()
+    {
+        StringBuilder q = new StringBuilder();
+
+        if (LANGUAGE != null) 
+            q.append("language:").append(LANGUAGE).append(" ");
+        if (MIN_STARS != null) 
+            q.append("stars:>=").append(MIN_STARS).append(" ");
+        if (MIN_FORKS != null) 
+            q.append("forks:>=").append(MIN_FORKS).append(" ");
+        if (MIN_COMMITS != null) 
+            q.append("commits:>=").append(MIN_COMMITS).append(" ");
+        if (MIN_SIZE_KB != null && MAX_SIZE_KB != null) 
+            q.append("size:").append(MIN_SIZE_KB).append("..").append(MAX_SIZE_KB).append(" ");
+        else if (MIN_SIZE_KB != null) 
+            q.append("size:>=").append(MIN_SIZE_KB).append(" ");
+        else if (MAX_SIZE_KB != null) 
+            q.append("size:<=").append(MAX_SIZE_KB).append(" ");
+        if (CREATED_AFTER != null && CREATED_BEFORE != null) 
+            q.append("created:").append(CREATED_AFTER).append("..").append(CREATED_BEFORE).append(" ");
+        else if (CREATED_AFTER != null) 
+            q.append("created:>=").append(CREATED_AFTER).append(" ");
+        else if (CREATED_BEFORE != null) 
+            q.append("created:<=").append(CREATED_BEFORE).append(" ");
+        if (PUSHED_AFTER != null) 
+            q.append("pushed:>=").append(PUSHED_AFTER).append(" ");
+        
+        return q.toString().trim();
+    }
+
+    private static void writeRepoRow(PrintWriter out, GitHubSearcher.Repo r, String scrapedAt, int javaFileCount)
+    {
+        out.printf("\"%s\",\"%s\",%s,\"%s\",%d,%d,%d,%d,%d,%s,%s%n",
+                escape(r.fullName),
+                escape(r.htmlUrl),
+                scrapedAt,
+                escape(r.language),
+                r.stars,
+                r.forks,
+                r.sizeKb,
+                r.commitCount,
+                javaFileCount,
+                r.createdAt,
+                r.pushedAt);
     }
 
     private static void processFile(File file, String projectName, PrintWriter out) throws Exception
@@ -129,17 +217,6 @@ public class CCCalculator
                     .map(Path::toFile)
                     .forEach(File::delete);
         }
-    }
-
-    private static String deriveProjectName(String repoUrl)
-    {
-        String cleaned = repoUrl.trim();
-        if (cleaned.endsWith("/")) cleaned = cleaned.substring(0, cleaned.length() - 1);
-        if (cleaned.endsWith(".git")) cleaned = cleaned.substring(0, cleaned.length() - 4);
-        cleaned = cleaned.replaceFirst("^https?://", "");
-        cleaned = cleaned.replaceFirst("^git@", "");
-        cleaned = cleaned.replaceFirst("^github\\.com[:/]", "");
-        return cleaned;
     }
 
     private static String escape(String value)

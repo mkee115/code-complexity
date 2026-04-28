@@ -2,11 +2,13 @@
 .Rproj.user/
 .Rhistory
 .RData
+.RDataTmp
 .Ruserdata
 .Rapp.history
-
-# R analysis outputs (regenerable)
 output/
 **/*.csv
 **/*.png
 **/*.txt
+
+# GitHub Token
+.token
