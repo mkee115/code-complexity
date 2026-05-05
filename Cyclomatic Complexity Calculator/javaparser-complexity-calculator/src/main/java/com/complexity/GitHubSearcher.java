@@ -66,6 +66,11 @@ public class GitHubSearcher
                 if (commitFilter.isActive() && !commitFilter.matches(repo.commitCount))
                     continue;
 
+                
+                // Check if this is a Maven project by verifying pom.xml exists
+                if (!hasPomXml(repo.fullName))
+                    continue;
+
                 results.add(repo);
             }
 
@@ -106,6 +111,15 @@ public class GitHubSearcher
         Matcher m = Pattern.compile("[?&]page=(\\d+)>;\\s*rel=\"last\"").matcher(link.get());
         if (m.find()) return Integer.parseInt(m.group(1));
         return -1;
+    }
+
+    // CHECK IF MAVEN PROJECT BY VERIFYING POM.XML EXISTS IN THE REPO
+
+    private boolean hasPomXml(String fullName) throws IOException, InterruptedException
+    {
+        String url = API + "/repos/" + fullName + "/contents/pom.xml";
+        HttpResponse<String> response = send(url);
+        return response.statusCode() == 200;
     }
 
     private HttpResponse<String> send(String url) throws IOException, InterruptedException
