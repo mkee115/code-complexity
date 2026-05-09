@@ -12,3 +12,6 @@ output/
 
 # GitHub Token
 .token
+
+# Target
+target/

@@ -60,7 +60,7 @@ public class CCCalculator
              PrintWriter reposOut = new PrintWriter(new FileWriter(reposFile, true)))
         {
             if (writeCcHeader)
-                ccOut.println("project,class_name,method_name,cc");
+                ccOut.println("project,class_name,method_name,cc,loc");
             
             if (writeReposHeader)
                 reposOut.println("full_name,url,scraped_at,language,stars,forks,size_kb,commit_count,java_file_count,created_at,pushed_at");
@@ -161,11 +161,13 @@ public class CCCalculator
             for (MethodDeclaration method : cls.getMethods())
             {
                 int cc = computeCC(method);
-                out.printf("\"%s\",\"%s\",\"%s\",%d%n",
+                int loc = LOCCalculator.computeLOC(method);
+                out.printf("\"%s\",\"%s\",\"%s\",%d,%d%n",
                         escape(projectName),
                         escape(className),
                         escape(method.getNameAsString()),
-                        cc);
+                        cc,
+                        loc);
             }
         }
     }
