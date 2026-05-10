@@ -204,4 +204,68 @@ report_lines <- c(
 )
 
 writeLines(report_lines, file.path(OUTPUT_DIR, "summary_report.txt"))
+
+# 9. LOC ANALYSIS
+
+cat("\nGenerating LOC plots...\n")
+
+loc <- df$loc
+
+# Descriptive stats for LOC
+loc_stats <- tibble(
+  Statistic = c("n", "Min", "Q1", "Median", "Mean", "Q3", "Max", "SD",
+                "% LOC > 24"),
+  Value = c(
+    nrow(df), min(loc), quantile(loc, 0.25), median(loc), mean(loc),
+    quantile(loc, 0.75), max(loc), sd(loc),
+    round(100 * mean(loc > 24), 2)
+  )
+)
+cat("\n-- Descriptive Statistics (LOC) --\n")
+print(loc_stats, n = Inf)
+write_csv(loc_stats, file.path(OUTPUT_DIR, "loc_descriptive_stats.csv"))
+
+# 9a. LOC histogram with 24-line threshold
+p_loc_hist <- ggplot(df, aes(x = loc)) +
+  geom_histogram(binwidth = 1, fill = "#e377c2", colour = "white", linewidth = 0.2) +
+  geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.8) +
+  annotate("text", x = 26, y = Inf, label = "24-line threshold",
+           colour = "red", hjust = 0, vjust = 1.5, size = 3.5) +
+  labs(title = "Distribution of LOC per Method",
+       x = "Lines of Code", y = "Method Count") +
+  theme_minimal(base_size = 12)
+
+ggsave(file.path(OUTPUT_DIR, "05_loc_histogram.png"), p_loc_hist,
+       width = 8, height = 5, dpi = 150)
+
+# 9b. CC vs LOC scatter plot
+p_scatter <- ggplot(df, aes(x = loc, y = cc)) +
+  geom_point(alpha = 0.2, size = 0.8, colour = "#4C72B0") +
+  geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.7) +
+  geom_smooth(method = "lm", colour = "orange", se = TRUE) +
+  labs(title = "Cyclomatic Complexity vs Lines of Code",
+       x = "Lines of Code", y = "Cyclomatic Complexity") +
+  theme_minimal(base_size = 12)
+
+ggsave(file.path(OUTPUT_DIR, "06_cc_vs_loc_scatter.png"), p_scatter,
+       width = 8, height = 5, dpi = 150)
+
+# 9c. Box plots of CC split by above/below 24-line threshold
+df <- df %>%
+  mutate(loc_band = ifelse(loc <= 24, "≤24 lines", ">24 lines"))
+
+p_loc_cc_box <- ggplot(df, aes(x = loc_band, y = cc, fill = loc_band)) +
+  geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4, alpha = 0.7) +
+  scale_fill_manual(values = c("≤24 lines" = "#2ca02c", ">24 lines" = "#d62728")) +
+  labs(title = "CC Distribution: Methods Above vs Below 24-Line Threshold",
+       x = "", y = "Cyclomatic Complexity") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none")
+
+ggsave(file.path(OUTPUT_DIR, "07_cc_by_loc_band.png"), p_loc_cc_box,
+       width = 6, height = 5, dpi = 150)
+
+# Correlation between CC and LOC
+cat(sprintf("\nCorrelation (CC vs LOC): %.4f\n", cor(df$cc, df$loc)))
+
 cat("\nDone\n")
