@@ -73,17 +73,21 @@ public class CCCalculator
                     cloneDir = cloneRepo(repo.cloneUrl);
                     List<File> javaFiles = findJavaFiles(cloneDir);
 
-                    for (File f : javaFiles)
-                    {
-                        try
-                        {
-                            processFile(f, repo.fullName, ccOut);
-                        }
-                        catch (Exception e)
-                        {
-                            System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
-                        }
-                    }
+                    int methodCount = 0;
+final int MAX_METHODS = 500;
+
+for (File f : javaFiles)
+{
+    if (methodCount >= MAX_METHODS) break;
+    try
+    {
+        methodCount += processFile(f, repo.fullName, ccOut);
+    }
+    catch (Exception e)
+    {
+        System.err.println("Skipping " + f.getName() + ": " + e.getMessage());
+    }
+}
 
                     writeRepoRow(reposOut, repo, scrapedAt, javaFiles.size());
                     ccOut.flush();
@@ -151,26 +155,29 @@ public class CCCalculator
                 r.pushedAt);
     }
 
-    private static void processFile(File file, String projectName, PrintWriter out) throws Exception
-    {
-        CompilationUnit cu = StaticJavaParser.parse(file);
+    private static int processFile(File file, String projectName, PrintWriter out) throws Exception
+{
+    int count = 0;
+    CompilationUnit cu = StaticJavaParser.parse(file);
 
-        for (ClassOrInterfaceDeclaration cls : cu.findAll(ClassOrInterfaceDeclaration.class))
+    for (ClassOrInterfaceDeclaration cls : cu.findAll(ClassOrInterfaceDeclaration.class))
+    {
+        String className = cls.getNameAsString();
+        for (MethodDeclaration method : cls.getMethods())
         {
-            String className = cls.getNameAsString();
-            for (MethodDeclaration method : cls.getMethods())
-            {
-                int cc = computeCC(method);
-                int loc = LOCCalculator.computeLOC(method);
-                out.printf("\"%s\",\"%s\",\"%s\",%d,%d%n",
-                        escape(projectName),
-                        escape(className),
-                        escape(method.getNameAsString()),
-                        cc,
-                        loc);
-            }
+            int cc = computeCC(method);
+            int loc = LOCCalculator.computeLOC(method);
+            out.printf("\"%s\",\"%s\",\"%s\",%d,%d%n",
+                    escape(projectName),
+                    escape(className),
+                    escape(method.getNameAsString()),
+                    cc,
+                    loc);
+            count++;
         }
     }
+    return count;
+}
 
     private static int computeCC(MethodDeclaration method)
     {

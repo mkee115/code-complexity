@@ -22,7 +22,7 @@ public class GitHubSearcher
 {
     private static final String API = "https://api.github.com";
     private static final int PER_PAGE = 100;
-    private static final int MAX_PAGES = 10;
+    private static final int MAX_PAGES = 1;
 
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper json = new ObjectMapper();
