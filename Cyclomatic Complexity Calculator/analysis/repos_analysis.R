@@ -133,66 +133,73 @@ writeLines(report_lines, file.path(OUTPUT_DIR, "repos_summary.txt"))
 
 cat("\nGenerating plots...\n")
 
-# 4a. Stars histogram (log scale)
-p_stars <- suppressWarnings(
-  ggplot(df, aes(x = stars)) +
+# repos_01: Stars histogram (log-log)
+suppressWarnings(
+  p_stars <- ggplot(df, aes(x = stars)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Star Count Distribution",
-         x = "Stars (log scale)", y = "Count") +
+         x = "Stars (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_01_stars_hist.png"), p_stars,
        width = 8, height = 5, dpi = 150)
 
-# 4b. Forks histogram (log scale)
-p_forks <- suppressWarnings(
-  ggplot(df %>% filter(forks > 0), aes(x = forks)) +
+# repos_02: Forks histogram (log-log)
+suppressWarnings(
+  p_forks <- ggplot(df %>% filter(forks > 0), aes(x = forks)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Fork Count Distribution",
-         x = "Forks (log scale)", y = "Count") +
+         x = "Forks (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_02_forks_hist.png"), p_forks,
        width = 8, height = 5, dpi = 150)
 
-# 4c. Size histogram (log scale)
-p_size <- suppressWarnings(
-  ggplot(df %>% filter(size_kb > 0), aes(x = size_kb)) +
+# repos_03: Size histogram (log-log)
+suppressWarnings(
+  p_size <- ggplot(df %>% filter(size_kb > 0), aes(x = size_kb)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Size Distribution",
-         x = "Size (KB, log scale)", y = "Count") +
+         x = "Size (KB, log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_03_size_hist.png"), p_size,
        width = 8, height = 5, dpi = 150)
 
-# 4d. Commit count histogram (log scale, exclude -1)
-p_commits <- suppressWarnings(
-  ggplot(df %>% filter(commit_count > 0), aes(x = commit_count)) +
+# repos_04: Commit count histogram (log-log)
+suppressWarnings(
+  p_commits <- ggplot(df %>% filter(commit_count > 0), aes(x = commit_count)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Commit Count Distribution",
-         x = "Commits (log scale)", y = "Count") +
+         x = "Commits (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_04_commits_hist.png"), p_commits,
        width = 8, height = 5, dpi = 150)
 
-# 4e. Repo age histogram (linear)
-p_age <- ggplot(df, aes(x = age_days)) +
-  geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
-  labs(title = "Repository Age Distribution",
-       x = "Age (days)", y = "Count") +
-  theme_minimal(base_size = 12)
+# repos_05: Repo age histogram (log y)
+suppressWarnings(
+  p_age <- ggplot(df, aes(x = age_days)) +
+    geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "Repository Age Distribution",
+         x = "Age (days)", y = "Count (log scale)") +
+    theme_minimal(base_size = 12)
+)
 ggsave(file.path(OUTPUT_DIR, "repos_05_age_hist.png"), p_age,
        width = 8, height = 5, dpi = 150)
 
-# 4f. Stars vs forks scatter (both log scale)
-p_sf <- suppressWarnings(
-  ggplot(df %>% filter(stars > 0, forks > 0), aes(x = stars, y = forks)) +
+# repos_06: Stars vs forks scatter (both log scale)
+suppressWarnings(
+  p_sf <- ggplot(df %>% filter(stars > 0, forks > 0), aes(x = stars, y = forks)) +
     geom_point(alpha = 0.4, size = 0.8, colour = "#4C72B0") +
     scale_x_log10(labels = label_comma()) +
     scale_y_log10(labels = label_comma()) +
@@ -203,10 +210,10 @@ p_sf <- suppressWarnings(
 ggsave(file.path(OUTPUT_DIR, "repos_06_stars_vs_forks.png"), p_sf,
        width = 8, height = 5, dpi = 150)
 
-# 4g. Commits vs Java file count scatter (both log scale)
-p_cj <- suppressWarnings(
-  ggplot(df %>% filter(commit_count > 0, java_file_count > 0),
-         aes(x = commit_count, y = java_file_count)) +
+# repos_07: Commits vs Java file count scatter (both log scale)
+suppressWarnings(
+  p_cj <- ggplot(df %>% filter(commit_count > 0, java_file_count > 0),
+                 aes(x = commit_count, y = java_file_count)) +
     geom_point(alpha = 0.4, size = 0.8, colour = "#4C72B0") +
     scale_x_log10(labels = label_comma()) +
     scale_y_log10(labels = label_comma()) +

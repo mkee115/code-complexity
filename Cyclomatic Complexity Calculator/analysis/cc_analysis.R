@@ -9,7 +9,6 @@ INPUT_FILE  <- "cc_data.csv"
 OUTPUT_DIR  <- "output"
 CC_COL      <- "cc"
 
-# Risk band upper bounds (final band catches everything above the last value)
 BAND_BREAKS  <- c(5, 10, 15, 25)
 BAND_LABELS  <- c("1-5", "6-10", "11-15", "16-25", "25+")
 BAND_COLOURS <- c("#2ca02c", "#8fbc8f", "#ff7f0e", "#d62728", "#9467bd")
@@ -25,6 +24,12 @@ required_cols <- c("method_name", "class_name", "project", CC_COL)
 missing <- setdiff(required_cols, names(df))
 if (length(missing) > 0) {
   stop("Missing required columns: ", paste(missing, collapse = ", "))
+}
+
+has_loc <- "loc" %in% names(df)
+has_loc_physical <- "loc_physical" %in% names(df)
+if (!has_loc) {
+  cat("Note: 'loc' column not found. LOC analysis (section 9+) will be skipped.\n")
 }
 
 df <- df %>%
@@ -108,21 +113,25 @@ cat("\nGenerating plots...\n")
 
 project_order <- project_summary %>% arrange(median_cc) %>% pull(project)
 
-# 6a. Histogram (all data, binwidth = 1)
-p_hist <- ggplot(df, aes(x = .data[[CC_COL]])) +
-  geom_histogram(binwidth = 1, fill = "#4C72B0", colour = "white", linewidth = 0.2) +
-  geom_vline(xintercept = BAND_BREAKS,
-             linetype  = "dashed",
-             colour    = BAND_COLOURS[-length(BAND_COLOURS)],
-             linewidth = 0.7) +
-  labs(title = "Distribution of Cyclomatic Complexity",
-       x = "Cyclomatic Complexity", y = "Method Count") +
-  theme_minimal(base_size = 12)
+# Plot 01: CC histogram (log-log)
+suppressWarnings(
+  p_hist <- ggplot(df, aes(x = .data[[CC_COL]])) +
+    geom_histogram(bins = 40, fill = "#4C72B0", colour = "white", linewidth = 0.2) +
+    geom_vline(xintercept = BAND_BREAKS,
+               linetype  = "dashed",
+               colour    = BAND_COLOURS[-length(BAND_COLOURS)],
+               linewidth = 0.7) +
+    scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "Distribution of Cyclomatic Complexity",
+         x = "Cyclomatic Complexity (log scale)", y = "Method Count (log scale)") +
+    theme_minimal(base_size = 12)
+)
 
 ggsave(file.path(OUTPUT_DIR, "01_cc_histogram.png"), p_hist,
        width = 8, height = 5, dpi = 150)
 
-# 6b. Risk band bar chart
+# Plot 02: Risk band bar chart
 p_band <- ggplot(band_summary, aes(x = risk_band, y = pct, fill = risk_band)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 3.5) +
@@ -134,35 +143,38 @@ p_band <- ggplot(band_summary, aes(x = risk_band, y = pct, fill = risk_band)) +
 ggsave(file.path(OUTPUT_DIR, "02_risk_bands.png"), p_band,
        width = 7, height = 5, dpi = 150)
 
-# 6c. Boxplot per project (all data)
-p_box <- ggplot(df, aes(x = factor(project, levels = project_order),
-                        y = .data[[CC_COL]])) +
-  geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4,
-               fill = "#4C72B0", alpha = 0.7) +
-  coord_flip() +
-  geom_hline(yintercept = BAND_BREAKS,
-             linetype  = "dashed",
-             colour    = BAND_COLOURS[-length(BAND_COLOURS)],
-             linewidth = 0.5) +
-  labs(title = "CC Distribution per Project",
-       x = "Project", y = "Cyclomatic Complexity") +
-  theme_minimal(base_size = 11)
+# Plot 03: Boxplot per project (log y)
+suppressWarnings(
+  p_box <- ggplot(df, aes(x = factor(project, levels = project_order),
+                          y = .data[[CC_COL]])) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4,
+                 fill = "#4C72B0", alpha = 0.7) +
+    coord_flip() +
+    geom_hline(yintercept = BAND_BREAKS,
+               linetype  = "dashed",
+               colour    = BAND_COLOURS[-length(BAND_COLOURS)],
+               linewidth = 0.5) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "CC Distribution per Project",
+         x = "Project", y = "Cyclomatic Complexity (log scale)") +
+    theme_minimal(base_size = 11)
+)
 
 ggsave(file.path(OUTPUT_DIR, "03_project_boxplots.png"), p_box,
        width = 9, height = max(5, n_distinct(df$project) * 0.4 + 2), dpi = 150)
 
-# 6d. Empirical CDF (all data)
-# For any CC value on the x-axis, shows what % of methods score at or below it.
+# Plot 04: Empirical CDF (log x)
 p_ecdf <- ggplot(df, aes(x = .data[[CC_COL]])) +
   stat_ecdf(geom = "step", colour = "#4C72B0", linewidth = 0.9) +
   geom_vline(xintercept = BAND_BREAKS,
              linetype  = "dashed",
              colour    = BAND_COLOURS[-length(BAND_COLOURS)],
              linewidth = 0.5) +
+  scale_x_log10(labels = label_comma()) +
   scale_y_continuous(labels = percent_format()) +
   labs(title    = "Empirical CDF of Cyclomatic Complexity",
        subtitle = "For a given CC value, shows what % of methods score at or below it",
-       x = "Cyclomatic Complexity", y = "% of Methods") +
+       x = "Cyclomatic Complexity (log scale)", y = "% of Methods") +
   theme_minimal(base_size = 12)
 
 ggsave(file.path(OUTPUT_DIR, "04_ecdf.png"), p_ecdf,
@@ -207,65 +219,116 @@ writeLines(report_lines, file.path(OUTPUT_DIR, "summary_report.txt"))
 
 # 9. LOC ANALYSIS
 
-cat("\nGenerating LOC plots...\n")
+if (!has_loc) {
+  cat("\nSkipping LOC analysis (no 'loc' column in data).\n")
+} else {
 
-loc <- df$loc
+  cat("\nGenerating LOC plots...\n")
 
-# Descriptive stats for LOC
-loc_stats <- tibble(
-  Statistic = c("n", "Min", "Q1", "Median", "Mean", "Q3", "Max", "SD",
-                "% LOC > 24"),
-  Value = c(
-    nrow(df), min(loc), quantile(loc, 0.25), median(loc), mean(loc),
-    quantile(loc, 0.75), max(loc), sd(loc),
-    round(100 * mean(loc > 24), 2)
+  loc <- df$loc
+
+  loc_stats <- tibble(
+    Statistic = c("n", "Min", "Q1", "Median", "Mean", "Q3", "Max", "SD",
+                  "% LOC > 24"),
+    Value = c(
+      nrow(df), min(loc), quantile(loc, 0.25), median(loc), mean(loc),
+      quantile(loc, 0.75), max(loc), sd(loc),
+      round(100 * mean(loc > 24), 2)
+    )
   )
-)
-cat("\n-- Descriptive Statistics (LOC) --\n")
-print(loc_stats, n = Inf)
-write_csv(loc_stats, file.path(OUTPUT_DIR, "loc_descriptive_stats.csv"))
+  cat("\n-- Descriptive Statistics (LOC) --\n")
+  print(loc_stats, n = Inf)
+  write_csv(loc_stats, file.path(OUTPUT_DIR, "loc_descriptive_stats.csv"))
 
-# 9a. LOC histogram with 24-line threshold
-p_loc_hist <- ggplot(df, aes(x = loc)) +
-  geom_histogram(binwidth = 1, fill = "#e377c2", colour = "white", linewidth = 0.2) +
-  geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.8) +
-  annotate("text", x = 26, y = Inf, label = "24-line threshold",
-           colour = "red", hjust = 0, vjust = 1.5, size = 3.5) +
-  labs(title = "Distribution of LOC per Method",
-       x = "Lines of Code", y = "Method Count") +
-  theme_minimal(base_size = 12)
+  # Plot 05: LOC histogram (log-log)
+  suppressWarnings(
+    p_loc_hist <- ggplot(df, aes(x = loc)) +
+      geom_histogram(bins = 40, fill = "#e377c2", colour = "white", linewidth = 0.2) +
+      geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.8) +
+      annotate("text", x = 26, y = Inf, label = "24-line threshold",
+               colour = "red", hjust = 0, vjust = 1.5, size = 3.5) +
+      scale_x_log10(labels = label_comma()) +
+      scale_y_log10(labels = label_comma()) +
+      labs(title = "Distribution of LOC per Method",
+           x = "Lines of Code (log scale)", y = "Method Count (log scale)") +
+      theme_minimal(base_size = 12)
+  )
 
-ggsave(file.path(OUTPUT_DIR, "05_loc_histogram.png"), p_loc_hist,
-       width = 8, height = 5, dpi = 150)
+  ggsave(file.path(OUTPUT_DIR, "05_loc_histogram.png"), p_loc_hist,
+         width = 8, height = 5, dpi = 150)
 
-# 9b. CC vs LOC scatter plot
-p_scatter <- ggplot(df, aes(x = loc, y = cc)) +
-  geom_point(alpha = 0.2, size = 0.8, colour = "#4C72B0") +
-  geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.7) +
-  geom_smooth(method = "lm", colour = "orange", se = TRUE) +
-  labs(title = "Cyclomatic Complexity vs Lines of Code",
-       x = "Lines of Code", y = "Cyclomatic Complexity") +
-  theme_minimal(base_size = 12)
+  # Plot 06: CC vs LOC scatter (log-log)
+  p_scatter <- ggplot(df, aes(x = loc, y = cc)) +
+    geom_point(alpha = 0.2, size = 0.8, colour = "#4C72B0") +
+    geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.7) +
+    scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "Cyclomatic Complexity vs Lines of Code",
+         x = "Lines of Code (log scale)", y = "Cyclomatic Complexity (log scale)") +
+    theme_minimal(base_size = 12)
+  try(p_scatter <- p_scatter + geom_smooth(method = "lm", colour = "orange", se = TRUE))
 
-ggsave(file.path(OUTPUT_DIR, "06_cc_vs_loc_scatter.png"), p_scatter,
-       width = 8, height = 5, dpi = 150)
+  ggsave(file.path(OUTPUT_DIR, "06_cc_vs_loc_scatter.png"), p_scatter,
+         width = 8, height = 5, dpi = 150)
 
-# 9c. Box plots of CC split by above/below 24-line threshold
-df <- df %>%
-  mutate(loc_band = ifelse(loc <= 24, "≤24 lines", ">24 lines"))
+  # Plot 07: CC by LOC band boxplot (log y)
+  df <- df %>%
+    mutate(loc_band = ifelse(loc <= 24, "≤24 lines", ">24 lines"))
 
-p_loc_cc_box <- ggplot(df, aes(x = loc_band, y = cc, fill = loc_band)) +
-  geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4, alpha = 0.7) +
-  scale_fill_manual(values = c("≤24 lines" = "#2ca02c", ">24 lines" = "#d62728")) +
-  labs(title = "CC Distribution: Methods Above vs Below 24-Line Threshold",
-       x = "", y = "Cyclomatic Complexity") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "none")
+  suppressWarnings(
+    p_loc_cc_box <- ggplot(df, aes(x = loc_band, y = cc, fill = loc_band)) +
+      geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4, alpha = 0.7) +
+      scale_fill_manual(values = c("≤24 lines" = "#2ca02c", ">24 lines" = "#d62728")) +
+      scale_y_log10(labels = label_comma()) +
+      labs(title = "CC Distribution: Methods Above vs Below 24-Line Threshold",
+           x = "", y = "Cyclomatic Complexity (log scale)") +
+      theme_minimal(base_size = 12) +
+      theme(legend.position = "none")
+  )
 
-ggsave(file.path(OUTPUT_DIR, "07_cc_by_loc_band.png"), p_loc_cc_box,
-       width = 6, height = 5, dpi = 150)
+  ggsave(file.path(OUTPUT_DIR, "07_cc_by_loc_band.png"), p_loc_cc_box,
+         width = 6, height = 5, dpi = 150)
 
-# Correlation between CC and LOC
-cat(sprintf("\nCorrelation (CC vs LOC): %.4f\n", cor(df$cc, df$loc)))
+  cat(sprintf("\nCorrelation (CC vs LOC): %.4f\n", cor(df$cc, df$loc)))
+
+  if (has_loc_physical) {
+
+    loc_phys <- df$loc_physical
+
+    loc_phys_stats <- tibble(
+      Statistic = c("n", "Min", "Q1", "Median", "Mean", "Q3", "Max", "SD",
+                    "% loc_physical > 24"),
+      Value = c(
+        nrow(df), min(loc_phys), quantile(loc_phys, 0.25), median(loc_phys),
+        mean(loc_phys), quantile(loc_phys, 0.75), max(loc_phys), sd(loc_phys),
+        round(100 * mean(loc_phys > 24), 2)
+      )
+    )
+    cat("\n-- Descriptive Statistics (LOC Physical) --\n")
+    print(loc_phys_stats, n = Inf)
+    write_csv(loc_phys_stats, file.path(OUTPUT_DIR, "loc_physical_descriptive_stats.csv"))
+
+    cat(sprintf("Correlation (CC vs LOC physical): %.4f\n", cor(df$cc, df$loc_physical)))
+    cat(sprintf("Correlation (LOC vs LOC physical): %.4f\n", cor(df$loc, df$loc_physical)))
+
+    # Plot 08: LOC vs LOC physical scatter (log-log)
+    suppressWarnings(
+      p_loc_compare <- ggplot(df, aes(x = loc, y = loc_physical)) +
+        geom_point(alpha = 0.2, size = 0.8, colour = "#4C72B0") +
+        geom_abline(slope = 1, intercept = 0, colour = "red", linetype = "dashed", linewidth = 0.7) +
+        scale_x_log10(labels = label_comma()) +
+        scale_y_log10(labels = label_comma()) +
+        labs(title = "NBNC LOC vs Physical LOC per Method",
+             subtitle = "Red line = equal; points above = more blank/comment lines",
+             x = "NBNC Lines of Code (log scale)", y = "Physical Lines of Code (log scale)") +
+        theme_minimal(base_size = 12)
+    )
+
+    ggsave(file.path(OUTPUT_DIR, "08_loc_vs_loc_physical.png"), p_loc_compare,
+           width = 8, height = 5, dpi = 150)
+
+  }
+
+}
 
 cat("\nDone\n")
