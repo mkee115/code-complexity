@@ -9,6 +9,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,9 @@ public class GitHubSearcher
 {
     private static final String API = "https://api.github.com";
     private static final int PER_PAGE = 100;
-    private static final int MAX_PAGES = 1;
+    private static final int MAX_PAGES = 10;
+    private static final LocalDate GITHUB_EPOCH = LocalDate.of(2008, 1, 1);
+    private static final long API_DELAY_MS = 750;
 
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper json = new ObjectMapper();
@@ -38,6 +42,139 @@ public class GitHubSearcher
         return Files.readString(tokenFile).trim();
     }
 
+    public List<SearchChunk> planChunks(String baseQuery, LocalDate createdBefore, int targetRepos)
+            throws IOException, InterruptedException
+    {
+        List<SearchChunk> chunks = new ArrayList<>();
+        LocalDate chunkEnd = createdBefore;
+        int totalCollected = 0;
+        int chunkNum = 0;
+
+        while (totalCollected < targetRepos)
+        {
+            if (!chunkEnd.isAfter(GITHUB_EPOCH)) break;
+
+            chunkNum++;
+            int remaining = targetRepos - totalCollected;
+            long maxDays = ChronoUnit.DAYS.between(GITHUB_EPOCH, chunkEnd);
+
+            System.out.print("  Planning chunk " + chunkNum + "... ");
+
+            int fullRangeCount = countResultsRaw(baseQuery + " created:" + GITHUB_EPOCH + ".." + chunkEnd);
+
+            if (fullRangeCount == 0)
+            {
+                System.out.println("no results remaining, stopping.");
+                break;
+            }
+
+            boolean lastPhase = remaining < 1000 || fullRangeCount < 1000;
+
+            SearchChunk chunk;
+            if (lastPhase)
+            {
+                int need = Math.min(remaining, fullRangeCount);
+                chunk = findMinWindowMeetingTarget(baseQuery, chunkEnd, maxDays, need);
+                System.out.println(chunk.expectedCount + " results between "
+                        + chunk.startDate + " and " + chunk.endDate);
+                chunks.add(chunk);
+                totalCollected += chunk.expectedCount;
+                break;
+            }
+            else
+            {
+                chunk = findMaxWindowUnderLimit(baseQuery, chunkEnd, maxDays, 1000);
+                System.out.println(chunk.expectedCount + " results between "
+                        + chunk.startDate + " and " + chunk.endDate);
+                chunks.add(chunk);
+                totalCollected += chunk.expectedCount;
+                chunkEnd = chunk.startDate.minusDays(1);
+            }
+        }
+
+        return chunks;
+    }
+
+    private SearchChunk findMaxWindowUnderLimit(String baseQuery, LocalDate chunkEnd,
+            long maxDays, int limit) throws IOException, InterruptedException
+    {
+        long lo = 1, hi = maxDays;
+        long bestDays = 1;
+
+        while (lo <= hi)
+        {
+            long mid = (lo + hi) / 2;
+            LocalDate testStart = chunkEnd.minusDays(mid);
+            int count = countResultsRaw(baseQuery + " created:" + testStart + ".." + chunkEnd);
+
+            if (count < limit)
+            {
+                bestDays = mid;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+
+        LocalDate chunkStart = chunkEnd.minusDays(bestDays);
+        int finalCount = countResultsRaw(baseQuery + " created:" + chunkStart + ".." + chunkEnd);
+        return new SearchChunk(chunkStart, chunkEnd, finalCount);
+    }
+
+    private SearchChunk findMinWindowMeetingTarget(String baseQuery, LocalDate chunkEnd,
+            long maxDays, int need) throws IOException, InterruptedException
+    {
+        long lo = 1, hi = maxDays;
+        long bestDays = maxDays;
+
+        while (lo <= hi)
+        {
+            long mid = (lo + hi) / 2;
+            LocalDate testStart = chunkEnd.minusDays(mid);
+            int count = countResultsRaw(baseQuery + " created:" + testStart + ".." + chunkEnd);
+
+            if (count >= need)
+            {
+                bestDays = mid;
+                hi = mid - 1;
+            }
+            else
+            {
+                lo = mid + 1;
+            }
+        }
+
+        LocalDate chunkStart = chunkEnd.minusDays(bestDays);
+        int finalCount = countResultsRaw(baseQuery + " created:" + chunkStart + ".." + chunkEnd);
+        return new SearchChunk(chunkStart, chunkEnd, finalCount);
+    }
+
+    private int countResultsRaw(String query) throws IOException, InterruptedException
+    {
+        Thread.sleep(API_DELAY_MS);
+        String url = API + "/search/repositories?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
+                + "&per_page=1&page=1";
+
+        HttpResponse<String> response = send(url);
+
+        if (response.statusCode() == 422) return 0;
+
+        if (response.statusCode() == 403 || response.statusCode() == 429)
+        {
+            System.err.println("\nRate limited, waiting 60s...");
+            Thread.sleep(60_000);
+            response = send(url);
+        }
+
+        if (response.statusCode() != 200)
+            throw new IOException("Count request failed: " + response.statusCode() + " " + response.body());
+
+        JsonNode root = json.readTree(response.body());
+        return root.get("total_count").asInt();
+    }
+
     public List<Repo> search(String rawQuery) throws IOException, InterruptedException
     {
         CommitFilter commitFilter = CommitFilter.extract(rawQuery);
@@ -47,10 +184,19 @@ public class GitHubSearcher
 
         for (int page = 1; page <= MAX_PAGES; page++)
         {
+            Thread.sleep(API_DELAY_MS);
             String url = API + "/search/repositories?q=" + URLEncoder.encode(cleanedQuery, StandardCharsets.UTF_8)
                     + "&per_page=" + PER_PAGE + "&page=" + page;
 
             HttpResponse<String> response = send(url);
+
+            if (response.statusCode() == 403 || response.statusCode() == 429)
+            {
+                System.err.println("\nRate limited during search, waiting 60s...");
+                Thread.sleep(60_000);
+                response = send(url);
+            }
+
             if (response.statusCode() != 200)
                 throw new IOException("Search failed: " + response.statusCode() + " " + response.body());
 
@@ -66,8 +212,6 @@ public class GitHubSearcher
                 if (commitFilter.isActive() && !commitFilter.matches(repo.commitCount))
                     continue;
 
-                
-                // Check if this is a Maven project by verifying pom.xml exists
                 if (!hasPomXml(repo.fullName))
                     continue;
 
@@ -113,8 +257,6 @@ public class GitHubSearcher
         return -1;
     }
 
-    // CHECK IF MAVEN PROJECT BY VERIFYING POM.XML EXISTS IN THE REPO
-
     private boolean hasPomXml(String fullName) throws IOException, InterruptedException
     {
         String url = API + "/repos/" + fullName + "/contents/pom.xml";
@@ -130,6 +272,25 @@ public class GitHubSearcher
         if (token != null && !token.isEmpty())
             builder.header("Authorization", "Bearer " + token);
         return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static class SearchChunk
+    {
+        public final LocalDate startDate;
+        public final LocalDate endDate;
+        public final int expectedCount;
+
+        public SearchChunk(LocalDate startDate, LocalDate endDate, int expectedCount)
+        {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.expectedCount = expectedCount;
+        }
+
+        public String dateFilter()
+        {
+            return "created:" + startDate + ".." + endDate;
+        }
     }
 
     public static class Repo
