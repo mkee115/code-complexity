@@ -6,7 +6,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LOCCalculator
+public class MethodLocCalculator
 {
     public static int computePhysicalLOC(MethodDeclaration method)
     {

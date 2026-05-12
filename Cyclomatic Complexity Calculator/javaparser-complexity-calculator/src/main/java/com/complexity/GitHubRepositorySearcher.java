@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GitHubSearcher
+public class GitHubRepositorySearcher
 {
     private static final String API = "https://api.github.com";
     private static final int PER_PAGE = 100;
@@ -32,7 +32,7 @@ public class GitHubSearcher
     private final ObjectMapper json = new ObjectMapper();
     private final String token;
 
-    public GitHubSearcher(String token)
+    public GitHubRepositorySearcher(String token)
     {
         this.token = token;
     }

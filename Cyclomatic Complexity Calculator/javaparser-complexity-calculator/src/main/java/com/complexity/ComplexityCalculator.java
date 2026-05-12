@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class CCCalculator
+public class ComplexityCalculator
 {
     // "LOCAL_PATH" | "GITHUB_REPO" | "GITHUB_SEARCH"
     private static final String RUN_MODE = "GITHUB_SEARCH";
@@ -32,31 +32,33 @@ public class CCCalculator
 
     // GitHub search filters - set to null to omit that filter from the query
     private static final String LANGUAGE = "java";
-    private static final Integer MIN_STARS = null;
-    private static final Integer MIN_FORKS = null;
+    private static final Integer MIN_STARS = 10;
+    private static final Integer MIN_FORKS = 10;
     private static final Integer MIN_SIZE_KB = null;   // repo size lower bound
     private static final Integer MAX_SIZE_KB = null;   // repo size upper bound
-    private static final String PUSHED_AFTER = null;   // e.g. "2020-01-01"
+    private static final String PUSHED_AFTER = "2026-01-01";   // e.g. "2020-01-01"
     private static final Integer MIN_COMMITS = null;
 
     // max repos to search; actual Maven repos collected will be less due to post-filter
-    private static final int TARGET_REPOS = 10000;
+    private static final int TARGET_REPOS = 1000;
     // only include repos created before this date (YYYY-MM-DD); controls chunk planning range
     private static final String CREATED_BEFORE = "2026-01-01";
 
     // true = add rows to existing CSV files; false = overwrite them from scratch
     private static final boolean APPEND_OUTPUT = false;
 
-    private static final String OUTPUT_DIR = ".\\Cyclomatic Complexity Calculator\\analysis";
+    private static final String OUTPUT_DIR = ".\\analysis";
     private static final String CC_FILE = OUTPUT_DIR + "\\cc_data.csv";
     private static final String REPOS_FILE = OUTPUT_DIR + "\\repos.csv";
     private static final String SKIPPED_FILE = OUTPUT_DIR + "\\skipped.csv";
-    // plain-text file containing a GitHub personal access token (no extra whitespace)
-    private static final String TOKEN_FILE = ".\\Cyclomatic Complexity Calculator\\javaparser-complexity-calculator\\.token";
+    // plain-text file containing a GitHub personal access token
+    private static final String TOKEN_FILE = ".\\javaparser-complexity-calculator\\.token";
 
     public static void main(String[] args) throws Exception
     {
         StaticJavaParser.getParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+
+        new File(OUTPUT_DIR).mkdirs();
 
         File ccFile = new File(CC_FILE);
         File reposFile = new File(REPOS_FILE);
@@ -73,7 +75,7 @@ public class CCCalculator
              PrintWriter skipOut = new PrintWriter(new FileWriter(skippedFile, APPEND_OUTPUT)))
         {
             if (writeCcHeader)
-                ccOut.println("project,class_name,method_name,cc,loc,loc_physical");
+                ccOut.println("project,class_name,method_name,cc,cognitive_complexity,loc,loc_physical,avg_nesting,max_nesting,avg_id_words,abbreviated_ratio,single_letter_ids,longest_id,total_words,comment_count,comment_words");
             if (writeReposHeader)
                 reposOut.println("full_name,url,scraped_at,language,stars,forks,size_kb,commit_count,java_file_count,created_at,pushed_at");
             if (writeSkippedHeader)
@@ -126,15 +128,15 @@ public class CCCalculator
     private static void runGitHubSearch(PrintWriter ccOut, PrintWriter reposOut,
                                         PrintWriter skipOut, String scrapedAt) throws Exception
     {
-        String token = GitHubSearcher.readToken(Paths.get(TOKEN_FILE));
-        GitHubSearcher searcher = new GitHubSearcher(token);
+        String token = GitHubRepositorySearcher.readToken(Paths.get(TOKEN_FILE));
+        GitHubRepositorySearcher searcher = new GitHubRepositorySearcher(token);
 
         String baseQuery = buildBaseQuery();
         LocalDate createdBefore = LocalDate.parse(CREATED_BEFORE);
         System.out.println("Planning search chunks for " + TARGET_REPOS + " results"
                 + " created on or before " + createdBefore + "...");
 
-        List<GitHubSearcher.SearchChunk> chunks = searcher.planChunks(baseQuery, createdBefore, TARGET_REPOS);
+        List<GitHubRepositorySearcher.SearchChunk> chunks = searcher.planChunks(baseQuery, createdBefore, TARGET_REPOS);
 
         int grandTotal = chunks.stream().mapToInt(c -> c.expectedCount).sum();
         System.out.println();
@@ -142,7 +144,7 @@ public class CCCalculator
         System.out.println("Total raw results planned: " + grandTotal);
         for (int i = 0; i < chunks.size(); i++)
         {
-            GitHubSearcher.SearchChunk c = chunks.get(i);
+            GitHubRepositorySearcher.SearchChunk c = chunks.get(i);
             System.out.printf("  Chunk %d: %d results between %s and %s%n",
                     i + 1, c.expectedCount, c.startDate, c.endDate);
         }
@@ -153,16 +155,16 @@ public class CCCalculator
         outer:
         for (int i = 0; i < chunks.size(); i++)
         {
-            GitHubSearcher.SearchChunk chunk = chunks.get(i);
+            GitHubRepositorySearcher.SearchChunk chunk = chunks.get(i);
             String chunkQuery = baseQuery + " " + chunk.dateFilter();
 
             System.out.printf("Processing chunk %d/%d (%s to %s)...%n",
                     i + 1, chunks.size(), chunk.startDate, chunk.endDate);
 
-            List<GitHubSearcher.Repo> repos = searcher.search(chunkQuery);
+            List<GitHubRepositorySearcher.Repo> repos = searcher.search(chunkQuery);
             System.out.println("  Retrieved " + repos.size() + " repos in chunk");
 
-            for (GitHubSearcher.Repo repo : repos)
+            for (GitHubRepositorySearcher.Repo repo : repos)
             {
                 if (mavenProcessed >= TARGET_REPOS) break outer;
 
@@ -267,15 +269,30 @@ public class CCCalculator
                 try
                 {
                     int cc = computeCC(method);
-                    int loc = LOCCalculator.computeLOC(method);
-                    int locPhysical = LOCCalculator.computePhysicalLOC(method);
-                    out.printf("\"%s\",\"%s\",\"%s\",%d,%d,%d%n",
+                    int cognitiveComplexity = computeCognitiveComplexity(method);
+                    int loc = MethodLocCalculator.computeLOC(method);
+                    int locPhysical = MethodLocCalculator.computePhysicalLOC(method);
+                    double[] nesting = MethodNestingCalculator.computeNesting(method);
+                    double avgNesting = nesting[0];
+                    int maxNesting = (int) nesting[1];
+                    IdentifierMetricsCalculator.Metrics idMetrics = IdentifierMetricsCalculator.compute(method);
+                    out.printf("\"%s\",\"%s\",\"%s\",%d,%d,%d,%d,%.2f,%d,%.2f,%.3f,%d,%d,%d,%d,%d%n",
                             escape(projectName),
                             escape(className),
                             escape(methodName),
                             cc,
+                            cognitiveComplexity,
                             loc,
-                            locPhysical);
+                            locPhysical,
+                            avgNesting,
+                            maxNesting,
+                            idMetrics.avgIdentifierWords(),
+                            idMetrics.abbreviatedRatio(),
+                            idMetrics.singleLetterCount(),
+                            idMetrics.longestIdentifier(),
+                            idMetrics.totalWordCount(),
+                            idMetrics.commentCount(),
+                            idMetrics.commentWordCount());
                     count++;
                 }
                 catch (StackOverflowError e)
@@ -298,6 +315,11 @@ public class CCCalculator
         int[] counter = {1};
         new CyclomaticComplexityVisitor().visit(method, counter);
         return counter[0];
+    }
+
+    private static int computeCognitiveComplexity(MethodDeclaration method)
+    {
+        return CognitiveComplexityVisitor.compute(method);
     }
 
     private static List<File> findJavaFiles(File dir)
@@ -341,7 +363,7 @@ public class CCCalculator
         }
     }
 
-    private static void writeRepoRow(PrintWriter out, GitHubSearcher.Repo r,
+    private static void writeRepoRow(PrintWriter out, GitHubRepositorySearcher.Repo r,
                                      String scrapedAt, int javaFileCount)
     {
         out.printf("\"%s\",\"%s\",%s,\"%s\",%d,%d,%d,%d,%d,%s,%s%n",
