@@ -76,7 +76,7 @@ public class CCCalculator
              PrintWriter reposOut = new PrintWriter(new FileWriter(reposFile, true)))
         {
             if (writeCcHeader)
-                ccOut.println("project,class_name,method_name,cc,loc");
+                ccOut.println("project,class_name,method_name,cc,loc,cogcc");
             if (writeReposHeader)
                 reposOut.println("full_name,url,scraped_at,language,stars,forks,size_kb,commit_count,java_file_count,created_at,pushed_at");
 
@@ -199,14 +199,16 @@ public class CCCalculator
             String className = cls.getNameAsString();
             for (MethodDeclaration method : cls.getMethods())
             {
-                int cc = computeCC(method);
-                int loc = LOCCalculator.computeLOC(method);
-                out.printf("\"%s\",\"%s\",\"%s\",%d,%d%n",
+                int cc     = computeCC(method);
+                int loc    = LOCCalculator.computeLOC(method);
+                int cogcc  = computeCogCC(method);
+                out.printf("\"%s\",\"%s\",\"%s\",%d,%d,%d%n",
                         escape(projectName),
                         escape(className),
                         escape(method.getNameAsString()),
                         cc,
-                        loc);
+                        loc,
+                        cogcc);
                 count++;
             }
         }
@@ -217,6 +219,13 @@ public class CCCalculator
     {
         int[] counter = {1};
         new CyclomaticComplexityVisitor().visit(method, counter);
+        return counter[0];
+    }
+
+    private static int computeCogCC(MethodDeclaration method)
+    {
+        int[] counter = {0, 0};
+        new CognitiveComplexityVisitor().visit(method, counter);
         return counter[0];
     }
 
