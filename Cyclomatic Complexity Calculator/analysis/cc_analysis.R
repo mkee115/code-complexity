@@ -268,4 +268,78 @@ ggsave(file.path(OUTPUT_DIR, "07_cc_by_loc_band.png"), p_loc_cc_box,
 # Correlation between CC and LOC
 cat(sprintf("\nCorrelation (CC vs LOC): %.4f\n", cor(df$cc, df$loc)))
 
+# 10. COGNITIVE COMPLEXITY ANALYSIS
+
+if ("cogcc" %in% names(df)) {
+
+  cat("\nGenerating cognitive complexity plots...\n")
+
+  df_cog <- df %>% filter(!is.na(cogcc))
+  cogcc  <- df_cog$cogcc
+
+  # Descriptive stats
+  cogcc_stats <- tibble(
+    Statistic = c("n", "Min", "Q1", "Median", "Mean", "Q3", "Max", "SD",
+                  "Skewness", "Kurtosis",
+                  paste0("% CogCC > ", BAND_BREAKS)),
+    Value = c(
+      length(cogcc),
+      min(cogcc), quantile(cogcc, 0.25), median(cogcc), mean(cogcc),
+      quantile(cogcc, 0.75), max(cogcc), sd(cogcc),
+      skewness(cogcc), kurtosis(cogcc),
+      sapply(BAND_BREAKS, function(t) round(100 * mean(cogcc > t), 2))
+    )
+  )
+  cat("\n-- Descriptive Statistics (CogCC) --\n")
+  print(cogcc_stats, n = Inf)
+  write_csv(cogcc_stats, file.path(OUTPUT_DIR, "cogcc_descriptive_stats.csv"))
+
+  cat(sprintf("\nCorrelation (CogCC vs CC):  %.4f\n", cor(cogcc, df_cog[[CC_COL]])))
+  cat(sprintf("Correlation (CogCC vs LOC): %.4f\n", cor(cogcc, df_cog$loc)))
+
+  # 10a. CogCC histogram
+  p_cogcc_hist <- ggplot(df_cog, aes(x = cogcc)) +
+    geom_histogram(binwidth = 1, fill = "#dd8452", colour = "white", linewidth = 0.2) +
+    geom_vline(xintercept = BAND_BREAKS,
+               linetype  = "dashed",
+               colour    = BAND_COLOURS[-length(BAND_COLOURS)],
+               linewidth = 0.7) +
+    labs(title = "Distribution of Cognitive Complexity",
+         x = "Cognitive Complexity", y = "Method Count") +
+    theme_minimal(base_size = 12)
+
+  ggsave(file.path(OUTPUT_DIR, "08_cogcc_histogram.png"), p_cogcc_hist,
+         width = 8, height = 5, dpi = 150)
+
+  # 10b. CC vs CogCC scatter — dashed 1:1 line shows where they diverge
+  p_cc_cogcc <- ggplot(df_cog, aes(x = .data[[CC_COL]], y = cogcc)) +
+    geom_point(alpha = 0.15, size = 0.8, colour = "#4C72B0") +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                colour = "red", linewidth = 0.7) +
+    geom_smooth(method = "lm", colour = "orange", se = TRUE) +
+    labs(title    = "Cognitive Complexity vs Cyclomatic Complexity",
+         subtitle = "Red dashed = 1:1 reference; orange = linear fit",
+         x = "Cyclomatic Complexity", y = "Cognitive Complexity") +
+    theme_minimal(base_size = 12)
+
+  ggsave(file.path(OUTPUT_DIR, "09_cc_vs_cogcc_scatter.png"), p_cc_cogcc,
+         width = 8, height = 5, dpi = 150)
+
+  # 10c. CogCC split by above/below 24-line threshold (mirrors graph 07)
+  p_cogcc_loc_box <- ggplot(df_cog, aes(x = loc_band, y = cogcc, fill = loc_band)) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4, alpha = 0.7) +
+    scale_fill_manual(values = c("≤24 lines" = "#2ca02c", ">24 lines" = "#d62728")) +
+    labs(title = "Cognitive Complexity: Methods Above vs Below 24-Line Threshold",
+         x = "", y = "Cognitive Complexity") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "none")
+
+  ggsave(file.path(OUTPUT_DIR, "10_cogcc_by_loc_band.png"), p_cogcc_loc_box,
+         width = 6, height = 5, dpi = 150)
+
+} else {
+  cat("\nNote: 'cogcc' column not found — skipping cognitive complexity plots.\n")
+  cat("Re-run the Java tool to generate a CSV with the cogcc column.\n")
+}
+
 cat("\nDone\n")
