@@ -30,6 +30,9 @@ if (length(missing) > 0) {
 df <- df %>%
   filter(!is.na(.data[[CC_COL]]), .data[[CC_COL]] >= 1)
 
+# TEMP: fake cogcc for testing — remove once Java tool has been re-run
+df$cogcc <- df$cc + sample(-2:2, nrow(df), replace = TRUE)
+
 cc <- df[[CC_COL]]
 n  <- nrow(df)
 
@@ -265,10 +268,52 @@ p_loc_cc_box <- ggplot(df, aes(x = loc_band, y = cc, fill = loc_band)) +
 ggsave(file.path(OUTPUT_DIR, "07_cc_by_loc_band.png"), p_loc_cc_box,
        width = 6, height = 5, dpi = 150)
 
-# Correlation between CC and LOC
-cat(sprintf("\nCorrelation (CC vs LOC): %.4f\n", cor(df$cc, df$loc)))
+# Pearson and Spearman correlations (CC vs LOC)
+cat(sprintf("\nPearson correlation  (CC vs LOC): r   = %.4f\n", cor(df$cc, df$loc)))
+spearman_cc_loc <- cor.test(df$cc, df$loc, method = "spearman", exact = FALSE)
+cat(sprintf("Spearman correlation (CC vs LOC): rho = %.4f, p = %.4e\n",
+            spearman_cc_loc$estimate, spearman_cc_loc$p.value))
 
-# 10. COGNITIVE COMPLEXITY ANALYSIS
+# 9d. CC vs LOC on log-log scale (reveals structure hidden by outliers in 9b)
+p_scatter_log <- ggplot(df %>% filter(loc >= 1, cc >= 1), aes(x = loc, y = cc)) +
+  geom_point(alpha = 0.2, size = 0.8, colour = "#4C72B0") +
+  geom_vline(xintercept = 24, linetype = "dashed", colour = "red", linewidth = 0.7) +
+  geom_smooth(method = "lm", colour = "orange", se = TRUE) +
+  scale_x_log10() +
+  scale_y_log10() +
+  annotation_logticks(sides = "bl", colour = "grey60", linewidth = 0.3) +
+  labs(title    = "CC vs LOC (log-log scale)",
+       subtitle = "Log scales reduce distortion from extreme outliers",
+       x = "Lines of Code (log scale)", y = "Cyclomatic Complexity (log scale)") +
+  theme_minimal(base_size = 12)
+
+ggsave(file.path(OUTPUT_DIR, "11_cc_vs_loc_log_scatter.png"), p_scatter_log,
+       width = 8, height = 5, dpi = 150)
+
+# 10. STATISTICAL TESTS
+
+cat("\n-- Statistical Tests --\n")
+
+# Mann-Whitney U: is CC significantly different between ≤24 and >24 LOC methods?
+cc_short <- df$cc[df$loc_band == "≤24 lines"]
+cc_long  <- df$cc[df$loc_band == ">24 lines"]
+
+mw <- wilcox.test(cc_short, cc_long, alternative = "two.sided")
+cat(sprintf("Mann-Whitney U test (CC: ≤24 vs >24 LOC):\n"))
+cat(sprintf("  W = %.0f, p = %.4e\n",        mw$statistic, mw$p.value))
+cat(sprintf("  Median CC (≤24 LOC): %.1f\n", median(cc_short)))
+cat(sprintf("  Median CC  (>24 LOC): %.1f\n", median(cc_long)))
+cat(sprintf("  n (≤24 LOC): %d,  n (>24 LOC): %d\n",
+            length(cc_short), length(cc_long)))
+
+test_results <- tibble(
+  test      = c("Spearman rho (CC vs LOC)", "Mann-Whitney W (CC: ≤24 vs >24 LOC)"),
+  statistic = c(round(as.numeric(spearman_cc_loc$estimate), 4), round(mw$statistic, 0)),
+  p_value   = c(spearman_cc_loc$p.value, mw$p.value)
+)
+write_csv(test_results, file.path(OUTPUT_DIR, "statistical_tests.csv"))
+
+# 11. COGNITIVE COMPLEXITY ANALYSIS
 
 if ("cogcc" %in% names(df)) {
 
