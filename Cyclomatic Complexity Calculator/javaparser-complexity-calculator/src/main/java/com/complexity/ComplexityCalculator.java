@@ -40,19 +40,19 @@ public class ComplexityCalculator
     private static final Integer MIN_COMMITS = null;
 
     // max repos to search; actual Maven repos collected will be less due to post-filter
-    private static final int TARGET_REPOS = 1000;
+    private static final int TARGET_REPOS = 5000;
     // only include repos created before this date (YYYY-MM-DD); controls chunk planning range
     private static final String CREATED_BEFORE = "2026-01-01";
 
     // true = add rows to existing CSV files; false = overwrite them from scratch
     private static final boolean APPEND_OUTPUT = false;
 
-    private static final String OUTPUT_DIR = ".\\analysis";
+    private static final String OUTPUT_DIR = "..\\analysis";
     private static final String CC_FILE = OUTPUT_DIR + "\\cc_data.csv";
     private static final String REPOS_FILE = OUTPUT_DIR + "\\repos.csv";
     private static final String SKIPPED_FILE = OUTPUT_DIR + "\\skipped.csv";
     // plain-text file containing a GitHub personal access token
-    private static final String TOKEN_FILE = ".\\javaparser-complexity-calculator\\.token";
+    private static final String TOKEN_FILE = ".\\.token";
 
     public static void main(String[] args) throws Exception
     {
@@ -331,11 +331,23 @@ public class ComplexityCalculator
         for (File f : entries)
         {
             if (f.isDirectory())
-                results.addAll(findJavaFiles(f));
+            {
+                if (!isMavenTestDir(f))
+                    results.addAll(findJavaFiles(f));
+            }
             else if (f.getName().endsWith(".java"))
                 results.add(f);
         }
         return results;
+    }
+
+    // Matches src/test and src/it — the standard Maven test source directories
+    private static boolean isMavenTestDir(File dir)
+    {
+        String name = dir.getName();
+        if (!name.equals("test") && !name.equals("it")) return false;
+        File parent = dir.getParentFile();
+        return parent != null && parent.getName().equals("src");
     }
 
     private static File cloneRepo(String repoUrl) throws Exception

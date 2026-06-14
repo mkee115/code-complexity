@@ -22,11 +22,9 @@ library(moments)
 if (!requireNamespace("GGally",   quietly = TRUE)) install.packages("GGally")
 if (!requireNamespace("ggridges", quietly = TRUE)) install.packages("ggridges")
 if (!requireNamespace("broom",    quietly = TRUE)) install.packages("broom")
-if (!requireNamespace("ggrepel",  quietly = TRUE)) install.packages("ggrepel")
 library(GGally)
 library(ggridges)
 library(broom)
-library(ggrepel)
 
 # =============================================================================
 # 0. CONFIG
@@ -35,15 +33,28 @@ library(ggrepel)
 CC_FILE    <- "cc_data.csv"
 REPOS_FILE <- "repos.csv"
 OUT        <- "output"
-dir.create(OUT, showWarnings = FALSE)
+
+DIR_DIST    <- file.path(OUT, "01_distributions")
+DIR_CORR    <- file.path(OUT, "02_correlations")
+DIR_BANDS   <- file.path(OUT, "03_risk_bands")
+DIR_PROJ    <- file.path(OUT, "04_projects")
+DIR_TABLES  <- file.path(OUT, "05_tables")
+DIR_CCVCOG  <- file.path(OUT, "06_cc_vs_cognitive")
+DIR_NESTING <- file.path(OUT, "07_nesting_drivers")
+DIR_LOC     <- file.path(OUT, "08_loc_vs_complexity")
+
+for (d in c(OUT, DIR_DIST, DIR_CORR, DIR_BANDS, DIR_PROJ, DIR_TABLES,
+            DIR_CCVCOG, DIR_NESTING, DIR_LOC)) {
+  dir.create(d, showWarnings = FALSE, recursive = TRUE)
+}
 
 BAND_BREAKS  <- c(5, 10, 15, 25)
 BAND_LABELS  <- c("1-5", "6-10", "11-15", "16-25", "25+")
 BAND_COLOURS <- c("#2ca02c", "#8fbc8f", "#ff7f0e", "#d62728", "#9467bd")
 names(BAND_COLOURS) <- BAND_LABELS
 
-save_plot <- function(p, name, w = 9, h = 6) {
-  ggsave(file.path(OUT, name), p, width = w, height = h, dpi = 150)
+sp <- function(p, dir, name, w = 9, h = 6) {
+  suppressWarnings(ggsave(file.path(dir, name), p, width = w, height = h, dpi = 150, limitsize = FALSE))
   invisible(p)
 }
 
@@ -54,7 +65,6 @@ save_plot <- function(p, name, w = 9, h = 6) {
 cat("Loading cc_data.csv...\n")
 df_raw <- read_csv(CC_FILE, show_col_types = FALSE)
 
-# enforce numeric types — only coerce columns that are actually present
 numeric_candidates <- c("cc", "cognitive_complexity", "loc", "loc_physical",
                         "avg_nesting", "max_nesting", "avg_id_words",
                         "abbreviated_ratio", "single_letter_ids", "longest_id",
@@ -62,112 +72,359 @@ numeric_candidates <- c("cc", "cognitive_complexity", "loc", "loc_physical",
 numeric_present <- intersect(numeric_candidates, names(df_raw))
 
 df <- df_raw
-for (col in numeric_present) {
-  df[[col]] <- as.numeric(unlist(df[[col]]))
-}
+for (col in numeric_present) df[[col]] <- as.numeric(unlist(df[[col]]))
 df <- df %>% filter(!is.na(cc), cc >= 1)
 
-# derived columns — guarded so missing source columns produce NA, not an error
-has_loc_col      <- "loc"                  %in% names(df)
-has_loc_phys_col <- "loc_physical"         %in% names(df)
-has_cog_col      <- "cognitive_complexity" %in% names(df)
-has_comment_cols <- all(c("comment_count", "comment_words") %in% names(df))
-has_id_cols      <- all(c("avg_id_words", "abbreviated_ratio") %in% names(df))
+has_loc      <- "loc"                  %in% names(df)
+has_loc_phys <- "loc_physical"         %in% names(df)
+has_cog      <- "cognitive_complexity" %in% names(df)
+has_nest     <- all(c("avg_nesting", "max_nesting") %in% names(df))
+has_id       <- all(c("avg_id_words", "abbreviated_ratio") %in% names(df))
+has_comments <- all(c("comment_count", "comment_words") %in% names(df))
 
-df <- df %>% mutate(
-  risk_band       = cut(cc, breaks = c(0, BAND_BREAKS, Inf),
-                        labels = BAND_LABELS, right = TRUE),
-  loc_band        = if (has_loc_col)      ifelse(loc <= 24, "<=24 LOC", ">24 LOC") else NA_character_,
-  has_comments    = if (has_comment_cols) comment_count > 0                         else NA,
-  comment_density = if (has_comment_cols && has_loc_col)
-    ifelse(loc > 0, comment_words / loc, NA_real_)               else NA_real_,
-  word_density    = if ("total_words" %in% names(df) && has_loc_col)
-    ifelse(loc > 0, total_words / loc, NA_real_)                 else NA_real_,
-  naming_score    = if (has_id_cols)
-    avg_id_words * (1 - abbreviated_ratio)                        else NA_real_,
-  cog_ratio       = if (has_cog_col)
-    ifelse(cc > 0, cognitive_complexity / cc, NA_real_)           else NA_real_,
-  blank_ratio     = if (has_loc_phys_col && has_loc_col)
-    ifelse(loc_physical > 0, (loc_physical - loc) / loc_physical, NA_real_) else NA_real_
-)
+# derived columns — assigned directly to avoid dplyr if() evaluation issues
+df$risk_band <- cut(df$cc, breaks = c(0, BAND_BREAKS, Inf), labels = BAND_LABELS, right = TRUE)
+if (has_loc)      df$loc_band        <- ifelse(df$loc <= 24, "<=24 LOC", ">24 LOC")
+if (has_comments) df$has_comment_flag <- df$comment_count > 0
+if (has_comments && has_loc) df$comment_density <- ifelse(df$loc > 0, df$comment_words / df$loc, NA_real_)
+if (has_loc && "total_words" %in% names(df)) df$word_density <- ifelse(df$loc > 0, df$total_words / df$loc, NA_real_)
+if (has_id)       df$naming_score    <- df$avg_id_words * (1 - df$abbreviated_ratio)
+if (has_cog)      df$cog_ratio       <- ifelse(df$cc > 0, df$cognitive_complexity / df$cc, NA_real_)
+if (has_cog)      df$cog_excess      <- df$cognitive_complexity - df$cc
+if (has_loc_phys && has_loc) df$blank_ratio <- ifelse(df$loc_physical > 0, (df$loc_physical - df$loc) / df$loc_physical, NA_real_)
+if (has_loc)      df$cc_per_loc      <- ifelse(df$loc > 0, df$cc / df$loc, NA_real_)
 
-# repos metadata (optional - enriches project-level analysis)
+
 repos <- if (file.exists(REPOS_FILE)) {
-  read_csv(REPOS_FILE, show_col_types = FALSE) %>%
-    rename(project = full_name)
+  read_csv(REPOS_FILE, show_col_types = FALSE) %>% rename(project = full_name)
 } else {
-  cat("Note: repos.csv not found. Project-level metadata plots will be skipped.\n")
+  cat("Note: repos.csv not found. Project metadata skipped.\n")
   NULL
 }
 
-n         <- nrow(df)
-n_proj    <- n_distinct(df$project)
-cat(sprintf("Loaded %d methods across %d projects.\n", n, n_proj))
-
-# columns present?
-has_repos    <- !is.null(repos)
-has_cognitive <- "cognitive_complexity" %in% names(df) && sum(!is.na(df$cognitive_complexity)) > 0
-has_nesting  <- all(c("avg_nesting", "max_nesting") %in% names(df))
-has_id       <- all(c("avg_id_words", "abbreviated_ratio") %in% names(df))
-has_comments <- all(c("comment_count", "comment_words") %in% names(df))
-has_loc      <- "loc" %in% names(df)
+n      <- nrow(df)
+n_proj <- n_distinct(df$project)
+cat(sprintf("Loaded %d methods across %d projects.\n\n", n, n_proj))
 
 # =============================================================================
-# 2. DESCRIPTIVE STATISTICS TABLE
+# 2. DESCRIPTIVE STATISTICS  →  05_tables
 # =============================================================================
 
-cat("\n-- Descriptive Statistics --\n")
+cat("Computing descriptive statistics...\n")
 
-metric_cols <- c("cc", "cognitive_complexity", "loc", "loc_physical",
-                 "avg_nesting", "max_nesting", "avg_id_words",
-                 "abbreviated_ratio", "total_words", "comment_words")
-metric_cols <- intersect(metric_cols, names(df))
+stat_cols <- intersect(
+  c("cc", "cognitive_complexity", "loc", "loc_physical",
+    "avg_nesting", "max_nesting", "avg_id_words", "abbreviated_ratio",
+    "single_letter_ids", "longest_id", "total_words",
+    "comment_count", "comment_words",
+    "cc_per_loc", "cog_ratio", "cog_excess", "naming_score",
+    "comment_density", "word_density", "blank_ratio"),
+  names(df)
+)
 
-desc <- map_dfr(metric_cols, function(col) {
+desc <- map_dfr(stat_cols, function(col) {
   x <- df[[col]][!is.na(df[[col]])]
   tibble(
     metric   = col,
     n        = length(x),
     min      = min(x),
+    p5       = quantile(x, 0.05),
     q1       = quantile(x, 0.25),
     median   = median(x),
     mean     = mean(x),
     q3       = quantile(x, 0.75),
+    p95      = quantile(x, 0.95),
     max      = max(x),
     sd       = sd(x),
+    cv       = sd(x) / abs(mean(x)),
     skewness = skewness(x),
     kurtosis = kurtosis(x)
   )
 })
-
 print(desc, n = Inf)
-write_csv(desc, file.path(OUT, "descriptive_stats.csv"))
+write_csv(desc, file.path(DIR_TABLES, "descriptive_stats.csv"))
+
+band_counts <- df %>%
+  count(risk_band) %>%
+  mutate(pct = round(100 * n / sum(n), 2))
+write_csv(band_counts, file.path(DIR_TABLES, "risk_band_counts.csv"))
+
+top50 <- df %>%
+  select(project, class_name, method_name, cc,
+         any_of(c("cognitive_complexity", "loc", "max_nesting"))) %>%
+  arrange(desc(cc)) %>%
+  slice_head(n = 50)
+write_csv(top50, file.path(DIR_TABLES, "top50_complex_methods.csv"))
 
 # =============================================================================
-# 3. METRIC INTERCORRELATION ANALYSIS
+# 3. DISTRIBUTIONS  →  01_distributions
 # =============================================================================
 
-# --- 3a. Full correlation matrix with significance -------------------------
+cat("Generating distribution plots...\n")
 
-cat("\n-- Correlation Matrix --\n")
+hist_linear <- function(data, col, fill_col, title, xlab) {
+  x <- data[[col]][!is.na(data[[col]])]
+  ggplot(data.frame(x = x), aes(x = x)) +
+    geom_histogram(bins = 60, fill = fill_col, colour = "white", linewidth = 0.2) +
+    labs(title = title, x = xlab, y = "Method Count") +
+    theme_minimal(base_size = 12)
+}
+
+hist_loglog <- function(data, col, fill_col, title, xlab) {
+  x <- data[[col]][!is.na(data[[col]]) & data[[col]] > 0]
+  ggplot(data.frame(x = x), aes(x = x)) +
+    geom_histogram(bins = 60, fill = fill_col, colour = "white", linewidth = 0.2) +
+    scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = paste(title, "(log-log)"),
+         x = paste(xlab, "(log scale)"), y = "Method Count (log scale)") +
+    theme_minimal(base_size = 12)
+}
+
+ecdf_plot <- function(data, col, colour, title, xlab,
+                      log_x = FALSE, vlines = NULL, vline_colours = NULL) {
+  x <- data[[col]][!is.na(data[[col]]) & data[[col]] > 0]
+  p <- ggplot(data.frame(x = x), aes(x = x)) +
+    stat_ecdf(geom = "step", colour = colour, linewidth = 0.9) +
+    scale_y_continuous(labels = percent_format()) +
+    labs(title = paste("ECDF –", title),
+         subtitle = "% of methods at or below each value",
+         x = xlab, y = "Cumulative %") +
+    theme_minimal(base_size = 12)
+  if (log_x) p <- p + scale_x_log10(labels = label_comma())
+  if (!is.null(vlines))
+    for (i in seq_along(vlines))
+      p <- p + geom_vline(xintercept = vlines[i], linetype = "dashed",
+                          colour = vline_colours[i], linewidth = 0.6)
+  p
+}
+
+# ── 3A. CYCLOMATIC COMPLEXITY ─────────────────────────────────────────────────
+
+sp(hist_linear(df, "cc", "#1f77b4", "Cyclomatic Complexity Distribution", "CC"),
+   DIR_DIST, "01a_cc_histogram_linear.png")
+sp(hist_loglog(df, "cc", "#1f77b4", "Cyclomatic Complexity Distribution", "CC"),
+   DIR_DIST, "01b_cc_histogram_loglog.png")
+sp(ecdf_plot(df, "cc", "#1f77b4", "Cyclomatic Complexity", "CC",
+             log_x = TRUE, vlines = BAND_BREAKS,
+             vline_colours = BAND_COLOURS[-length(BAND_COLOURS)]),
+   DIR_DIST, "01c_cc_ecdf.png")
+
+# ── 3B. COGNITIVE COMPLEXITY ──────────────────────────────────────────────────
+
+if (has_cog) {
+  sp(hist_linear(df %>% filter(cognitive_complexity >= 0),
+                 "cognitive_complexity", "#9467bd",
+                 "Cognitive Complexity Distribution", "Cognitive Complexity"),
+     DIR_DIST, "02a_cognitive_histogram_linear.png")
+  sp(hist_loglog(df, "cognitive_complexity", "#9467bd",
+                 "Cognitive Complexity Distribution", "Cognitive Complexity"),
+     DIR_DIST, "02b_cognitive_histogram_loglog.png")
+  sp(ecdf_plot(df, "cognitive_complexity", "#9467bd",
+               "Cognitive Complexity", "Cognitive Complexity", log_x = TRUE),
+     DIR_DIST, "02c_cognitive_ecdf.png")
+  
+  # overlay density: CC vs Cognitive
+  overlay_df <- df %>%
+    filter(cc > 0, cognitive_complexity > 0) %>%
+    select(cc, cognitive_complexity) %>%
+    pivot_longer(everything(), names_to = "metric", values_to = "value") %>%
+    mutate(metric = recode(metric,
+                           cc = "Cyclomatic", cognitive_complexity = "Cognitive"))
+  
+  p_overlay <- ggplot(overlay_df, aes(x = value, colour = metric, fill = metric)) +
+    geom_density(alpha = 0.15, linewidth = 0.9, adjust = 1.5) +
+    scale_x_log10(labels = label_comma()) +
+    scale_colour_manual(values = c("Cyclomatic" = "#1f77b4", "Cognitive" = "#9467bd")) +
+    scale_fill_manual(  values = c("Cyclomatic" = "#1f77b4", "Cognitive" = "#9467bd")) +
+    labs(title = "Cyclomatic vs Cognitive Complexity — Density Overlay",
+         subtitle = "Log scale — shows how the two metrics distribute relative to each other",
+         x = "Complexity Score (log scale)", y = "Density",
+         colour = NULL, fill = NULL) +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+  sp(p_overlay, DIR_DIST, "02d_cc_vs_cognitive_density_overlay.png")
+}
+
+# ── 3C. LOC (NBNC) ────────────────────────────────────────────────────────────
+
+if (has_loc) {
+  sp(hist_linear(df, "loc", "#e377c2", "LOC (NBNC) Distribution", "Lines of Code"),
+     DIR_DIST, "03a_loc_histogram_linear.png")
+  sp(hist_loglog(df, "loc", "#e377c2", "LOC (NBNC) Distribution", "Lines of Code"),
+     DIR_DIST, "03b_loc_histogram_loglog.png")
+  sp(ecdf_plot(df, "loc", "#e377c2", "LOC (NBNC)", "Lines of Code",
+               log_x = TRUE, vlines = 24, vline_colours = "red"),
+     DIR_DIST, "03c_loc_ecdf.png")
+}
+
+# ── 3D. PHYSICAL LOC ─────────────────────────────────────────────────────────
+
+if (has_loc_phys) {
+  sp(hist_linear(df, "loc_physical", "#f7b6d2",
+                 "Physical LOC Distribution", "Physical Lines of Code"),
+     DIR_DIST, "04a_loc_physical_histogram_linear.png")
+  sp(hist_loglog(df, "loc_physical", "#f7b6d2",
+                 "Physical LOC Distribution", "Physical Lines of Code"),
+     DIR_DIST, "04b_loc_physical_histogram_loglog.png")
+  sp(ecdf_plot(df, "loc_physical", "#f7b6d2",
+               "Physical LOC", "Physical Lines of Code", log_x = TRUE),
+     DIR_DIST, "04c_loc_physical_ecdf.png")
+}
+
+# ── 3E. NESTING ───────────────────────────────────────────────────────────────
+
+if (has_nest) {
+  sp(hist_linear(df, "max_nesting", "#17becf",
+                 "Max Nesting Depth Distribution", "Max Nesting Depth"),
+     DIR_DIST, "05a_max_nesting_histogram_linear.png")
+  sp(hist_loglog(df, "max_nesting", "#17becf",
+                 "Max Nesting Depth Distribution", "Max Nesting Depth"),
+     DIR_DIST, "05b_max_nesting_histogram_loglog.png")
+  sp(ecdf_plot(df, "max_nesting", "#17becf",
+               "Max Nesting Depth", "Max Nesting Depth"),
+     DIR_DIST, "05c_max_nesting_ecdf.png")
+  sp(hist_linear(df, "avg_nesting", "#9edae5",
+                 "Average Nesting Depth Distribution", "Avg Nesting Depth"),
+     DIR_DIST, "05d_avg_nesting_histogram_linear.png")
+  sp(hist_loglog(df, "avg_nesting", "#9edae5",
+                 "Average Nesting Depth Distribution", "Avg Nesting Depth"),
+     DIR_DIST, "05e_avg_nesting_histogram_loglog.png")
+}
+
+# ── 3F. IDENTIFIER METRICS ────────────────────────────────────────────────────
+
+if (has_id) {
+  sp(hist_linear(df, "avg_id_words", "#e377c2",
+                 "Avg Identifier Word Count Distribution", "Avg Words per Identifier"),
+     DIR_DIST, "06a_avg_id_words_histogram_linear.png")
+  sp(hist_loglog(df, "avg_id_words", "#e377c2",
+                 "Avg Identifier Word Count Distribution", "Avg Words per Identifier"),
+     DIR_DIST, "06b_avg_id_words_histogram_loglog.png")
+  sp(ecdf_plot(df, "avg_id_words", "#e377c2",
+               "Avg Identifier Word Count", "Avg Words per Identifier"),
+     DIR_DIST, "06c_avg_id_words_ecdf.png")
+  sp(hist_linear(df, "abbreviated_ratio", "#bcbd22",
+                 "Abbreviated Identifier Ratio Distribution", "Abbreviated Ratio"),
+     DIR_DIST, "07a_abbreviated_ratio_histogram_linear.png")
+  sp(hist_loglog(df, "abbreviated_ratio", "#bcbd22",
+                 "Abbreviated Identifier Ratio Distribution", "Abbreviated Ratio"),
+     DIR_DIST, "07b_abbreviated_ratio_histogram_loglog.png")
+  sp(hist_linear(df, "single_letter_ids", "#dbdb8d",
+                 "Single-Letter Identifier Count Distribution", "Single-Letter ID Count"),
+     DIR_DIST, "07c_single_letter_ids_histogram_linear.png")
+  sp(hist_loglog(df, "single_letter_ids", "#dbdb8d",
+                 "Single-Letter Identifier Count Distribution", "Single-Letter ID Count"),
+     DIR_DIST, "07d_single_letter_ids_histogram_loglog.png")
+  sp(hist_linear(df, "longest_id", "#8c6d31",
+                 "Longest Identifier Length Distribution", "Characters"),
+     DIR_DIST, "07e_longest_id_histogram_linear.png")
+  sp(hist_loglog(df, "longest_id", "#8c6d31",
+                 "Longest Identifier Length Distribution", "Characters"),
+     DIR_DIST, "07f_longest_id_histogram_loglog.png")
+}
+
+# ── 3G. WORD COUNT ────────────────────────────────────────────────────────────
+
+if ("total_words" %in% names(df)) {
+  sp(hist_linear(df, "total_words", "#1f77b4",
+                 "Total Word Count per Method", "Total Words"),
+     DIR_DIST, "08a_total_words_histogram_linear.png")
+  sp(hist_loglog(df, "total_words", "#1f77b4",
+                 "Total Word Count per Method", "Total Words"),
+     DIR_DIST, "08b_total_words_histogram_loglog.png")
+}
+
+# ── 3H. COMMENT METRICS ───────────────────────────────────────────────────────
+
+if (has_comments) {
+  sp(hist_linear(df, "comment_count", "#2ca02c",
+                 "Comment Block Count per Method", "Comment Count"),
+     DIR_DIST, "09a_comment_count_histogram_linear.png")
+  sp(hist_loglog(df, "comment_count", "#2ca02c",
+                 "Comment Block Count per Method", "Comment Count"),
+     DIR_DIST, "09b_comment_count_histogram_loglog.png")
+  sp(hist_linear(df, "comment_words", "#98df8a",
+                 "Comment Word Count per Method", "Comment Words"),
+     DIR_DIST, "09c_comment_words_histogram_linear.png")
+  sp(hist_loglog(df, "comment_words", "#98df8a",
+                 "Comment Word Count per Method", "Comment Words"),
+     DIR_DIST, "09d_comment_words_histogram_loglog.png")
+  
+  comment_presence <- df %>%
+    mutate(label = ifelse(has_comment_flag, "Has comments", "No comments")) %>%
+    count(label) %>%
+    mutate(pct = round(100 * n / sum(n), 1))
+  p_cpres <- ggplot(comment_presence, aes(x = label, y = pct, fill = label)) +
+    geom_col(show.legend = FALSE) +
+    geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 4) +
+    scale_fill_manual(values = c("Has comments" = "#2ca02c", "No comments" = "#d62728")) +
+    labs(title = "Proportion of Methods With vs Without Comments",
+         x = NULL, y = "% of Methods") +
+    theme_minimal(base_size = 12)
+  sp(p_cpres, DIR_DIST, "09e_comment_presence_bar.png", w = 6, h = 5)
+}
+
+# ── 3I. DERIVED METRICS ───────────────────────────────────────────────────────
+
+if (has_loc) {
+  sp(hist_linear(df %>% filter(!is.na(cc_per_loc)), "cc_per_loc", "#ff7f0e",
+                 "CC per Line of Code Distribution", "CC / LOC"),
+     DIR_DIST, "10a_cc_per_loc_histogram_linear.png")
+  sp(hist_loglog(df %>% filter(!is.na(cc_per_loc)), "cc_per_loc", "#ff7f0e",
+                 "CC per Line of Code Distribution", "CC / LOC"),
+     DIR_DIST, "10b_cc_per_loc_histogram_loglog.png")
+}
+
+if (has_cog) {
+  sp(hist_linear(df %>% filter(!is.na(cog_excess)), "cog_excess", "#9467bd",
+                 "Cognitive Excess (Cognitive - Cyclomatic) Distribution",
+                 "Cognitive - Cyclomatic"),
+     DIR_DIST, "11a_cog_excess_histogram_linear.png")
+  sp(hist_linear(df %>% filter(!is.na(cog_ratio), cog_ratio > 0),
+                 "cog_ratio", "#c5b0d5",
+                 "Cognitive / Cyclomatic Ratio Distribution", "Cog / CC Ratio"),
+     DIR_DIST, "11b_cog_ratio_histogram_linear.png")
+  sp(hist_loglog(df %>% filter(!is.na(cog_ratio), cog_ratio > 0),
+                 "cog_ratio", "#c5b0d5",
+                 "Cognitive / Cyclomatic Ratio Distribution", "Cog / CC Ratio"),
+     DIR_DIST, "11c_cog_ratio_histogram_loglog.png")
+}
+
+if (has_id) {
+  sp(hist_linear(df %>% filter(!is.na(naming_score)), "naming_score", "#ff7f0e",
+                 "Naming Quality Score Distribution",
+                 "Naming Score (avg_id_words * (1 - abbrev_ratio))"),
+     DIR_DIST, "12a_naming_score_histogram_linear.png")
+  sp(hist_loglog(df %>% filter(!is.na(naming_score), naming_score > 0),
+                 "naming_score", "#ff7f0e",
+                 "Naming Quality Score Distribution", "Naming Score"),
+     DIR_DIST, "12b_naming_score_histogram_loglog.png")
+}
+
+# =============================================================================
+# 4. CORRELATIONS  →  02_correlations
+# =============================================================================
+
+cat("Generating correlation plots...\n")
 
 cor_cols <- intersect(
   c("cc", "cognitive_complexity", "loc", "loc_physical",
     "avg_nesting", "max_nesting", "avg_id_words", "abbreviated_ratio",
     "single_letter_ids", "longest_id", "total_words",
-    "comment_count", "comment_words"),
+    "comment_count", "comment_words",
+    "cc_per_loc", "cog_ratio", "naming_score",
+    "comment_density", "word_density", "blank_ratio"),
   names(df)
 )
 
 cor_data   <- df[, cor_cols] %>% drop_na()
 cor_matrix <- cor(cor_data, use = "pairwise.complete.obs")
-print(round(cor_matrix, 3))
 write_csv(as_tibble(cor_matrix, rownames = "metric"),
-          file.path(OUT, "correlation_matrix.csv"))
+          file.path(DIR_TABLES, "correlation_matrix.csv"))
 
 nice_names <- c(
-  cc                   = "Cyclomatic",
-  cognitive_complexity = "Cognitive",
+  cc                   = "Cyclomatic CC",
+  cognitive_complexity = "Cognitive CC",
   loc                  = "LOC (NBNC)",
   loc_physical         = "LOC (physical)",
   avg_nesting          = "Avg Nesting",
@@ -178,7 +435,13 @@ nice_names <- c(
   longest_id           = "Longest ID",
   total_words          = "Total Words",
   comment_count        = "Comment Count",
-  comment_words        = "Comment Words"
+  comment_words        = "Comment Words",
+  cc_per_loc           = "CC / LOC",
+  cog_ratio            = "Cog/CC Ratio",
+  naming_score         = "Naming Score",
+  comment_density      = "Comment Density",
+  word_density         = "Word Density",
+  blank_ratio          = "Blank Line Ratio"
 )
 
 cor_long <- as_tibble(cor_matrix, rownames = "var1") %>%
@@ -186,48 +449,200 @@ cor_long <- as_tibble(cor_matrix, rownames = "var1") %>%
   mutate(
     var1  = recode(var1, !!!nice_names),
     var2  = recode(var2, !!!nice_names),
-    label = ifelse(abs(r) >= 0.05, sprintf("%.2f", r), "")
+    label = sprintf("%.2f", r)  # every cell labelled
   )
 
-# Plot 01: Correlation heatmap
-p01 <- ggplot(cor_long, aes(x = var1, y = var2, fill = r)) +
-  geom_tile(colour = "white", linewidth = 0.4) +
-  geom_text(aes(label = label), size = 2.6) +
+n_vars     <- length(cor_cols)
+tile_size  <- max(10, n_vars * 0.65)
+
+p_corr <- ggplot(cor_long, aes(x = var1, y = var2, fill = r)) +
+  geom_tile(colour = "white", linewidth = 0.3) +
+  geom_text(aes(label = label), size = 2.4) +
   scale_fill_gradient2(low = "#d62728", mid = "white", high = "#1f77b4",
-                       midpoint = 0, limits = c(-1, 1), name = "r") +
-  labs(title = "Pearson Correlation Between All Complexity Metrics",
-       subtitle = "Cells suppressed below |r| = 0.05",
+                       midpoint = 0, limits = c(-1, 1), name = "Pearson r") +
+  labs(title = "Pearson Correlation Matrix — All Complexity Metrics",
        x = NULL, y = NULL) +
-  theme_minimal(base_size = 11) +
+  theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid  = element_blank())
-save_plot(p01, "01_correlation_heatmap.png", w = 11, h = 9)
+sp(p_corr, DIR_CORR, "01_correlation_heatmap_full.png",
+   w = tile_size, h = tile_size * 0.85)
 
-# --- 3b. Cyclomatic vs Cognitive: where do they diverge? ------------------
+# ── Scatter: CC vs each other metric (hex + lm) ───────────────────────────────
 
-if (has_cognitive) {
-  
-  # Ratio distribution: cog/cc — values above 1 mean cognitive penalises more
-  p02 <- ggplot(df %>% filter(!is.na(cog_ratio), cog_ratio > 0, cc >= 2),
-                aes(x = cc, y = cog_ratio)) +
-    geom_hex(bins = 60) +
-    geom_hline(yintercept = 1, linetype = "dashed", colour = "red", linewidth = 0.8) +
-    geom_smooth(method = "loess", span = 0.5, colour = "orange",
-                se = FALSE, linewidth = 1) +
+scatter_pairs <- list(
+  list(x="loc",               xlab="LOC (NBNC)",        col="#e377c2", file="02_cc_vs_loc.png"),
+  list(x="loc_physical",      xlab="LOC (physical)",    col="#f7b6d2", file="03_cc_vs_loc_physical.png"),
+  list(x="max_nesting",       xlab="Max Nesting Depth", col="#17becf", file="04_cc_vs_max_nesting.png"),
+  list(x="avg_nesting",       xlab="Avg Nesting Depth", col="#9edae5", file="05_cc_vs_avg_nesting.png"),
+  list(x="avg_id_words",      xlab="Avg ID Words",      col="#e377c2", file="06_cc_vs_avg_id_words.png"),
+  list(x="abbreviated_ratio", xlab="Abbreviated Ratio", col="#bcbd22", file="07_cc_vs_abbreviated_ratio.png"),
+  list(x="single_letter_ids", xlab="Single-letter IDs", col="#dbdb8d", file="08_cc_vs_single_letter_ids.png"),
+  list(x="total_words",       xlab="Total Words",       col="#1f77b4", file="09_cc_vs_total_words.png"),
+  list(x="comment_count",     xlab="Comment Count",     col="#2ca02c", file="10_cc_vs_comment_count.png"),
+  list(x="comment_words",     xlab="Comment Words",     col="#98df8a", file="11_cc_vs_comment_words.png"),
+  list(x="longest_id",        xlab="Longest Identifier",col="#8c6d31", file="12_cc_vs_longest_id.png"),
+  list(x="naming_score",      xlab="Naming Score",      col="#ff7f0e", file="13_cc_vs_naming_score.png")
+)
+
+for (pair in scatter_pairs) {
+  if (!(pair$x %in% names(df))) next
+  r_val <- cor(df$cc, df[[pair$x]], use = "complete.obs")
+  p <- ggplot(df %>% filter(!is.na(.data[[pair$x]]), .data[[pair$x]] > 0, cc > 0),
+              aes(x = .data[[pair$x]], y = cc)) +
+    geom_hex(bins = 70) +
+    scale_fill_viridis_c(trans = "log10", name = "Methods") +
+    geom_smooth(method = "lm", colour = "orange", se = TRUE,
+                linewidth = 0.9, alpha = 0.3) +
     scale_x_log10(labels = label_comma()) +
     scale_y_log10(labels = label_comma()) +
-    scale_fill_viridis_c(trans = "log10", name = "Methods") +
-    labs(title = "Cognitive / Cyclomatic Ratio vs Cyclomatic Complexity",
-         subtitle = "Above red line: cognitive complexity scores relatively higher than cyclomatic",
-         x = "Cyclomatic Complexity (log)", y = "Cognitive / Cyclomatic Ratio (log)") +
+    annotate("text", x = Inf, y = Inf, label = sprintf("r = %.3f", r_val),
+             hjust = 1.1, vjust = 1.5, size = 4, family = "mono") +
+    labs(title = sprintf("Cyclomatic CC vs %s", pair$xlab),
+         x = sprintf("%s (log scale)", pair$xlab),
+         y = "Cyclomatic CC (log scale)") +
     theme_minimal(base_size = 12)
-  save_plot(p02, "02_cog_cc_ratio_vs_cc.png")
-  
-  # Methods where the two metrics strongly disagree
-  df_disagree <- df %>%
-    filter(!is.na(cog_ratio), cc >= 3) %>%
-    mutate(
+  sp(p, DIR_CORR, pair$file)
+}
+
+if (has_cog) {
+  r_cc_cog <- cor(df$cc, df$cognitive_complexity, use = "complete.obs")
+  p_cc_cog <- ggplot(df %>% filter(cc > 0, cognitive_complexity > 0),
+                     aes(x = cc, y = cognitive_complexity)) +
+    geom_hex(bins = 70) +
+    scale_fill_viridis_c(trans = "log10", name = "Methods") +
+    geom_smooth(method = "lm", colour = "orange", se = TRUE,
+                linewidth = 0.9, alpha = 0.3) +
+    scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
+    annotate("text", x = Inf, y = Inf, label = sprintf("r = %.3f", r_cc_cog),
+             hjust = 1.1, vjust = 1.5, size = 4, family = "mono") +
+    labs(title = "Cyclomatic CC vs Cognitive Complexity",
+         x = "Cyclomatic CC (log scale)", y = "Cognitive Complexity (log scale)") +
+    theme_minimal(base_size = 12)
+  sp(p_cc_cog, DIR_CORR, "14_cc_vs_cognitive.png")
+}
+
+if (has_loc && has_loc_phys) {
+  r_loc <- cor(df$loc, df$loc_physical, use = "complete.obs")
+  p_locs <- ggplot(df %>% filter(loc > 0, loc_physical > 0),
+                   aes(x = loc, y = loc_physical)) +
+    geom_hex(bins = 70) +
+    scale_fill_viridis_c(trans = "log10", name = "Methods") +
+    geom_abline(slope = 1, intercept = 0, colour = "red",
+                linetype = "dashed", linewidth = 0.8) +
+    scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
+    annotate("text", x = Inf, y = Inf,
+             label = sprintf("r = %.3f\nred = equal", r_loc),
+             hjust = 1.1, vjust = 1.5, size = 3.5, family = "mono") +
+    labs(title = "LOC (NBNC) vs Physical LOC",
+         subtitle = "Points above red line have more blank/comment lines",
+         x = "LOC NBNC (log scale)", y = "Physical LOC (log scale)") +
+    theme_minimal(base_size = 12)
+  sp(p_locs, DIR_CORR, "15_loc_vs_loc_physical.png")
+}
+
+# =============================================================================
+# 5. RISK BANDS  →  03_risk_bands
+# =============================================================================
+
+cat("Generating risk band plots...\n")
+
+p_band_bar <- ggplot(band_counts, aes(x = risk_band, y = pct, fill = risk_band)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 3.5) +
+  scale_fill_manual(values = BAND_COLOURS) +
+  labs(title = "Methods by CC Risk Band", x = "CC Band", y = "% of Methods") +
+  theme_minimal(base_size = 12)
+sp(p_band_bar, DIR_BANDS, "01_risk_band_distribution.png", w = 7, h = 5)
+
+band_metric_plots <- list(
+  list(col="loc",               ylab="LOC (NBNC)",          log_y=TRUE,  file="02_loc_by_cc_band.png"),
+  list(col="loc_physical",      ylab="Physical LOC",        log_y=TRUE,  file="03_loc_physical_by_cc_band.png"),
+  list(col="max_nesting",       ylab="Max Nesting Depth",   log_y=TRUE,  file="04_max_nesting_by_cc_band.png"),
+  list(col="avg_nesting",       ylab="Avg Nesting Depth",   log_y=FALSE, file="05_avg_nesting_by_cc_band.png"),
+  list(col="avg_id_words",      ylab="Avg ID Words",        log_y=FALSE, file="06_avg_id_words_by_cc_band.png"),
+  list(col="abbreviated_ratio", ylab="Abbreviated Ratio",   log_y=FALSE, file="07_abbreviated_ratio_by_cc_band.png"),
+  list(col="single_letter_ids", ylab="Single-letter IDs",   log_y=TRUE,  file="08_single_letter_ids_by_cc_band.png"),
+  list(col="total_words",       ylab="Total Words",         log_y=TRUE,  file="09_total_words_by_cc_band.png"),
+  list(col="comment_count",     ylab="Comment Count",       log_y=TRUE,  file="10_comment_count_by_cc_band.png"),
+  list(col="comment_words",     ylab="Comment Words",       log_y=TRUE,  file="11_comment_words_by_cc_band.png"),
+  list(col="naming_score",      ylab="Naming Score",        log_y=FALSE, file="12_naming_score_by_cc_band.png"),
+  list(col="comment_density",   ylab="Comment Words / LOC", log_y=TRUE,  file="13_comment_density_by_cc_band.png"),
+  list(col="cc_per_loc",        ylab="CC / LOC",            log_y=TRUE,  file="14_cc_per_loc_by_cc_band.png")
+)
+
+for (bm in band_metric_plots) {
+  if (!(bm$col %in% names(df))) next
+  plot_df <- df %>% filter(!is.na(risk_band), !is.na(.data[[bm$col]]))
+  if (bm$log_y) plot_df <- plot_df %>% filter(.data[[bm$col]] > 0)
+  meds <- plot_df %>%
+    group_by(risk_band) %>%
+    summarise(med = median(.data[[bm$col]], na.rm = TRUE), .groups = "drop")
+  p <- ggplot(plot_df, aes(x = risk_band, y = .data[[bm$col]], fill = risk_band)) +
+    geom_boxplot(outlier.size = 0.4, outlier.alpha = 0.2, alpha = 0.8) +
+    geom_text(data = meds, aes(x = risk_band, y = med,
+                               label = sprintf("%.2g", med)),
+              vjust = -0.6, size = 2.8, inherit.aes = FALSE) +
+    scale_fill_manual(values = BAND_COLOURS) +
+    labs(title = sprintf("%s by CC Risk Band", bm$ylab),
+         x = "CC Risk Band", y = bm$ylab) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "none")
+  if (bm$log_y) p <- p + scale_y_log10(labels = label_comma())
+  sp(p, DIR_BANDS, bm$file, w = 8, h = 5)
+}
+
+# ridgeline
+ridge_cols <- intersect(
+  c("loc", "max_nesting", "avg_id_words", "abbreviated_ratio",
+    "total_words", "comment_words", "cognitive_complexity"),
+  names(df)
+)
+if (length(ridge_cols) >= 2) {
+  ridge_df <- df %>%
+    filter(!is.na(risk_band)) %>%
+    select(risk_band, all_of(ridge_cols)) %>%
+    pivot_longer(-risk_band, names_to = "metric", values_to = "value") %>%
+    filter(!is.na(value), value > 0) %>%
+    mutate(metric = recode(metric, !!!nice_names))
+  p_ridge <- ggplot(ridge_df, aes(x = value, y = risk_band, fill = risk_band)) +
+    geom_density_ridges(alpha = 0.7, scale = 1.2, rel_min_height = 0.01) +
+    scale_fill_manual(values = BAND_COLOURS) +
+    scale_x_log10(labels = label_comma()) +
+    facet_wrap(~ metric, scales = "free_x", ncol = 2) +
+    labs(title = "Metric Distributions by CC Risk Band (Ridgeline)",
+         x = "Value (log scale)", y = "CC Risk Band") +
+    theme_minimal(base_size = 11) +
+    theme(legend.position = "none", strip.text = element_text(face = "bold"))
+  sp(p_ridge, DIR_BANDS, "15_ridgeline_all_metrics_by_cc_band.png", w = 12, h = 14)
+}
+
+if (has_comments) {
+  comment_rate <- df %>%
+    filter(!is.na(risk_band)) %>%
+    group_by(risk_band) %>%
+    summarise(pct_commented = round(100 * mean(comment_count > 0, na.rm = TRUE), 1),
+              .groups = "drop")
+  write_csv(comment_rate, file.path(DIR_TABLES, "comment_rate_by_band.csv"))
+  p_crate <- ggplot(comment_rate, aes(x = risk_band, y = pct_commented, fill = risk_band)) +
+    geom_col(show.legend = FALSE) +
+    geom_text(aes(label = paste0(pct_commented, "%")), vjust = -0.4, size = 3.5) +
+    scale_fill_manual(values = BAND_COLOURS) +
+    coord_cartesian(ylim = c(0, max(comment_rate$pct_commented) * 1.15)) +
+    labs(title = "% of Methods With Comments by CC Risk Band",
+         x = "CC Risk Band", y = "% Methods With Comments") +
+    theme_minimal(base_size = 12)
+  sp(p_crate, DIR_BANDS, "16_comment_rate_by_cc_band.png", w = 7, h = 5)
+}
+
+# metric agreement bands (both unfiltered and CC>=3)
+if (has_cog) {
+  classify_agree <- function(d) {
+    d %>% mutate(
       agree_band = case_when(
+        is.na(cog_ratio) ~ NA_character_,
         cog_ratio < 0.5  ~ "Cyclomatic much higher",
         cog_ratio < 0.8  ~ "Cyclomatic slightly higher",
         cog_ratio <= 1.2 ~ "Roughly equal",
@@ -236,709 +651,740 @@ if (has_cognitive) {
       ),
       agree_band = factor(agree_band, levels = c(
         "Cyclomatic much higher", "Cyclomatic slightly higher",
-        "Roughly equal",
-        "Cognitive slightly higher", "Cognitive much higher"))
+        "Roughly equal", "Cognitive slightly higher", "Cognitive much higher"))
     )
-  
-  agree_summary <- df_disagree %>%
-    count(agree_band) %>%
-    mutate(pct = round(100 * n / sum(n), 1))
-  print(agree_summary)
-  write_csv(agree_summary, file.path(OUT, "metric_agreement_summary.csv"))
-  
-  p03 <- ggplot(agree_summary, aes(x = agree_band, y = pct, fill = agree_band)) +
-    geom_col(show.legend = FALSE) +
-    geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 3.5) +
-    scale_fill_manual(values = c(
-      "Cyclomatic much higher"   = "#1f77b4",
-      "Cyclomatic slightly higher" = "#aec7e8",
-      "Roughly equal"            = "#98df8a",
-      "Cognitive slightly higher" = "#ffbb78",
-      "Cognitive much higher"    = "#d62728"
-    )) +
-    labs(title = "Agreement Between Cyclomatic and Cognitive Complexity",
-         subtitle = "Methods with CC >= 3 only; ratio = cognitive / cyclomatic",
-         x = NULL, y = "% of Methods") +
-    theme_minimal(base_size = 12) +
-    theme(axis.text.x = element_text(angle = 20, hjust = 1))
-  save_plot(p03, "03_metric_agreement_bands.png", w = 9, h = 5)
-  
-  # What structural features predict high cognitive penalty?
-  # cc_residual: how much cognitive EXCEEDS what cyclomatic predicts
-  df_res <- df %>%
-    filter(cc > 0, cognitive_complexity >= 0, !is.na(cc)) %>%
-    mutate(cog_excess = cognitive_complexity - cc)
-  
-  cat("\n-- Cognitive excess (cognitive - cyclomatic) summary --\n")
-  cat(sprintf("  Mean excess:   %.2f\n",   mean(df_res$cog_excess)))
-  cat(sprintf("  Median excess: %.2f\n", median(df_res$cog_excess)))
-  cat(sprintf("  %% where cognitive > cyclomatic: %.1f%%\n",
-              100 * mean(df_res$cog_excess > 0)))
-  
-  write_csv(
-    df_res %>%
-      summarise(mean_excess   = mean(cog_excess),
-                median_excess = median(cog_excess),
-                pct_cog_wins  = 100 * mean(cog_excess > 0)),
-    file.path(OUT, "cognitive_excess_summary.csv")
+  }
+  agree_colours <- c(
+    "Cyclomatic much higher"     = "#1f77b4",
+    "Cyclomatic slightly higher" = "#aec7e8",
+    "Roughly equal"              = "#98df8a",
+    "Cognitive slightly higher"  = "#ffbb78",
+    "Cognitive much higher"      = "#d62728"
   )
   
-  # Excess by nesting: does deep nesting drive cognitive penalty?
-  if (has_nesting) {
-    p04 <- ggplot(df_res %>% filter(max_nesting <= 15) %>%
-                    sample_frac(min(1, 100000 / nrow(.))),
-                  aes(x = factor(max_nesting), y = cog_excess)) +
-      geom_boxplot(fill = "#9467bd", alpha = 0.6,
-                   outlier.size = 0.5, outlier.alpha = 0.3) +
-      geom_hline(yintercept = 0, linetype = "dashed", colour = "red") +
-      labs(title = "Cognitive Excess (Cognitive - Cyclomatic) by Max Nesting Depth",
-           subtitle = "Positive = cognitive penalises more; driven by nesting penalty in cognitive spec",
-           x = "Max Nesting Depth", y = "Cognitive - Cyclomatic") +
-      theme_minimal(base_size = 12)
-    save_plot(p04, "04_cog_excess_by_nesting.png")
+  for (filt in list(list(label="all_methods", min_cc=1),
+                    list(label="cc3plus",      min_cc=3))) {
+    df_a <- classify_agree(df %>% filter(!is.na(cog_ratio), cc >= filt$min_cc))
+    agg  <- df_a %>% count(agree_band) %>% drop_na() %>%
+      mutate(pct = round(100 * n / sum(n), 1))
+    write_csv(agg, file.path(DIR_TABLES,
+                             sprintf("metric_agreement_%s.csv", filt$label)))
+    subtitle <- if (filt$min_cc == 1)
+      "All methods; ratio = cognitive / cyclomatic"
+    else
+      "CC >= 3 only — low-CC methods trivially score 0 on cognitive"
+    p_a <- ggplot(agg, aes(x = agree_band, y = pct, fill = agree_band)) +
+      geom_col(show.legend = FALSE) +
+      geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 3.5) +
+      scale_fill_manual(values = agree_colours) +
+      labs(title = "Agreement Between Cyclomatic and Cognitive Complexity",
+           subtitle = subtitle, x = NULL, y = "% of Methods") +
+      theme_minimal(base_size = 12) +
+      theme(axis.text.x = element_text(angle = 20, hjust = 1))
+    sp(p_a, DIR_BANDS,
+       sprintf("17%s_metric_agreement_%s.png",
+               ifelse(filt$min_cc == 1, "a", "b"), filt$label),
+       w = 9, h = 5)
   }
 }
 
 # =============================================================================
-# 4. COMPLEXITY METRIC DISTRIBUTIONS (density overlays, comparable scale)
+# 6. PROJECT-LEVEL  →  04_projects
 # =============================================================================
 
-# Overlay normalised density for cc, cognitive, loc on the same plot so you
-# can visually compare their shape/spread
+cat("Generating project-level plots...\n")
 
-if (has_cognitive && has_loc) {
+project_stats <- df %>%
+  group_by(project) %>%
+  summarise(
+    n_methods   = n(),
+    median_cc   = median(cc),
+    mean_cc     = round(mean(cc), 2),
+    sd_cc       = round(sd(cc), 2),
+    max_cc      = max(cc),
+    pct_cc_gt5  = round(100 * mean(cc > 5),  2),
+    pct_cc_gt10 = round(100 * mean(cc > 10), 2),
+    pct_cc_gt25 = round(100 * mean(cc > 25), 2),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(median_cc))
+
+# add optional columns after grouping, not inside summarise
+if (has_cog)
+  project_stats$median_cognitive <- df %>% group_by(project) %>%
+  summarise(v = median(cognitive_complexity, na.rm = TRUE), .groups = "drop") %>%
+  { .$v[match(project_stats$project, .$project)] }
+
+if (has_loc)
+  project_stats$median_loc <- df %>% group_by(project) %>%
+  summarise(v = median(loc, na.rm = TRUE), .groups = "drop") %>%
+  { .$v[match(project_stats$project, .$project)] }
+
+if (has_nest)
+  project_stats$median_nesting <- df %>% group_by(project) %>%
+  summarise(v = median(max_nesting, na.rm = TRUE), .groups = "drop") %>%
+  { .$v[match(project_stats$project, .$project)] }
+
+if (has_comments)
+  project_stats$pct_commented <- df %>% group_by(project) %>%
+  summarise(v = round(100 * mean(comment_count > 0, na.rm = TRUE), 1), .groups = "drop") %>%
+  { .$v[match(project_stats$project, .$project)] }
+
+write_csv(project_stats, file.path(DIR_TABLES, "project_summary.csv"))
+
+if (!is.null(repos)) {
+  project_stats <- project_stats %>%
+    left_join(repos %>% select(project, stars, forks,
+                               commit_count, size_kb, java_file_count),
+              by = "project")
+}
+
+project_order <- project_stats %>% arrange(median_cc) %>% pull(project)
+ps <- function(x) str_extract(x, "[^/]+$")
+
+p_proj_box <- ggplot(df %>% filter(cc > 0),
+                     aes(x = factor(project, levels = project_order), y = cc)) +
+  geom_boxplot(outlier.size = 0.4, outlier.alpha = 0.2, fill = "#4C72B0", alpha = 0.7) +
+  coord_flip() +
+  scale_y_log10(labels = label_comma()) +
+  scale_x_discrete(labels = ps) +
+  labs(title = "CC Distribution per Project (sorted by median)",
+       x = NULL, y = "Cyclomatic Complexity (log scale)") +
+  theme_minimal(base_size = 8)
+sp(p_proj_box, DIR_PROJ, "01_cc_boxplot_per_project.png",
+   w = 12, h = max(6, n_proj * 0.28 + 2))
+
+p_proj_bar <- ggplot(project_stats %>% mutate(proj = ps(project)),
+                     aes(x = reorder(proj, median_cc), y = median_cc)) +
+  geom_col(fill = "#4C72B0", alpha = 0.8) +
+  coord_flip() +
+  labs(title = "Median Cyclomatic Complexity per Project", x = NULL, y = "Median CC") +
+  theme_minimal(base_size = 8)
+sp(p_proj_bar, DIR_PROJ, "02_median_cc_per_project.png",
+   w = 10, h = max(6, n_proj * 0.28 + 2))
+
+p_proj_pct <- ggplot(project_stats %>% mutate(proj = ps(project)),
+                     aes(x = reorder(proj, pct_cc_gt10), y = pct_cc_gt10)) +
+  geom_col(fill = "#d62728", alpha = 0.8) +
+  coord_flip() +
+  labs(title = "% Methods with CC > 10 per Project", x = NULL, y = "% Methods CC > 10") +
+  theme_minimal(base_size = 8)
+sp(p_proj_pct, DIR_PROJ, "03_pct_high_cc_per_project.png",
+   w = 10, h = max(6, n_proj * 0.28 + 2))
+
+p_size_cc <- ggplot(project_stats, aes(x = n_methods, y = median_cc)) +
+  geom_point(alpha = 0.6, size = 2, colour = "#4C72B0") +
+  geom_smooth(method = "lm", colour = "orange", se = TRUE) +
+  scale_x_log10(labels = label_comma()) +
+  labs(title = "Project Size (Method Count) vs Median CC",
+       x = "Number of Methods (log scale)", y = "Median CC") +
+  theme_minimal(base_size = 12)
+sp(p_size_cc, DIR_PROJ, "04_project_size_vs_median_cc.png")
+
+if (!is.null(repos) && "commit_count" %in% names(project_stats)) {
+  ps_commits <- project_stats %>% filter(!is.na(commit_count), commit_count > 0)
+  if (nrow(ps_commits) > 0) {
+    p_commits <- ggplot(ps_commits, aes(x = commit_count, y = median_cc, size = n_methods)) +
+      geom_point(alpha = 0.6, colour = "#4C72B0") +
+      geom_smooth(method = "lm", colour = "orange", se = TRUE, inherit.aes = FALSE,
+                  data = ps_commits, aes(x = commit_count, y = median_cc)) +
+      scale_x_log10(labels = label_comma()) +
+      scale_size_continuous(name = "Methods", range = c(2, 8)) +
+      labs(title = "Commit Count vs Median Project CC",
+           x = "Commit Count (log scale)", y = "Median CC") +
+      theme_minimal(base_size = 12)
+    sp(p_commits, DIR_PROJ, "05_commits_vs_median_cc.png")
+  }
+}
+
+# =============================================================================
+# 7. NORMALITY & SHAPE  →  05_tables
+# =============================================================================
+
+cat("Running normality tests...\n")
+
+norm_cols <- intersect(c("cc", "cognitive_complexity", "loc", "max_nesting",
+                         "avg_id_words", "total_words"), names(df))
+
+norm_results <- map_dfr(norm_cols, function(col) {
+  x    <- df[[col]][!is.na(df[[col]]) & df[[col]] > 0]
+  sw_s <- sample(x, min(5000, length(x)))
+  sw   <- shapiro.test(sw_s)
+  ks   <- ks.test(x, "plnorm", meanlog = mean(log(x)), sdlog = sd(log(x)))
+  tibble(metric         = col,
+         sw_W           = round(sw$statistic, 5),
+         sw_p           = sw$p.value,
+         ks_D           = round(ks$statistic, 5),
+         ks_p           = ks$p.value,
+         fits_lognormal = ks$p.value > 0.05)
+})
+print(norm_results)
+write_csv(norm_results, file.path(DIR_TABLES, "normality_tests.csv"))
+
+shape_stats <- map_dfr(norm_cols, function(col) {
+  x <- df[[col]][!is.na(df[[col]]) & df[[col]] > 0]
+  tibble(metric   = col,
+         skewness = round(skewness(x), 3),
+         kurtosis = round(kurtosis(x), 3),
+         cv       = round(sd(x) / mean(x), 3))
+})
+write_csv(shape_stats, file.path(DIR_TABLES, "distributional_shape.csv"))
+
+# =============================================================================
+# 8. SUMMARY REPORT
+# =============================================================================
+report <- c(
+  "================================================================",
+  "  COMPLEXITY ANALYSIS SUMMARY",
+  "================================================================",
+  sprintf("  Generated : %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
+  sprintf("  Methods   : %s", format(n, big.mark = ",")),
+  sprintf("  Projects  : %d", n_proj),
+  "",
   
-  overlay_df <- df %>%
-    select(cc, cognitive_complexity, loc) %>%
-    drop_na() %>%
-    filter(cc > 0, cognitive_complexity >= 0, loc > 0) %>%
-    pivot_longer(everything(), names_to = "metric", values_to = "value") %>%
+  # ── CYCLOMATIC COMPLEXITY ──────────────────────────────────────
+  "----------------------------------------------------------------",
+  "  CYCLOMATIC COMPLEXITY (CC)",
+  "----------------------------------------------------------------",
+  sprintf("  Min      : %g",    min(df$cc)),
+  sprintf("  P5       : %g",    quantile(df$cc, 0.05)),
+  sprintf("  Q1       : %g",    quantile(df$cc, 0.25)),
+  sprintf("  Median   : %g",    median(df$cc)),
+  sprintf("  Mean     : %.2f",  mean(df$cc)),
+  sprintf("  Q3       : %g",    quantile(df$cc, 0.75)),
+  sprintf("  P95      : %g",    quantile(df$cc, 0.95)),
+  sprintf("  Max      : %g",    max(df$cc)),
+  sprintf("  SD       : %.2f",  sd(df$cc)),
+  sprintf("  Skewness : %.2f",  skewness(df$cc)),
+  sprintf("  Kurtosis : %.1f",  kurtosis(df$cc)),
+  "",
+  "  Risk Band Distribution:",
+  paste(apply(band_counts, 1, function(r)
+    sprintf("    CC %-6s  %5s%%   (%s methods)",
+            r["risk_band"], r["pct"],
+            format(as.integer(r["n"]), big.mark = ","))),
+    collapse = "\n"),
+  sprintf("  %% with CC > 5  : %.1f%%", 100 * mean(df$cc > 5)),
+  sprintf("  %% with CC > 10 : %.1f%%", 100 * mean(df$cc > 10)),
+  sprintf("  %% with CC > 25 : %.1f%%", 100 * mean(df$cc > 25)),
+  "",
+  
+  # ── COGNITIVE COMPLEXITY ───────────────────────────────────────
+  if (has_cog) "----------------------------------------------------------------",
+  if (has_cog) "  COGNITIVE COMPLEXITY",
+  if (has_cog) "----------------------------------------------------------------",
+  if (has_cog) sprintf("  Min      : %g",    min(df$cognitive_complexity,  na.rm = TRUE)),
+  if (has_cog) sprintf("  P5       : %g",    quantile(df$cognitive_complexity, 0.05, na.rm = TRUE)),
+  if (has_cog) sprintf("  Median   : %g",    median(df$cognitive_complexity,   na.rm = TRUE)),
+  if (has_cog) sprintf("  Mean     : %.2f",  mean(df$cognitive_complexity,     na.rm = TRUE)),
+  if (has_cog) sprintf("  P95      : %g",    quantile(df$cognitive_complexity, 0.95, na.rm = TRUE)),
+  if (has_cog) sprintf("  Max      : %g",    max(df$cognitive_complexity,      na.rm = TRUE)),
+  if (has_cog) sprintf("  SD       : %.2f",  sd(df$cognitive_complexity,       na.rm = TRUE)),
+  if (has_cog) sprintf("  Skewness : %.2f",  skewness(df$cognitive_complexity[!is.na(df$cognitive_complexity)])),
+  if (has_cog) sprintf("  r(CC, Cognitive)  : %.3f", cor(df$cc, df$cognitive_complexity, use = "complete.obs")),
+  if (has_cog) sprintf("  Median cog excess : %.2f  (cognitive - cyclomatic)", median(df$cog_excess, na.rm = TRUE)),
+  if (has_cog) sprintf("  %% methods cog > cc : %.1f%%", 100 * mean(df$cog_excess > 0, na.rm = TRUE)),
+  if (has_cog) "",
+  
+  # ── LOC ────────────────────────────────────────────────────────
+  if (has_loc) "----------------------------------------------------------------",
+  if (has_loc) "  LINES OF CODE (NBNC LOC)",
+  if (has_loc) "----------------------------------------------------------------",
+  if (has_loc) sprintf("  Min      : %g",    min(df$loc,            na.rm = TRUE)),
+  if (has_loc) sprintf("  P5       : %g",    quantile(df$loc, 0.05, na.rm = TRUE)),
+  if (has_loc) sprintf("  Median   : %g",    median(df$loc,         na.rm = TRUE)),
+  if (has_loc) sprintf("  Mean     : %.2f",  mean(df$loc,           na.rm = TRUE)),
+  if (has_loc) sprintf("  P95      : %g",    quantile(df$loc, 0.95, na.rm = TRUE)),
+  if (has_loc) sprintf("  Max      : %g",    max(df$loc,            na.rm = TRUE)),
+  if (has_loc) sprintf("  SD       : %.2f",  sd(df$loc,             na.rm = TRUE)),
+  if (has_loc) sprintf("  Skewness : %.2f",  skewness(df$loc[!is.na(df$loc)])),
+  if (has_loc) sprintf("  r(CC, LOC)        : %.3f", cor(df$cc, df$loc, use = "complete.obs")),
+  if (has_loc) sprintf("  %% methods > 24 LOC : %.1f%%", 100 * mean(df$loc > 24, na.rm = TRUE)),
+  if (has_loc && has_loc_phys) sprintf("  r(LOC, LOC_phys)  : %.3f", cor(df$loc, df$loc_physical, use = "complete.obs")),
+  if (has_loc) "",
+  
+  # ── NESTING ────────────────────────────────────────────────────
+  if (has_nest) "----------------------------------------------------------------",
+  if (has_nest) "  NESTING DEPTH",
+  if (has_nest) "----------------------------------------------------------------",
+  if (has_nest) sprintf("  Max Nesting — Median : %g",   median(df$max_nesting, na.rm = TRUE)),
+  if (has_nest) sprintf("  Max Nesting — Mean   : %.2f", mean(df$max_nesting,   na.rm = TRUE)),
+  if (has_nest) sprintf("  Max Nesting — P95    : %g",   quantile(df$max_nesting, 0.95, na.rm = TRUE)),
+  if (has_nest) sprintf("  Max Nesting — Max    : %g",   max(df$max_nesting,    na.rm = TRUE)),
+  if (has_nest) sprintf("  Avg Nesting — Median : %.2f", median(df$avg_nesting, na.rm = TRUE)),
+  if (has_nest) sprintf("  r(CC, max_nesting)   : %.3f", cor(df$cc, df$max_nesting, use = "complete.obs")),
+  if (has_nest && has_cog) sprintf("  r(Cog, max_nesting)  : %.3f", cor(df$cognitive_complexity, df$max_nesting, use = "complete.obs")),
+  if (has_nest) sprintf("  %% methods nesting=0  : %.1f%%", 100 * mean(df$max_nesting == 0, na.rm = TRUE)),
+  if (has_nest) sprintf("  %% methods nesting>=3 : %.1f%%", 100 * mean(df$max_nesting >= 3, na.rm = TRUE)),
+  if (has_nest) "",
+  
+  # ── IDENTIFIER / NAMING ────────────────────────────────────────
+  if (has_id) "----------------------------------------------------------------",
+  if (has_id) "  IDENTIFIER & NAMING METRICS",
+  if (has_id) "----------------------------------------------------------------",
+  if (has_id) sprintf("  Avg ID words — Median   : %.2f", median(df$avg_id_words,      na.rm = TRUE)),
+  if (has_id) sprintf("  Avg ID words — Mean     : %.2f", mean(df$avg_id_words,        na.rm = TRUE)),
+  if (has_id) sprintf("  Abbrev ratio — Median   : %.3f", median(df$abbreviated_ratio, na.rm = TRUE)),
+  if (has_id) sprintf("  Abbrev ratio — Mean     : %.3f", mean(df$abbreviated_ratio,   na.rm = TRUE)),
+  if (has_id) sprintf("  Single-letter IDs — Med : %g",   median(df$single_letter_ids, na.rm = TRUE)),
+  if (has_id) sprintf("  Longest ID — Median     : %g",   median(df$longest_id,        na.rm = TRUE)),
+  if (has_id) sprintf("  Naming score — Median   : %.3f", median(df$naming_score,      na.rm = TRUE)),
+  if (has_id) sprintf("  r(CC, naming_score)     : %.3f", cor(df$cc, df$naming_score,  use = "complete.obs")),
+  if (has_id) sprintf("  r(CC, abbrev_ratio)     : %.3f", cor(df$cc, df$abbreviated_ratio, use = "complete.obs")),
+  if (has_id) "",
+  
+  # ── COMMENTS ───────────────────────────────────────────────────
+  if (has_comments) "----------------------------------------------------------------",
+  if (has_comments) "  COMMENT METRICS",
+  if (has_comments) "----------------------------------------------------------------",
+  if (has_comments) sprintf("  %% methods with comments    : %.1f%%", 100 * mean(df$has_comment_flag, na.rm = TRUE)),
+  if (has_comments) sprintf("  Comment words — Median     : %g",   median(df$comment_words, na.rm = TRUE)),
+  if (has_comments) sprintf("  Comment words — Mean       : %.2f", mean(df$comment_words,   na.rm = TRUE)),
+  if (has_comments) sprintf("  Comment words — P95        : %g",   quantile(df$comment_words, 0.95, na.rm = TRUE)),
+  if (has_comments) sprintf("  r(CC, comment_words)       : %.3f", cor(df$cc, df$comment_words, use = "complete.obs")),
+  if (has_comments) {
+    med_com   <- median(df$cc[df$has_comment_flag == TRUE],  na.rm = TRUE)
+    med_nocom <- median(df$cc[df$has_comment_flag == FALSE], na.rm = TRUE)
+    sprintf("  Median CC (commented)      : %g", med_com)
+  },
+  if (has_comments) {
+    med_nocom <- median(df$cc[df$has_comment_flag == FALSE], na.rm = TRUE)
+    sprintf("  Median CC (not commented)  : %g", med_nocom)
+  },
+  if (has_comments) "",
+  
+  # ── PROJECT-LEVEL ──────────────────────────────────────────────
+  "----------------------------------------------------------------",
+  "  PROJECT-LEVEL SUMMARY",
+  "----------------------------------------------------------------",
+  sprintf("  Median project method count : %g",   median(project_stats$n_methods)),
+  sprintf("  Median project median CC    : %.2f", median(project_stats$median_cc)),
+  sprintf("  Project with highest median CC : %s (median CC = %g)",
+          str_extract(project_stats$project[which.max(project_stats$median_cc)], "[^/]+$"),
+          max(project_stats$median_cc)),
+  sprintf("  Project with lowest median CC  : %s (median CC = %g)",
+          str_extract(project_stats$project[which.min(project_stats$median_cc)], "[^/]+$"),
+          min(project_stats$median_cc)),
+  sprintf("  Project with highest max CC    : %s (max CC = %g)",
+          str_extract(project_stats$project[which.max(project_stats$max_cc)], "[^/]+$"),
+          max(project_stats$max_cc)),
+  "",
+  
+  # ── KEY CORRELATIONS ───────────────────────────────────────────
+  "----------------------------------------------------------------",
+  "  KEY CORRELATIONS WITH CC",
+  "----------------------------------------------------------------",
+  if (has_cog)  sprintf("  CC vs Cognitive CC   : r = %.3f", cor(df$cc, df$cognitive_complexity, use = "complete.obs")),
+  if (has_loc)  sprintf("  CC vs LOC            : r = %.3f", cor(df$cc, df$loc,                  use = "complete.obs")),
+  if (has_nest) sprintf("  CC vs max nesting    : r = %.3f", cor(df$cc, df$max_nesting,          use = "complete.obs")),
+  if (has_id)   sprintf("  CC vs naming score   : r = %.3f", cor(df$cc, df$naming_score,         use = "complete.obs")),
+  if (has_id)   sprintf("  CC vs abbrev ratio   : r = %.3f", cor(df$cc, df$abbreviated_ratio,    use = "complete.obs")),
+  if (has_comments) sprintf("  CC vs comment words  : r = %.3f", cor(df$cc, df$comment_words,   use = "complete.obs")),
+  if (has_cog && has_nest) sprintf("  Cognitive vs nesting : r = %.3f", cor(df$cognitive_complexity, df$max_nesting, use = "complete.obs")),
+  "",
+  
+  # ── OUTPUT FOLDERS ─────────────────────────────────────────────
+  "----------------------------------------------------------------",
+  "  OUTPUT FOLDERS",
+  "----------------------------------------------------------------",
+  "  01_distributions/  histograms (linear + log-log), ECDFs for every metric",
+  "  02_correlations/   full correlation heatmap + CC vs each metric scatterplots",
+  "  03_risk_bands/     boxplots per band, ridgelines, naming/comment by band",
+  "  04_projects/       per-project CC profiles + small multiples grid",
+  "  05_tables/         all CSVs (descriptive stats, correlations, summaries)",
+  "  06_cc_vs_cognitive CC vs cognitive comparisons and disagreement analysis",
+  "  07_nesting_drivers nesting depth as a complexity driver",
+  "  08_loc_vs_complexity LOC-based plots and CC density by method length",
+  "================================================================"
+)
+
+
+writeLines(report[!sapply(report, is.null)], file.path(OUT, "summary_report.txt"))
+cat("\nDone. Outputs written to:", OUT, "\n")
+
+# =============================================================================
+# 9. CC VS COGNITIVE  →  06_cc_vs_cognitive
+# =============================================================================
+
+if (has_cog) {
+  cat("Generating CC vs Cognitive plots...\n")
+  
+  # 01: Per-project scatter — median CC vs median Cognitive
+  proj_cog <- df %>%
+    group_by(project) %>%
+    summarise(
+      median_cc  = median(cc),
+      median_cog = median(cognitive_complexity, na.rm = TRUE),
+      n_methods  = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(proj = str_extract(project, "[^/]+$"))
+  
+  r_proj_ccvscog <- cor(proj_cog$median_cc, proj_cog$median_cog, use = "complete.obs")
+  
+  p <- ggplot(proj_cog, aes(x = median_cc, y = median_cog, size = n_methods)) +
+    geom_point(alpha = 0.65, colour = "#4C72B0") +
+    geom_smooth(method = "lm", colour = "orange", se = TRUE,
+                data = proj_cog, mapping = aes(x = median_cc, y = median_cog)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                colour = "red", linewidth = 0.7) +
+    scale_size_continuous(name = "Methods", range = c(2, 8)) +
+    annotate("text", x = Inf, y = -Inf,
+             label = sprintf("r = %.3f\nred = equal", r_proj_ccvscog),
+             hjust = 1.1, vjust = -0.5, size = 3.5, family = "mono") +
+    labs(title = "Per-Project Median CC vs Median Cognitive Complexity",
+         subtitle = "Projects above red line: cognitive scores higher than cyclomatic on average",
+         x = "Median Cyclomatic CC", y = "Median Cognitive Complexity") +
+    theme_minimal(base_size = 12)
+  sp(p, DIR_CCVCOG, "01_project_median_cc_vs_cognitive.png")
+  write_csv(proj_cog, file.path(DIR_TABLES, "project_cc_vs_cognitive.csv"))
+  
+  # 02: Side-by-side boxplots of CC and Cognitive by risk band
+  ccvscog_long <- df %>%
+    filter(!is.na(risk_band), cognitive_complexity >= 0) %>%
+    select(risk_band, cc, cognitive_complexity) %>%
+    pivot_longer(c(cc, cognitive_complexity),
+                 names_to = "metric", values_to = "value") %>%
     mutate(metric = recode(metric,
                            cc                   = "Cyclomatic",
-                           cognitive_complexity = "Cognitive",
-                           loc                  = "LOC (NBNC)"
-    ))
+                           cognitive_complexity = "Cognitive"
+    )) %>%
+    filter(value > 0)
   
-  p05 <- ggplot(overlay_df %>% filter(value > 0),
-                aes(x = value, colour = metric, fill = metric)) +
-    geom_density(alpha = 0.15, linewidth = 0.9, adjust = 1.5) +
-    scale_x_log10(labels = label_comma()) +
-    scale_colour_manual(values = c("Cyclomatic" = "#1f77b4",
-                                   "Cognitive"  = "#9467bd",
-                                   "LOC (NBNC)" = "#e377c2")) +
-    scale_fill_manual(values = c("Cyclomatic" = "#1f77b4",
-                                 "Cognitive"  = "#9467bd",
-                                 "LOC (NBNC)" = "#e377c2")) +
-    labs(title = "Density Comparison: Cyclomatic, Cognitive, and LOC",
-         subtitle = "Log scale; curves normalised to density so shape is comparable",
-         x = "Value (log scale)", y = "Density", colour = NULL, fill = NULL) +
+  p <- ggplot(ccvscog_long, aes(x = risk_band, y = value, fill = metric)) +
+    geom_boxplot(outlier.size = 0.3, outlier.alpha = 0.15, alpha = 0.8,
+                 position = position_dodge(width = 0.8)) +
+    scale_fill_manual(values = c("Cyclomatic" = "#1f77b4", "Cognitive" = "#9467bd")) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "Cyclomatic vs Cognitive Complexity by CC Risk Band",
+         subtitle = "Side-by-side within each band; cognitive typically scores higher for complex methods",
+         x = "CC Risk Band", y = "Score (log scale)", fill = NULL) +
     theme_minimal(base_size = 12) +
     theme(legend.position = "top")
-  save_plot(p05, "05_metric_density_overlay.png")
-}
-
-# =============================================================================
-# 5. WHAT DRIVES HIGH CYCLOMATIC COMPLEXITY?
-#    Partial correlation / regression decomposition
-# =============================================================================
-
-# We want to know: given LOC, nesting, and identifier quality — how much of
-# CC variance do each explain independently?
-
-if (has_loc && has_nesting && has_id) {
+  sp(p, DIR_CCVCOG, "02_cc_vs_cognitive_sidebyside_by_band.png")
   
-  cat("\n-- Linear model: log(CC) ~ log(LOC) + max_nesting + avg_id_words + abbreviated_ratio --\n")
-  
-  df_lm <- df %>%
-    filter(cc > 0, loc > 0, !is.na(max_nesting), !is.na(avg_id_words),
-           !is.na(abbreviated_ratio)) %>%
-    mutate(log_cc  = log(cc),
-           log_loc = log(loc))
-  
-  lm_full <- lm(log_cc ~ log_loc + max_nesting + avg_id_words + abbreviated_ratio,
-                data = df_lm)
-  cat(sprintf("  Full model R^2: %.4f\n", summary(lm_full)$r.squared))
-  print(tidy(lm_full))
-  write_csv(tidy(lm_full), file.path(OUT, "lm_cc_predictors.csv"))
-  
-  # Incremental R^2: how much does each predictor add beyond the others?
-  lm_loc_only    <- lm(log_cc ~ log_loc,                                        data = df_lm)
-  lm_nesting     <- lm(log_cc ~ log_loc + max_nesting,                          data = df_lm)
-  lm_id          <- lm(log_cc ~ log_loc + max_nesting + avg_id_words,           data = df_lm)
-  lm_abbrev      <- lm(log_cc ~ log_loc + max_nesting + avg_id_words + abbreviated_ratio, data = df_lm)
-  
-  r2_steps <- tibble(
-    model     = c("LOC only", "+ max nesting", "+ avg ID words", "+ abbrev ratio"),
-    r_squared = c(
-      summary(lm_loc_only)$r.squared,
-      summary(lm_nesting)$r.squared,
-      summary(lm_id)$r.squared,
-      summary(lm_abbrev)$r.squared
-    )
-  ) %>% mutate(incremental_r2 = r_squared - lag(r_squared, default = 0))
-  
-  cat("\n-- Incremental R^2 by predictor --\n")
-  print(r2_steps)
-  write_csv(r2_steps, file.path(OUT, "incremental_r2.csv"))
-  
-  p06 <- ggplot(r2_steps, aes(x = model, y = incremental_r2, fill = model)) +
-    geom_col(show.legend = FALSE) +
-    geom_text(aes(label = sprintf("+%.3f", incremental_r2)), vjust = -0.4, size = 3.5) +
-    scale_x_discrete(limits = r2_steps$model) +
-    labs(title = "Incremental R² Added by Each Predictor of log(CC)",
-         subtitle = "Each bar = unique variance explained beyond predictors to its left",
-         x = NULL, y = "Incremental R²") +
-    theme_minimal(base_size = 12)
-  save_plot(p06, "06_incremental_r2.png", w = 8, h = 5)
-}
-
-# =============================================================================
-# 6. NESTING VS COMPLEXITY METRICS
-# =============================================================================
-
-if (has_nesting) {
-  
-  # Does max nesting predict cognitive better than cyclomatic?
-  # (Expected yes, because cognitive explicitly penalises nesting)
-  if (has_cognitive) {
-    r_cc_nest  <- cor(df$cc,                   df$max_nesting, use = "complete.obs")
-    r_cog_nest <- cor(df$cognitive_complexity, df$max_nesting, use = "complete.obs")
-    cat(sprintf("\nCorrelation max_nesting vs CC:        %.4f\n", r_cc_nest))
-    cat(sprintf(  "Correlation max_nesting vs Cognitive: %.4f\n", r_cog_nest))
-    
-    nest_pivot <- df %>%
-      filter(!is.na(max_nesting), !is.na(cognitive_complexity)) %>%
-      select(max_nesting, cc, cognitive_complexity) %>%
-      pivot_longer(c(cc, cognitive_complexity),
-                   names_to = "metric", values_to = "value") %>%
-      mutate(metric = recode(metric,
-                             cc                   = "Cyclomatic",
-                             cognitive_complexity = "Cognitive"
-      )) %>%
-      filter(value > 0)
-    
-    p07 <- ggplot(nest_pivot %>% sample_frac(min(1, 100000 / nrow(.))),
-                  aes(x = max_nesting + 1, y = value, colour = metric)) +
-      geom_smooth(method = "lm", se = TRUE, linewidth = 1.1) +
-      scale_x_log10(labels = label_comma()) +
-      scale_y_log10(labels = label_comma()) +
-      scale_colour_manual(values = c("Cyclomatic" = "#1f77b4",
-                                     "Cognitive"  = "#9467bd")) +
-      annotate("text", x = Inf, y = Inf,
-               label = sprintf("r(CC) = %.3f\nr(Cog) = %.3f", r_cc_nest, r_cog_nest),
-               hjust = 1.1, vjust = 1.5, size = 3.5, family = "mono") +
-      labs(title = "Nesting Depth vs Cyclomatic and Cognitive Complexity",
-           subtitle = "Cognitive should correlate more strongly with nesting by design",
-           x = "Max Nesting Depth + 1 (log)", y = "Complexity Score (log)",
-           colour = NULL) +
-      theme_minimal(base_size = 12) +
-      theme(legend.position = "top")
-    save_plot(p07, "07_nesting_vs_both_metrics.png")
-  }
-  
-  # Nesting profile: how is nesting depth distributed across risk bands?
-  p08 <- ggplot(df %>% filter(!is.na(max_nesting)),
-                aes(x = max_nesting, y = risk_band, fill = risk_band)) +
-    geom_density_ridges(alpha = 0.7, scale = 1.3, rel_min_height = 0.01) +
+  # 03: Cog excess (cog - cc) distribution by risk band
+  p <- ggplot(df %>% filter(!is.na(risk_band), !is.na(cog_excess)),
+              aes(x = risk_band, y = cog_excess, fill = risk_band)) +
+    geom_boxplot(outlier.size = 0.3, outlier.alpha = 0.15, alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed", colour = "red", linewidth = 0.8) +
+    coord_cartesian(ylim = c(-10, 80)) +
     scale_fill_manual(values = BAND_COLOURS) +
-    scale_x_continuous(breaks = 0:20, limits = c(0, 20)) +
-    labs(title = "Max Nesting Depth Distribution by CC Risk Band",
-         x = "Max Nesting Depth", y = "CC Risk Band") +
+    labs(title = "Cognitive Excess (Cognitive - Cyclomatic) by CC Risk Band",
+         subtitle = "Above 0: cognitive penalises more; y-axis capped at 80 (outliers exist beyond)",
+         x = "CC Risk Band", y = "Cognitive - Cyclomatic") +
     theme_minimal(base_size = 12) +
     theme(legend.position = "none")
-  save_plot(p08, "08_nesting_ridgeline_by_cc_band.png", w = 9, h = 6)
+  sp(p, DIR_CCVCOG, "03_cog_excess_by_cc_band.png")
+  
+  
+  # 05: % of methods where cognitive > cyclomatic, by project
+  proj_cog_pct <- df %>%
+    filter(!is.na(cog_excess)) %>%
+    group_by(project) %>%
+    summarise(
+      pct_cog_higher = round(100 * mean(cog_excess > 0), 1),
+      median_cog_excess = median(cog_excess),
+      .groups = "drop"
+    ) %>%
+    mutate(proj = str_extract(project, "[^/]+$"))
+  write_csv(proj_cog_pct, file.path(DIR_TABLES, "project_cog_excess.csv"))
+  
+  p <- ggplot(proj_cog_pct, aes(x = reorder(proj, pct_cog_higher), y = pct_cog_higher)) +
+    geom_col(fill = "#9467bd", alpha = 0.8) +
+    geom_hline(yintercept = 50, linetype = "dashed", colour = "red", linewidth = 0.7) +
+    coord_flip() +
+    labs(title = "% of Methods Where Cognitive > Cyclomatic, by Project",
+         subtitle = "Red line = 50%; above means cognitive tends to score higher in this project",
+         x = NULL, y = "% Methods where Cognitive > Cyclomatic") +
+    theme_minimal(base_size = 8)
+  sp(p, DIR_CCVCOG, "05_pct_cog_higher_by_project.png",
+     w = 10, h = max(6, n_proj * 0.28 + 2))
 }
 
 # =============================================================================
-# 7. NAMING QUALITY & COMPLEXITY
+# 10. NESTING AS A COMPLEXITY DRIVER  →  07_nesting_drivers
+# =============================================================================
+
+if (has_nest) {
+  cat("Generating nesting driver plots...\n")
+  
+  
+  # 02: % of methods exceeding CC > 10 at each nesting depth
+  nest_cc_pct <- df %>%
+    filter(max_nesting <= 12) %>%
+    group_by(max_nesting) %>%
+    summarise(
+      n              = n(),
+      pct_cc_gt10    = round(100 * mean(cc > 10), 1),
+      pct_cc_gt5     = round(100 * mean(cc > 5),  1),
+      pct_cc_gt25    = round(100 * mean(cc > 25), 1),
+      median_cc      = median(cc),
+      .groups = "drop"
+    )
+  write_csv(nest_cc_pct, file.path(DIR_TABLES, "nesting_vs_cc_pct.csv"))
+  
+  p <- ggplot(nest_cc_pct, aes(x = max_nesting)) +
+    geom_line(aes(y = pct_cc_gt5,  colour = "CC > 5"),  linewidth = 1) +
+    geom_line(aes(y = pct_cc_gt10, colour = "CC > 10"), linewidth = 1) +
+    geom_line(aes(y = pct_cc_gt25, colour = "CC > 25"), linewidth = 1) +
+    geom_point(aes(y = pct_cc_gt5,  colour = "CC > 5"),  size = 2.5) +
+    geom_point(aes(y = pct_cc_gt10, colour = "CC > 10"), size = 2.5) +
+    geom_point(aes(y = pct_cc_gt25, colour = "CC > 25"), size = 2.5) +
+    scale_colour_manual(values = c("CC > 5"  = "#8fbc8f",
+                                   "CC > 10" = "#ff7f0e",
+                                   "CC > 25" = "#d62728")) +
+    scale_x_continuous(breaks = 0:12) +
+    labs(title = "% of Methods Exceeding CC Thresholds by Max Nesting Depth",
+         subtitle = "Each point = all methods at that nesting depth",
+         x = "Max Nesting Depth", y = "% of Methods", colour = NULL) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+  sp(p, DIR_NESTING, "02_pct_high_cc_by_nesting_depth.png")
+  
+  # 03: Median CC at each nesting depth (bar)
+  p <- ggplot(nest_cc_pct, aes(x = max_nesting, y = median_cc)) +
+    geom_col(fill = "#17becf", alpha = 0.85) +
+    geom_text(aes(label = sprintf("%.1f", median_cc)), vjust = -0.4, size = 3) +
+    scale_x_continuous(breaks = 0:12) +
+    labs(title = "Median Cyclomatic CC at Each Max Nesting Depth",
+         x = "Max Nesting Depth", y = "Median CC") +
+    theme_minimal(base_size = 12)
+  sp(p, DIR_NESTING, "03_median_cc_by_nesting_depth.png")
+  
+  # 04: Nesting depth distribution split: methods that exceed CC>10 vs those that don't
+  p <- ggplot(df %>% filter(max_nesting <= 15),
+              aes(x = max_nesting, fill = cc > 10, colour = cc > 10)) +
+    geom_density(alpha = 0.3, adjust = 1.5, linewidth = 0.8, position = "identity") +
+    scale_fill_manual(values  = c("TRUE" = "#d62728", "FALSE" = "#2ca02c"),
+                      labels  = c("TRUE" = "CC > 10", "FALSE" = "CC <= 10")) +
+    scale_colour_manual(values = c("TRUE" = "#d62728", "FALSE" = "#2ca02c"),
+                        labels = c("TRUE" = "CC > 10", "FALSE" = "CC <= 10")) +
+    labs(title = "Nesting Depth Distribution: High vs Low CC Methods",
+         subtitle = "Do high-CC methods nest deeper?",
+         x = "Max Nesting Depth", y = "Density",
+         fill = NULL, colour = NULL) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+  sp(p, DIR_NESTING, "04_nesting_density_by_cc_group.png")
+  
+  if (has_cog) {
+    # 05: Nesting depth vs cog excess — does nesting explain why cognitive > cyclomatic?
+    p <- ggplot(df %>% filter(!is.na(cog_excess), max_nesting <= 12),
+                aes(x = factor(max_nesting), y = cog_excess)) +
+      geom_boxplot(fill = "#9467bd", alpha = 0.6,
+                   outlier.size = 0.4, outlier.alpha = 0.2) +
+      geom_hline(yintercept = 0, linetype = "dashed", colour = "red", linewidth = 0.8) +
+      coord_cartesian(ylim = c(-5, 50)) +
+      labs(title = "Cognitive Excess by Max Nesting Depth",
+           subtitle = "Positive = cognitive scores higher; y-axis capped at 50 (outliers exist beyond)",
+           x = "Max Nesting Depth", y = "Cognitive - Cyclomatic") +
+      theme_minimal(base_size = 12)
+    sp(p, DIR_NESTING, "05_cog_excess_by_nesting_depth.png")
+  }
+}
+
+# =============================================================================
+# 11. LOC VS COMPLEXITY  →  08_loc_vs_complexity
+# =============================================================================
+
+if (has_loc) {
+  cat("Generating LOC vs complexity plots...\n")
+  
+  # 01: CC/LOC ratio by project — density/complexity per line
+  proj_ccloc <- df %>%
+    filter(!is.na(cc_per_loc), cc_per_loc > 0) %>%
+    group_by(project) %>%
+    summarise(
+      median_cc_per_loc = median(cc_per_loc),
+      median_cc         = median(cc),
+      median_loc        = median(loc),
+      n_methods         = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(proj = str_extract(project, "[^/]+$"))
+  write_csv(proj_ccloc, file.path(DIR_TABLES, "project_cc_per_loc.csv"))
+  
+  p <- ggplot(proj_ccloc, aes(x = reorder(proj, median_cc_per_loc),
+                              y = median_cc_per_loc)) +
+    geom_col(fill = "#ff7f0e", alpha = 0.85) +
+    coord_flip() +
+    labs(title = "Median CC / LOC by Project",
+         subtitle = "High = short methods densely packed with branches; low = long methods few branches",
+         x = NULL, y = "Median CC per Line of Code") +
+    theme_minimal(base_size = 8)
+  sp(p, DIR_LOC, "01_cc_per_loc_by_project.png",
+     w = 10, h = max(6, n_proj * 0.28 + 2))
+  
+  
+  
+  # 04: Methods above/below 24-line threshold — CC distribution comparison
+  p <- ggplot(df %>% filter(!is.na(loc_band), cc > 0),
+              aes(x = cc, fill = loc_band, colour = loc_band)) +
+    geom_density(alpha = 0.25, adjust = 1.5, linewidth = 0.9) +
+    scale_x_log10(labels = label_comma()) +
+    scale_fill_manual(values  = c("<=24 LOC" = "#2ca02c", ">24 LOC" = "#d62728")) +
+    scale_colour_manual(values = c("<=24 LOC" = "#2ca02c", ">24 LOC" = "#d62728")) +
+    labs(title = "CC Distribution: Methods Above vs Below 24-Line Threshold",
+         subtitle = "Long methods (>24 LOC) — are they also more complex?",
+         x = "Cyclomatic CC (log scale)", y = "Density",
+         fill = NULL, colour = NULL) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+  sp(p, DIR_LOC, "04_cc_density_by_loc_band.png")
+  
+  # stats for the two LOC groups
+  loc_band_stats <- df %>%
+    filter(!is.na(loc_band)) %>%
+    group_by(loc_band) %>%
+    summarise(n = n(), median_cc = median(cc), mean_cc = mean(cc),
+              pct_cc_gt10 = round(100 * mean(cc > 10), 1), .groups = "drop")
+  write_csv(loc_band_stats, file.path(DIR_TABLES, "cc_by_loc_band.csv"))
+}
+
+# =============================================================================
+# 12. NAMING QUALITY  →  03_risk_bands
 # =============================================================================
 
 if (has_id) {
+  cat("Generating naming quality plots...\n")
   
-  # 7a. Is identifier quality a function of complexity or just of method length?
-  # We compare avg_id_words and abbreviated_ratio controlling for LOC
+  # 01: Abbreviated ratio vs avg_id_words scatter, coloured by CC band
+  p <- ggplot(df %>% filter(!is.na(risk_band), !is.na(avg_id_words),
+                            !is.na(abbreviated_ratio)) %>%
+                sample_frac(min(1, 300000 / nrow(.))),
+              aes(x = avg_id_words, y = abbreviated_ratio, colour = risk_band)) +
+    geom_point(alpha = 0.12, size = 0.5) +
+    scale_colour_manual(values = BAND_COLOURS) +
+    scale_y_continuous(labels = percent_format()) +
+    labs(title = "Abbreviated Ratio vs Avg ID Word Count, Coloured by CC Band",
+         subtitle = "Bottom-right = long descriptive names; top-left = short cryptic names",
+         x = "Avg Identifier Word Count", y = "Abbreviated Identifier Ratio",
+         colour = "CC Band") +
+    guides(colour = guide_legend(override.aes = list(alpha = 1, size = 2))) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+  sp(p, DIR_BANDS, "17_abbrev_ratio_vs_id_words_by_cc_band.png")
   
-  if (has_loc) {
-    
-    cat("\n-- Naming quality controlling for LOC --\n")
-    
-    df_nam <- df %>%
-      filter(loc > 0, !is.na(avg_id_words), !is.na(abbreviated_ratio)) %>%
-      mutate(log_loc = log(loc))
-    
-    lm_idwords <- lm(avg_id_words      ~ log_loc + cc, data = df_nam)
-    lm_abbrev  <- lm(abbreviated_ratio ~ log_loc + cc, data = df_nam)
-    
-    cat("avg_id_words ~ log(LOC) + CC:\n")
-    print(tidy(lm_idwords))
-    cat("\nabbreviated_ratio ~ log(LOC) + CC:\n")
-    print(tidy(lm_abbrev))
-    
-    write_csv(tidy(lm_idwords), file.path(OUT, "lm_id_words_vs_loc_cc.csv"))
-    write_csv(tidy(lm_abbrev),  file.path(OUT, "lm_abbrev_vs_loc_cc.csv"))
-  }
   
-  # 7b. Does naming quality differ between the structural complexity profiles?
-  # Split on high/low nesting AND high/low CC to get 4 quadrants
-  
-  if (has_nesting && has_loc) {
-    med_cc   <- median(df$cc,          na.rm = TRUE)
-    med_nest <- median(df$max_nesting, na.rm = TRUE)
-    
-    df_quad <- df %>%
-      filter(!is.na(max_nesting), !is.na(naming_score)) %>%
-      mutate(
-        cc_level   = ifelse(cc          > med_cc,   "High CC",   "Low CC"),
-        nest_level = ifelse(max_nesting > med_nest, "Deep Nest", "Shallow Nest"),
-        quadrant   = paste(cc_level, "/", nest_level)
-      )
-    
-    quad_summary <- df_quad %>%
-      group_by(quadrant) %>%
-      summarise(
-        n               = n(),
-        median_naming   = median(naming_score,    na.rm = TRUE),
-        median_abbrev   = median(abbreviated_ratio, na.rm = TRUE),
-        median_idwords  = median(avg_id_words,    na.rm = TRUE),
-        .groups = "drop"
-      )
-    cat("\n-- Naming quality by CC x Nesting quadrant --\n")
-    print(quad_summary)
-    write_csv(quad_summary, file.path(OUT, "naming_by_cc_nesting_quadrant.csv"))
-    
-    p09 <- ggplot(df_quad, aes(x = quadrant, y = naming_score, fill = quadrant)) +
-      geom_violin(alpha = 0.4, trim = TRUE) +
-      geom_boxplot(width = 0.12, outlier.size = 0.3, outlier.alpha = 0.15, alpha = 0.9) +
-      geom_text(data = quad_summary,
-                aes(x = quadrant, y = median_naming,
-                    label = sprintf("med=%.2f", median_naming)),
-                vjust = -0.8, size = 3, inherit.aes = FALSE) +
-      labs(title = "Naming Quality Score by Structural Complexity Quadrant",
-           subtitle = sprintf("Split at median CC=%g, median max_nesting=%g", med_cc, med_nest),
-           x = NULL, y = "Naming Score (avg_id_words * (1 - abbrev_ratio))") +
-      theme_minimal(base_size = 12) +
-      theme(legend.position = "none",
-            axis.text.x = element_text(angle = 15, hjust = 1))
-    save_plot(p09, "09_naming_by_cc_nesting_quadrant.png", w = 9, h = 6)
-  }
-  
-  # 7c. Single-letter ID rate: does it track with complexity?
-  r_single_cc <- cor(df$cc, df$single_letter_ids, use = "complete.obs")
-  cat(sprintf("\nCorrelation CC vs single_letter_ids: %.4f\n", r_single_cc))
-  
-  p10 <- ggplot(df %>% filter(!is.na(risk_band)),
-                aes(x = risk_band, y = single_letter_ids + 1, fill = risk_band)) +
+  # 03: Naming score violin by CC band
+  p <- ggplot(df %>% filter(!is.na(risk_band), !is.na(naming_score)),
+              aes(x = risk_band, y = naming_score, fill = risk_band)) +
     geom_violin(alpha = 0.4, trim = TRUE) +
-    geom_boxplot(width = 0.12, outlier.size = 0.3, outlier.alpha = 0.15, alpha = 0.9) +
+    geom_boxplot(width = 0.1, outlier.size = 0.3, outlier.alpha = 0.15, alpha = 0.9) +
     scale_fill_manual(values = BAND_COLOURS) +
-    scale_y_log10(labels = label_comma()) +
-    labs(title = "Single-Letter Identifier Count by CC Risk Band",
-         subtitle = sprintf("r(CC, single_letter_ids) = %.3f", r_single_cc),
-         x = "CC Risk Band", y = "Single-letter IDs + 1 (log scale)") +
+    labs(title = "Naming Quality Score by CC Risk Band",
+         subtitle = "Does naming quality degrade as complexity increases?",
+         x = "CC Risk Band", y = "Naming Score") +
     theme_minimal(base_size = 12) +
     theme(legend.position = "none")
-  save_plot(p10, "10_single_letter_ids_by_cc_band.png", w = 8, h = 5)
+  sp(p, DIR_BANDS, "18_naming_score_violin_by_cc_band.png", w = 8, h = 5)
+  
+  
+  # naming band summary table
+  naming_band_summary <- df %>%
+    filter(!is.na(risk_band)) %>%
+    group_by(risk_band) %>%
+    summarise(
+      median_naming     = round(median(naming_score,      na.rm = TRUE), 3),
+      median_id_words   = round(median(avg_id_words,      na.rm = TRUE), 3),
+      median_abbrev     = round(median(abbreviated_ratio, na.rm = TRUE), 3),
+      median_single_ids = round(median(single_letter_ids, na.rm = TRUE), 1),
+      .groups = "drop"
+    )
+  write_csv(naming_band_summary, file.path(DIR_TABLES, "naming_by_cc_band.csv"))
 }
 
 # =============================================================================
-# 8. COMMENT BEHAVIOUR
+# 13. COMMENT BEHAVIOUR  →  03_risk_bands
 # =============================================================================
 
 if (has_comments) {
+  cat("Generating comment behaviour plots...\n")
   
-  # 8a. Do developers comment more complex methods?
-  # Wilcoxon: CC distribution for commented vs uncommented methods
-  wtest <- wilcox.test(cc ~ has_comments, data = df)
-  cat(sprintf("\nWilcoxon CC ~ has_comments: W=%.0f, p=%.4e\n",
-              wtest$statistic, wtest$p.value))
-  
-  med_commented   <- median(df$cc[df$has_comments],  na.rm = TRUE)
-  med_uncommented <- median(df$cc[!df$has_comments], na.rm = TRUE)
-  cat(sprintf("  Median CC (commented):   %.1f\n", med_commented))
-  cat(sprintf("  Median CC (uncommented): %.1f\n", med_uncommented))
-  
-  p11 <- ggplot(df, aes(x = cc, fill = has_comments, colour = has_comments)) +
-    geom_density(alpha = 0.3, adjust = 1.5, linewidth = 0.9) +
+  # 01: CC density overlay by comment presence (cleaner than boxplot at this scale)
+  p <- ggplot(df %>% filter(cc > 0, !is.na(has_comment_flag)),
+              aes(x = cc, fill = has_comment_flag, colour = has_comment_flag)) +
+    geom_density(alpha = 0.25, adjust = 1.5, linewidth = 0.9) +
     scale_x_log10(labels = label_comma()) +
     scale_fill_manual(values  = c("TRUE" = "#2ca02c", "FALSE" = "#d62728"),
                       labels  = c("TRUE" = "Has comments", "FALSE" = "No comments")) +
     scale_colour_manual(values = c("TRUE" = "#2ca02c", "FALSE" = "#d62728"),
                         labels = c("TRUE" = "Has comments", "FALSE" = "No comments")) +
-    annotate("text", x = Inf, y = Inf,
-             label = sprintf("Wilcoxon p = %.2e\nmed(commented)=%.0f\nmed(uncommented)=%.0f",
-                             wtest$p.value, med_commented, med_uncommented),
-             hjust = 1.05, vjust = 1.4, size = 3.2, family = "mono") +
-    labs(title = "CC Density: Methods With vs Without Comments",
+    labs(title = "CC Distribution: Methods With vs Without Comments",
          subtitle = "Are higher-complexity methods more likely to be commented?",
-         x = "Cyclomatic Complexity (log scale)", y = "Density",
+         x = "Cyclomatic CC (log scale)", y = "Density",
          fill = NULL, colour = NULL) +
     theme_minimal(base_size = 12) +
     theme(legend.position = "top")
-  save_plot(p11, "11_cc_density_comment_presence.png")
+  sp(p, DIR_BANDS, "19_cc_density_by_comment_presence.png")
   
-  # 8b. Comment density vs complexity risk band
-  # (are dense comments a signal of complex code, or just verbose style?)
-  if (has_loc) {
-    p12 <- ggplot(df %>% filter(!is.na(comment_density), comment_density > 0,
-                                !is.na(risk_band)),
-                  aes(x = risk_band, y = comment_density, fill = risk_band)) +
-      geom_violin(alpha = 0.4, trim = TRUE) +
-      geom_boxplot(width = 0.12, outlier.size = 0.3, outlier.alpha = 0.15) +
-      scale_fill_manual(values = BAND_COLOURS) +
-      scale_y_log10(labels = label_comma()) +
-      labs(title = "Comment Density (Comment Words / LOC) by CC Risk Band",
-           subtitle = "Methods with at least 1 comment word only",
-           x = "CC Risk Band", y = "Comment Words / LOC (log scale)") +
-      theme_minimal(base_size = 12) +
-      theme(legend.position = "none")
-    save_plot(p12, "12_comment_density_by_cc_band.png", w = 8, h = 5)
-  }
+  # Wilcoxon test result saved to table
+  wtest <- wilcox.test(cc ~ has_comment_flag, data = df %>% filter(!is.na(has_comment_flag)))
+  write_csv(
+    tibble(test = "Wilcoxon CC ~ has_comments",
+           W    = wtest$statistic,
+           p    = wtest$p.value,
+           median_cc_commented   = median(df$cc[df$has_comment_flag  == TRUE],  na.rm = TRUE),
+           median_cc_uncommented = median(df$cc[df$has_comment_flag  == FALSE], na.rm = TRUE)),
+    file.path(DIR_TABLES, "wilcoxon_cc_comment_presence.csv")
+  )
   
-  # 8c. Comment rate by risk band (what % of methods in each band have comments?)
-  comment_rate <- df %>%
-    filter(!is.na(risk_band)) %>%
-    group_by(risk_band) %>%
+  
+  # 03: Comment rate trend across CC values (smoothed line)
+  comment_by_cc <- df %>%
+    filter(cc <= 50) %>%
+    group_by(cc) %>%
     summarise(
-      n           = n(),
-      pct_commented = round(100 * mean(has_comments), 1),
+      pct_commented = round(100 * mean(comment_count > 0, na.rm = TRUE), 1),
+      n             = n(),
       .groups = "drop"
-    )
-  cat("\n-- Comment rate by CC risk band --\n")
-  print(comment_rate)
-  write_csv(comment_rate, file.path(OUT, "comment_rate_by_cc_band.csv"))
+    ) %>%
+    filter(n >= 50)  # only CC values with enough data
   
-  p13 <- ggplot(comment_rate, aes(x = risk_band, y = pct_commented, fill = risk_band)) +
-    geom_col(show.legend = FALSE) +
-    geom_text(aes(label = paste0(pct_commented, "%")), vjust = -0.4, size = 3.5) +
-    scale_fill_manual(values = BAND_COLOURS) +
-    labs(title = "% of Methods With Comments by CC Risk Band",
-         subtitle = "Indicates whether developers comment complex code more frequently",
-         x = "CC Risk Band", y = "% Methods With Comments") +
-    theme_minimal(base_size = 12) +
-    coord_cartesian(ylim = c(0, max(comment_rate$pct_commented) * 1.15))
-  save_plot(p13, "13_comment_rate_by_cc_band.png", w = 7, h = 5)
-}
-
-# =============================================================================
-# 9. PROJECT-LEVEL ANALYSIS
-# =============================================================================
-
-project_stats <- df %>%
-  group_by(project) %>%
-  summarise(
-    n_methods        = n(),
-    median_cc        = median(cc),
-    mean_cc          = mean(cc),
-    sd_cc            = sd(cc),
-    max_cc           = max(cc),
-    pct_high_cc      = 100 * mean(cc > 10),
-    median_cognitive = if (has_cognitive) median(cognitive_complexity, na.rm = TRUE) else NA,
-    median_loc       = if (has_loc)       median(loc,                  na.rm = TRUE) else NA,
-    median_nesting   = if (has_nesting)   median(max_nesting,          na.rm = TRUE) else NA,
-    pct_commented    = if (has_comments)  100 * mean(has_comments,     na.rm = TRUE) else NA,
-    .groups = "drop"
-  )
-
-write_csv(project_stats, file.path(OUT, "project_summary.csv"))
-
-# If repos.csv is present, join for richer project plots
-if (has_repos) {
-  project_stats <- project_stats %>%
-    left_join(repos %>% select(project, stars, forks, commit_count,
-                               size_kb, java_file_count),
-              by = "project")
-  
-  # Does repo maturity (commits, stars) predict typical complexity?
-  if (all(c("commit_count", "stars") %in% names(project_stats))) {
-    
-    p14 <- project_stats %>%
-      filter(!is.na(commit_count), commit_count > 0) %>%
-      ggplot(aes(x = commit_count, y = median_cc, size = n_methods,
-                 colour = pct_high_cc)) +
-      geom_point(alpha = 0.7) +
-      geom_smooth(method = "lm", se = TRUE, colour = "orange",
-                  linewidth = 0.9, inherit.aes = FALSE,
-                  aes(x = commit_count, y = median_cc)) +
-      scale_x_log10(labels = label_comma()) +
-      scale_size_continuous(name = "Methods in repo", range = c(2, 8)) +
-      scale_colour_viridis_c(name = "% CC > 10") +
-      labs(title = "Repo Commit Count vs Median Cyclomatic Complexity",
-           subtitle = "Size = number of methods; colour = % methods with CC > 10",
-           x = "Commit Count (log scale)", y = "Median CC") +
-      theme_minimal(base_size = 12)
-    save_plot(p14, "14_commits_vs_median_cc.png")
-    
-    r_commits_cc <- cor(log(project_stats$commit_count[project_stats$commit_count > 0]),
-                        project_stats$median_cc[project_stats$commit_count > 0],
-                        use = "complete.obs")
-    cat(sprintf("\nCorrelation log(commits) vs median project CC: %.4f\n", r_commits_cc))
-  }
-  
-  # Project size (java_file_count) vs complexity spread
-  if ("java_file_count" %in% names(project_stats)) {
-    p15 <- project_stats %>%
-      filter(!is.na(java_file_count), java_file_count > 0) %>%
-      ggplot(aes(x = java_file_count, y = sd_cc, colour = median_cc)) +
-      geom_point(alpha = 0.75, size = 2.5) +
-      geom_smooth(method = "lm", se = TRUE, colour = "orange",
-                  linewidth = 0.9, inherit.aes = FALSE,
-                  aes(x = java_file_count, y = sd_cc)) +
-      scale_x_log10(labels = label_comma()) +
-      scale_colour_viridis_c(name = "Median CC") +
-      labs(title = "Project Size (Java Files) vs Complexity Spread (SD of CC)",
-           subtitle = "Do larger projects have more variance in method complexity?",
-           x = "Java File Count (log scale)", y = "SD of CC") +
-      theme_minimal(base_size = 12)
-    save_plot(p15, "15_project_size_vs_cc_spread.png")
-  }
-}
-
-# Project-level complexity profile: show the 20 highest and lowest median CC projects
-top_bottom <- bind_rows(
-  project_stats %>% slice_max(median_cc, n = 20) %>% mutate(group = "Highest CC"),
-  project_stats %>% slice_min(median_cc, n = 20) %>% mutate(group = "Lowest CC")
-) %>%
-  mutate(project_short = str_extract(project, "[^/]+$"))
-
-p16 <- ggplot(top_bottom,
-              aes(x = reorder(project_short, median_cc), y = median_cc,
-                  fill = group)) +
-  geom_col(show.legend = FALSE) +
-  geom_errorbar(aes(ymin = median_cc - sd_cc / sqrt(n_methods),
-                    ymax = median_cc + sd_cc / sqrt(n_methods)),
-                width = 0.4, colour = "grey40") +
-  facet_wrap(~ group, scales = "free_y") +
-  coord_flip() +
-  scale_fill_manual(values = c("Highest CC" = "#d62728", "Lowest CC" = "#2ca02c")) +
-  labs(title = "Top and Bottom 20 Projects by Median Cyclomatic Complexity",
-       x = NULL, y = "Median CC (error bars = SE)") +
-  theme_minimal(base_size = 10)
-save_plot(p16, "16_top_bottom_projects_cc.png", w = 12, h = 8)
-
-# =============================================================================
-# 10. LOC EFFICIENCY: COMPLEXITY PER LINE
-# =============================================================================
-
-if (has_loc) {
-  
-  df <- df %>%
-    mutate(cc_per_loc = ifelse(loc > 0, cc / loc, NA_real_))
-  
-  cat("\n-- CC per LOC summary --\n")
-  cat(sprintf("  Mean:   %.4f\n", mean(df$cc_per_loc, na.rm = TRUE)))
-  cat(sprintf("  Median: %.4f\n", median(df$cc_per_loc, na.rm = TRUE)))
-  
-  # High cc_per_loc = dense complexity (short methods that pack in many branches)
-  # Low  cc_per_loc = spread complexity (long methods with relatively few branches)
-  p17 <- ggplot(df %>% filter(!is.na(cc_per_loc), cc_per_loc > 0),
-                aes(x = cc_per_loc)) +
-    geom_histogram(bins = 60, fill = "#1f77b4", colour = "white", linewidth = 0.2) +
-    geom_vline(xintercept = median(df$cc_per_loc, na.rm = TRUE),
-               linetype = "dashed", colour = "red", linewidth = 0.8) +
-    scale_x_log10(labels = label_number(accuracy = 0.01)) +
-    scale_y_log10(labels = label_comma()) +
-    labs(title = "Cyclomatic Complexity per Line of Code",
-         subtitle = "High = short methods densely packed with branches; red = median",
-         x = "CC / LOC (log scale)", y = "Method Count (log scale)") +
+  p <- ggplot(comment_by_cc, aes(x = cc, y = pct_commented)) +
+    geom_line(colour = "#2ca02c", linewidth = 0.8) +
+    geom_point(aes(size = n), alpha = 0.5, colour = "#2ca02c") +
+    geom_smooth(method = "loess", span = 0.4, colour = "orange",
+                se = TRUE, linewidth = 0.9) +
+    scale_size_continuous(range = c(1, 6), name = "Methods at CC") +
+    scale_x_continuous(breaks = c(1, 5, 10, 15, 20, 25, 30, 40, 50)) +
+    geom_vline(xintercept = BAND_BREAKS, linetype = "dashed",
+               colour = BAND_COLOURS[-length(BAND_COLOURS)], linewidth = 0.5) +
+    labs(title = "Comment Rate Across CC Values",
+         subtitle = "% of methods with comments at each CC value (CC 1-50, min 50 methods per point)",
+         x = "Cyclomatic CC", y = "% Methods With Comments") +
     theme_minimal(base_size = 12)
-  save_plot(p17, "17_cc_per_loc_histogram.png")
+  sp(p, DIR_BANDS, "20_comment_rate_across_cc_values.png", w = 10, h = 6)
   
-  # Physical vs NBNC LOC ratio (blank/comment ratio as a style proxy)
-  if ("loc_physical" %in% names(df)) {
-    p18 <- ggplot(df %>% filter(!is.na(blank_ratio), blank_ratio >= 0,
-                                !is.na(risk_band)),
-                  aes(x = risk_band, y = blank_ratio, fill = risk_band)) +
-      geom_violin(alpha = 0.4, trim = TRUE) +
-      geom_boxplot(width = 0.12, outlier.size = 0.3, outlier.alpha = 0.15) +
-      scale_fill_manual(values = BAND_COLOURS) +
-      scale_y_continuous(labels = percent_format()) +
-      labs(title = "Blank/Comment Line Ratio by CC Risk Band",
-           subtitle = "(physical LOC - NBNC LOC) / physical LOC",
-           x = "CC Risk Band", y = "Blank + Comment Line Fraction") +
-      theme_minimal(base_size = 12) +
-      theme(legend.position = "none")
-    save_plot(p18, "18_blank_ratio_by_cc_band.png", w = 8, h = 5)
-  }
+  write_csv(comment_by_cc, file.path(DIR_TABLES, "comment_rate_by_cc_value.csv"))
 }
 
 # =============================================================================
-# 11. STRUCTURAL FINGERPRINTS: METRIC PROFILES PER RISK BAND
+# 14. PROJECT DEEP DIVE  →  04_projects
 # =============================================================================
 
-# Radar-style summary: for each risk band, what is the typical value of each
-# metric expressed as a percentile rank of the overall distribution?
+cat("Generating project deep dive plots...\n")
 
-profile_metrics <- intersect(
-  c("loc", "avg_nesting", "max_nesting", "avg_id_words",
-    "abbreviated_ratio", "comment_density", "word_density"),
-  names(df)
-)
+# 01: Small multiples — CC density for each project (faceted)
+# Keep only projects with enough methods to form a meaningful density
+proj_counts <- df %>% count(project) %>% filter(n >= 100)
 
-if (length(profile_metrics) >= 3) {
-  
-  band_profiles <- df %>%
-    filter(!is.na(risk_band)) %>%
-    group_by(risk_band) %>%
-    summarise(across(all_of(profile_metrics), ~ median(.x, na.rm = TRUE)),
-              .groups = "drop")
-  
-  # Normalise each metric to [0,1] for comparability
-  band_profiles_norm <- band_profiles %>%
-    mutate(across(all_of(profile_metrics), ~ {
-      r <- range(.x, na.rm = TRUE)
-      if (diff(r) == 0) .x else (.x - r[1]) / diff(r)
-    }))
-  
-  band_long <- band_profiles_norm %>%
-    pivot_longer(-risk_band, names_to = "metric", values_to = "norm_value") %>%
-    mutate(metric = recode(metric,
-                           loc               = "LOC",
-                           avg_nesting       = "Avg Nesting",
-                           max_nesting       = "Max Nesting",
-                           avg_id_words      = "Avg ID Words",
-                           abbreviated_ratio = "Abbrev Ratio",
-                           comment_density   = "Comment Density",
-                           word_density      = "Word Density"
-    ))
-  
-  p19 <- ggplot(band_long, aes(x = metric, y = norm_value,
-                               colour = risk_band, group = risk_band)) +
-    geom_line(linewidth = 1) +
-    geom_point(size = 2.5) +
-    scale_colour_manual(values = BAND_COLOURS) +
-    scale_y_continuous(labels = percent_format(), limits = c(0, 1)) +
-    labs(title = "Structural Fingerprint of Each CC Risk Band",
-         subtitle = "Median of each metric, normalised 0-1 across bands; higher = relatively more",
-         x = NULL, y = "Normalised Median Value", colour = "CC Band") +
-    theme_minimal(base_size = 12) +
-    theme(axis.text.x = element_text(angle = 20, hjust = 1),
-          legend.position = "top")
-  save_plot(p19, "19_risk_band_structural_fingerprint.png", w = 9, h = 6)
-  
-  # Raw medians table for reference
-  write_csv(band_profiles, file.path(OUT, "band_metric_profiles.csv"))
-}
+p <- ggplot(df %>% filter(project %in% proj_counts$project, cc > 0),
+            aes(x = cc, fill = after_stat(x))) +
+  geom_histogram(bins = 30, colour = "white", linewidth = 0.1) +
+  scale_x_log10(labels = label_comma()) +
+  scale_y_log10(labels = label_comma()) +
+  scale_fill_viridis_c(trans = "log10", guide = "none") +
+  facet_wrap(~ str_extract(project, "[^/]+$"),
+             scales = "free_y", ncol = 6) +
+  labs(title = "CC Distribution — Small Multiples per Project",
+       subtitle = "Projects with >= 100 methods; y-axis free (method count, log); x-axis fixed (CC, log)",
+       x = "CC (log scale)", y = "Count (log scale)") +
+  theme_minimal(base_size = 7) +
+  theme(strip.text = element_text(size = 5.5, face = "bold"),
+        axis.text  = element_text(size = 5))
 
-# =============================================================================
-# 12. SKEWNESS & DISTRIBUTIONAL SHAPE COMPARISON
-# =============================================================================
-
-shape_cols <- intersect(
-  c("cc", "cognitive_complexity", "loc", "max_nesting",
-    "avg_id_words", "abbreviated_ratio", "comment_words"),
-  names(df)
-)
-
-shape_stats <- map_dfr(shape_cols, function(col) {
-  x <- df[[col]][!is.na(df[[col]]) & df[[col]] > 0]
-  tibble(
-    metric      = col,
-    skewness    = skewness(x),
-    kurtosis    = kurtosis(x),
-    cv          = sd(x) / mean(x),   # coefficient of variation
-    gini        = {
-      xs <- sort(x)
-      n  <- length(xs)
-      2 * sum(seq_len(n) * xs) / (n * sum(xs)) - (n + 1) / n
-    }
-  )
-}) %>% arrange(desc(skewness))
-
-cat("\n-- Distributional Shape Statistics --\n")
-print(shape_stats)
-write_csv(shape_stats, file.path(OUT, "distributional_shape.csv"))
-
-p20 <- shape_stats %>%
-  mutate(metric = recode(metric, !!!nice_names)) %>%
-  ggplot(aes(x = reorder(metric, skewness), y = skewness, fill = skewness > 0)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = sprintf("%.1f", skewness),
-                hjust = ifelse(skewness >= 0, -0.1, 1.1)), size = 3.5) +
-  coord_flip() +
-  scale_fill_manual(values = c("TRUE" = "#d62728", "FALSE" = "#1f77b4")) +
-  labs(title = "Skewness of Each Complexity Metric",
-       subtitle = "All metrics are expected to be right-skewed; more skew = heavier tail",
-       x = NULL, y = "Skewness") +
-  theme_minimal(base_size = 12) +
-  expand_limits(y = max(shape_stats$skewness) * 1.15)
-save_plot(p20, "20_metric_skewness_comparison.png", w = 8, h = 5)
-
-# =============================================================================
-# 13. NORMALITY TESTS
-# =============================================================================
-
-cat("\n-- Normality Tests (Shapiro-Wilk on 5000-sample, KS vs log-normal fit) --\n")
-
-norm_results <- map_dfr(intersect(c("cc", "cognitive_complexity", "loc"), names(df)),
-                        function(col) {
-                          x <- df[[col]][!is.na(df[[col]]) & df[[col]] > 0]
-                          sw_s <- sample(x, min(5000, length(x)))
-                          sw   <- shapiro.test(sw_s)
-                          ks   <- ks.test(x, "plnorm",
-                                          meanlog = mean(log(x)), sdlog = sd(log(x)))
-                          tibble(
-                            metric     = col,
-                            sw_W       = sw$statistic,
-                            sw_p       = sw$p.value,
-                            ks_D       = ks$statistic,
-                            ks_p       = ks$p.value
-                          )
-                        }
-)
-
-print(norm_results)
-write_csv(norm_results, file.path(OUT, "normality_tests.csv"))
-
-# =============================================================================
-# 14. SUMMARY REPORT
-# =============================================================================
-
-report <- c(
-  "# Complexity Analysis Summary",
-  sprintf("Generated: %s", Sys.time()),
-  sprintf("Methods:   %d", n),
-  sprintf("Projects:  %d", n_proj),
-  "",
-  "## Key Statistics",
-  sprintf("  Cyclomatic:  median=%g, mean=%.2f, SD=%.2f",
-          median(df$cc), mean(df$cc), sd(df$cc)),
-  if (has_cognitive) sprintf(
-    "  Cognitive:   median=%g, mean=%.2f, SD=%.2f",
-    median(df$cognitive_complexity, na.rm = TRUE),
-    mean(df$cognitive_complexity, na.rm = TRUE),
-    sd(df$cognitive_complexity, na.rm = TRUE)),
-  if (has_loc) sprintf(
-    "  LOC (NBNC):  median=%g, mean=%.2f, SD=%.2f",
-    median(df$loc, na.rm = TRUE),
-    mean(df$loc, na.rm = TRUE),
-    sd(df$loc, na.rm = TRUE)),
-  "",
-  "## Metric Correlations (with CC)",
-  if (has_cognitive) sprintf(
-    "  CC vs Cognitive:    r=%.3f",
-    cor(df$cc, df$cognitive_complexity, use = "complete.obs")),
-  if (has_loc) sprintf(
-    "  CC vs LOC:          r=%.3f",
-    cor(df$cc, df$loc, use = "complete.obs")),
-  if (has_nesting) sprintf(
-    "  CC vs max_nesting:  r=%.3f",
-    cor(df$cc, df$max_nesting, use = "complete.obs")),
-  if (has_id) sprintf(
-    "  CC vs naming_score: r=%.3f",
-    cor(df$cc, df$naming_score, use = "complete.obs")),
-  "",
-  "## Risk Band Distribution",
-  paste(
-    apply(
-      df %>% count(risk_band) %>%
-        mutate(pct = round(100 * n / sum(n), 1)),
-      1, function(r) sprintf("  CC %s: %s%%", r["risk_band"], r["pct"])
-    ),
-    collapse = "\n"
-  )
-)
-
-writeLines(report[!sapply(report, is.null)],
-           file.path(OUT, "summary_report.txt"))
-
-cat("\nDone. Output written to:", OUT, "\n")
+n_shown <- nrow(proj_counts)
+sp(p, DIR_PROJ,  "06_cc_small_multiples_per_project.png",
+   w = 22, h = ceiling(n_shown / 6) * 2.5 + 2)

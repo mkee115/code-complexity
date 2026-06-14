@@ -26,7 +26,6 @@ public class GitHubRepositorySearcher
     private static final int PER_PAGE = 100;
     private static final int MAX_PAGES = 10;
     private static final LocalDate GITHUB_EPOCH = LocalDate.of(2008, 1, 1);
-    private static final long API_DELAY_MS = 750;
 
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper json = new ObjectMapper();
@@ -153,7 +152,6 @@ public class GitHubRepositorySearcher
 
     private int countResultsRaw(String query) throws IOException, InterruptedException
     {
-        Thread.sleep(API_DELAY_MS);
         String url = API + "/search/repositories?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&per_page=1&page=1";
 
@@ -184,7 +182,6 @@ public class GitHubRepositorySearcher
 
         for (int page = 1; page <= MAX_PAGES; page++)
         {
-            Thread.sleep(API_DELAY_MS);
             String url = API + "/search/repositories?q=" + URLEncoder.encode(cleanedQuery, StandardCharsets.UTF_8)
                     + "&per_page=" + PER_PAGE + "&page=" + page;
 
@@ -271,7 +268,40 @@ public class GitHubRepositorySearcher
                 .header("X-GitHub-Api-Version", "2022-11-28");
         if (token != null && !token.isEmpty())
             builder.header("Authorization", "Bearer " + token);
-        return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = builder.build();
+
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 403 || response.statusCode() == 429)
+        {
+            long waitMs = getRateLimitWaitMs(response);
+            System.err.printf("%nRate limited (%d), waiting %.0fs...%n",
+                    response.statusCode(), waitMs / 1000.0);
+            Thread.sleep(waitMs);
+            response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        }
+
+        int remaining = response.headers().firstValue("X-RateLimit-Remaining")
+                .map(Integer::parseInt).orElse(Integer.MAX_VALUE);
+        if (remaining < 5)
+        {
+            long waitMs = getRateLimitWaitMs(response);
+            Thread.sleep(waitMs);
+        }
+
+        return response;
+    }
+
+    private long getRateLimitWaitMs(HttpResponse<?> response)
+    {
+        return response.headers().firstValue("X-RateLimit-Reset")
+                .map(reset -> {
+                    long resetEpoch = Long.parseLong(reset);
+                    long nowEpoch = System.currentTimeMillis() / 1000;
+                    long waitMs = (resetEpoch - nowEpoch) * 1000 + 2000;
+                    return Math.max(waitMs, 5000L);
+                })
+                .orElse(60_000L);
     }
 
     public static class SearchChunk
