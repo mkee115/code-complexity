@@ -4,10 +4,13 @@ library(scales)
 
 # 0. CONFIGURATION
 
-INPUT_FILE <- "repos.csv"
-OUTPUT_DIR <- "output"
+# CSV inputs/tables live in data_tables/; plots go to graphs/.
+DATA_DIR   <- "data_tables"
+OUTPUT_DIR <- "graphs"          # plots
+INPUT_FILE <- file.path(DATA_DIR, "repos.csv")
 
-dir.create(OUTPUT_DIR, showWarnings = FALSE)
+dir.create(DATA_DIR, showWarnings = FALSE, recursive = TRUE)
+dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # 1. DATA LOADING
 
@@ -127,7 +130,7 @@ report_lines <- c(
   paste(sprintf("  %s (%d)", top_java$full_name, top_java$java_file_count), collapse = "\n")
 )
 
-writeLines(report_lines, file.path(OUTPUT_DIR, "repos_summary.txt"))
+writeLines(report_lines, file.path(DATA_DIR, "repos_summary.txt"))
 
 # 4. PLOTS
 
@@ -223,5 +226,93 @@ suppressWarnings(
 )
 ggsave(file.path(OUTPUT_DIR, "repos_07_commits_vs_javafiles.png"), p_cj,
        width = 8, height = 5, dpi = 150)
+
+# 5. COMPLEXITY STRATIFIED BY REPO AGE & RECENCY
+# Joins per-method complexity (cc_data.csv) back to repo metadata so we can ask:
+# does code complexity differ between old vs young, or stale vs actively-pushed
+# repositories?
+
+CC_DATA_FILE <- file.path(DATA_DIR, "cc_data.csv")
+
+if (file.exists(CC_DATA_FILE)) {
+  cat("\nStratifying complexity by repo age / recency...\n")
+
+  cc <- read_csv(CC_DATA_FILE, show_col_types = FALSE)
+
+  # aggregate to one row per project (full_name)
+  agg_cols <- intersect(c("cc", "cognitive_complexity", "loc",
+                          "maintainability_index", "halstead_volume"), names(cc))
+  proj_cc <- cc %>%
+    group_by(project) %>%
+    summarise(across(all_of(agg_cols),
+                     ~ median(as.numeric(.), na.rm = TRUE),
+                     .names = "median_{.col}"),
+              n_methods = n(), .groups = "drop")
+
+  joined <- df %>%
+    select(full_name, age_days, days_since_push, stars) %>%
+    inner_join(proj_cc, by = c("full_name" = "project")) %>%
+    mutate(
+      age_band = cut(age_days,
+                     breaks = c(-Inf, 365, 1095, 1825, Inf),
+                     labels = c("<1y", "1-3y", "3-5y", "5y+")),
+      recency_band = cut(days_since_push,
+                         breaks = c(-Inf, 30, 180, 365, Inf),
+                         labels = c("<30d", "30-180d", "180-365d", "1y+"))
+    )
+
+  if (nrow(joined) > 0 && "median_cc" %in% names(joined)) {
+
+    band_box <- function(data, band_col, title, file) {
+      d <- data %>% filter(!is.na(.data[[band_col]]))
+      meds <- d %>% group_by(.data[[band_col]]) %>%
+        summarise(med = median(median_cc, na.rm = TRUE), .groups = "drop")
+      p <- ggplot(d, aes(x = .data[[band_col]], y = median_cc)) +
+        geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.3,
+                     fill = "#4C72B0", alpha = 0.75) +
+        geom_text(data = meds, aes(x = .data[[band_col]], y = med,
+                                   label = sprintf("%.1f", med)),
+                  vjust = -0.6, size = 3, inherit.aes = FALSE) +
+        labs(title = title, x = NULL, y = "Project Median Cyclomatic CC") +
+        theme_minimal(base_size = 12)
+      ggsave(file.path(OUTPUT_DIR, file), p, width = 8, height = 5, dpi = 150)
+    }
+
+    band_box(joined, "age_band",
+             "Project Median CC by Repository Age", "repos_08_cc_by_age_band.png")
+    band_box(joined, "recency_band",
+             "Project Median CC by Days Since Last Push", "repos_09_cc_by_recency_band.png")
+
+    # Kruskal-Wallis across bands + Spearman vs the raw continuous variables.
+    strat_tests <- tibble(
+      test = c("Kruskal-Wallis (median CC ~ age_band)",
+               "Kruskal-Wallis (median CC ~ recency_band)",
+               "Spearman (median CC vs age_days)",
+               "Spearman (median CC vs days_since_push)",
+               "Spearman (median CC vs stars)"),
+      statistic = c(
+        kruskal.test(median_cc ~ age_band, data = joined)$statistic,
+        kruskal.test(median_cc ~ recency_band, data = joined)$statistic,
+        cor(joined$median_cc, joined$age_days,        method = "spearman", use = "complete.obs"),
+        cor(joined$median_cc, joined$days_since_push, method = "spearman", use = "complete.obs"),
+        cor(joined$median_cc, joined$stars,           method = "spearman", use = "complete.obs")
+      ),
+      p_value = c(
+        kruskal.test(median_cc ~ age_band, data = joined)$p.value,
+        kruskal.test(median_cc ~ recency_band, data = joined)$p.value,
+        cor.test(joined$median_cc, joined$age_days,        method = "spearman", exact = FALSE)$p.value,
+        cor.test(joined$median_cc, joined$days_since_push, method = "spearman", exact = FALSE)$p.value,
+        cor.test(joined$median_cc, joined$stars,           method = "spearman", exact = FALSE)$p.value
+      )
+    )
+    write_csv(strat_tests, file.path(DATA_DIR, "repos_stratification_tests.csv"))
+    write_csv(joined,      file.path(DATA_DIR, "repos_complexity_joined.csv"))
+    print(strat_tests, n = Inf)
+  } else {
+    cat("  No overlap between repos.csv and cc_data.csv projects; skipping.\n")
+  }
+} else {
+  cat("\nNote: cc_data.csv not found; skipping age/recency stratification.\n")
+}
 
 cat("\nDone\n")

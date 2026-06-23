@@ -9,7 +9,11 @@
 #   loc, loc_physical,
 #   avg_nesting, max_nesting,
 #   avg_id_words, abbreviated_ratio, single_letter_ids, longest_id,
-#   total_words, comment_count, comment_words
+#   total_words, comment_count, comment_words,
+#   halstead_volume, halstead_difficulty, halstead_effort,
+#   maintainability_index, mi_normalized,
+#   param_count, return_count, fan_out,
+#   max_line_length, avg_line_length
 #
 # repos.csv columns:
 #   full_name, url, scraped_at, language, stars, forks,
@@ -30,21 +34,28 @@ library(broom)
 # 0. CONFIG
 # =============================================================================
 
-CC_FILE    <- "cc_data.csv"
-REPOS_FILE <- "repos.csv"
-OUT        <- "output"
+# Inputs (produced by the Java program) and all generated CSV tables live in
+# data_tables/; every generated plot lives under graphs/.
+DATA_DIR   <- "data_tables"
+GRAPHS_DIR <- "graphs"
 
-DIR_DIST    <- file.path(OUT, "01_distributions")
-DIR_CORR    <- file.path(OUT, "02_correlations")
-DIR_BANDS   <- file.path(OUT, "03_risk_bands")
-DIR_PROJ    <- file.path(OUT, "04_projects")
-DIR_TABLES  <- file.path(OUT, "05_tables")
-DIR_CCVCOG  <- file.path(OUT, "06_cc_vs_cognitive")
-DIR_NESTING <- file.path(OUT, "07_nesting_drivers")
-DIR_LOC     <- file.path(OUT, "08_loc_vs_complexity")
+CC_FILE    <- file.path(DATA_DIR, "cc_data.csv")
+REPOS_FILE <- file.path(DATA_DIR, "repos.csv")
 
-for (d in c(OUT, DIR_DIST, DIR_CORR, DIR_BANDS, DIR_PROJ, DIR_TABLES,
-            DIR_CCVCOG, DIR_NESTING, DIR_LOC)) {
+DIR_DIST    <- file.path(GRAPHS_DIR, "01_distributions")
+DIR_CORR    <- file.path(GRAPHS_DIR, "02_correlations")
+DIR_BANDS   <- file.path(GRAPHS_DIR, "03_risk_bands")
+DIR_PROJ    <- file.path(GRAPHS_DIR, "04_projects")
+DIR_CCVCOG  <- file.path(GRAPHS_DIR, "06_cc_vs_cognitive")
+DIR_NESTING <- file.path(GRAPHS_DIR, "07_nesting_drivers")
+DIR_LOC     <- file.path(GRAPHS_DIR, "08_loc_vs_complexity")
+DIR_MODEL   <- file.path(GRAPHS_DIR, "09_modelling")
+
+# every write_csv() target — all tables collected in one flat folder
+DIR_TABLES  <- DATA_DIR
+
+for (d in c(DATA_DIR, GRAPHS_DIR, DIR_DIST, DIR_CORR, DIR_BANDS, DIR_PROJ,
+            DIR_TABLES, DIR_CCVCOG, DIR_NESTING, DIR_LOC, DIR_MODEL)) {
   dir.create(d, showWarnings = FALSE, recursive = TRUE)
 }
 
@@ -53,9 +64,29 @@ BAND_LABELS  <- c("1-5", "6-10", "11-15", "16-25", "25+")
 BAND_COLOURS <- c("#2ca02c", "#8fbc8f", "#ff7f0e", "#d62728", "#9467bd")
 names(BAND_COLOURS) <- BAND_LABELS
 
+# Graphics devices cap any single figure at 50,000px per side. At 150 dpi that
+# is ~333in, so clamp every saved figure's dimensions well under that ceiling —
+# otherwise a tall per-project chart aborts the whole script.
+MAX_DIM_IN <- 320
 sp <- function(p, dir, name, w = 9, h = 6) {
+  w <- min(w, MAX_DIM_IN); h <- min(h, MAX_DIM_IN)
   suppressWarnings(ggsave(file.path(dir, name), p, width = w, height = h, dpi = 150, limitsize = FALSE))
   invisible(p)
+}
+
+# With thousands of repositories, per-project bar/box charts that list every
+# project are unreadable AND large enough to blow past the device limit. Show
+# only the most extreme projects, and derive a safe height from how many appear.
+MAX_PROJ_BARS <- 60
+proj_h <- function(k) min(40, max(6, k * 0.28 + 2))
+
+# Top-k projects by a given summary column, plus a subtitle that says how many
+# of the full set are shown.
+top_projects <- function(stat_tbl, col, k = MAX_PROJ_BARS)
+  stat_tbl %>% slice_max(.data[[col]], n = k, with_ties = FALSE) %>% pull(project)
+proj_subtitle <- function(k_shown) {
+  if (n_proj > k_shown) sprintf("Showing top %d of %d projects", k_shown, n_proj)
+  else sprintf("All %d projects", n_proj)
 }
 
 # =============================================================================
@@ -68,7 +99,11 @@ df_raw <- read_csv(CC_FILE, show_col_types = FALSE)
 numeric_candidates <- c("cc", "cognitive_complexity", "loc", "loc_physical",
                         "avg_nesting", "max_nesting", "avg_id_words",
                         "abbreviated_ratio", "single_letter_ids", "longest_id",
-                        "total_words", "comment_count", "comment_words")
+                        "total_words", "comment_count", "comment_words",
+                        "halstead_volume", "halstead_difficulty", "halstead_effort",
+                        "maintainability_index", "mi_normalized",
+                        "param_count", "return_count", "fan_out",
+                        "max_line_length", "avg_line_length")
 numeric_present <- intersect(numeric_candidates, names(df_raw))
 
 df <- df_raw
@@ -117,6 +152,10 @@ stat_cols <- intersect(
     "avg_nesting", "max_nesting", "avg_id_words", "abbreviated_ratio",
     "single_letter_ids", "longest_id", "total_words",
     "comment_count", "comment_words",
+    "halstead_volume", "halstead_difficulty", "halstead_effort",
+    "maintainability_index", "mi_normalized",
+    "param_count", "return_count", "fan_out",
+    "max_line_length", "avg_line_length",
     "cc_per_loc", "cog_ratio", "cog_excess", "naming_score",
     "comment_density", "word_density", "blank_ratio"),
   names(df)
@@ -412,6 +451,10 @@ cor_cols <- intersect(
     "avg_nesting", "max_nesting", "avg_id_words", "abbreviated_ratio",
     "single_letter_ids", "longest_id", "total_words",
     "comment_count", "comment_words",
+    "halstead_volume", "halstead_difficulty", "halstead_effort",
+    "maintainability_index", "mi_normalized",
+    "param_count", "return_count", "fan_out",
+    "max_line_length", "avg_line_length",
     "cc_per_loc", "cog_ratio", "naming_score",
     "comment_density", "word_density", "blank_ratio"),
   names(df)
@@ -436,6 +479,16 @@ nice_names <- c(
   total_words          = "Total Words",
   comment_count        = "Comment Count",
   comment_words        = "Comment Words",
+  halstead_volume      = "Halstead Volume",
+  halstead_difficulty  = "Halstead Difficulty",
+  halstead_effort      = "Halstead Effort",
+  maintainability_index = "Maintainability Idx",
+  mi_normalized        = "Maintainability (0-100)",
+  param_count          = "Param Count",
+  return_count         = "Return Count",
+  fan_out              = "Fan-out",
+  max_line_length      = "Max Line Length",
+  avg_line_length      = "Avg Line Length",
   cc_per_loc           = "CC / LOC",
   cog_ratio            = "Cog/CC Ratio",
   naming_score         = "Naming Score",
@@ -467,6 +520,39 @@ p_corr <- ggplot(cor_long, aes(x = var1, y = var2, fill = r)) +
         panel.grid  = element_blank())
 sp(p_corr, DIR_CORR, "01_correlation_heatmap_full.png",
    w = tile_size, h = tile_size * 0.85)
+
+# ── Focused heatmap: only the headline complexity metrics ─────────────────────
+# The full matrix is comprehensive but busy. This trimmed version keeps just the
+# core size/branching/structure metrics that matter most, so the strongest
+# relationships are easy to read at a glance.
+key_cor_cols <- intersect(
+  c("cc", "cognitive_complexity", "loc", "max_nesting",
+    "halstead_volume", "halstead_effort", "maintainability_index",
+    "param_count", "fan_out"),
+  rownames(cor_matrix)
+)
+
+if (length(key_cor_cols) >= 2) {
+  key_matrix <- cor_matrix[key_cor_cols, key_cor_cols, drop = FALSE]
+  key_long <- as_tibble(key_matrix, rownames = "var1") %>%
+    pivot_longer(-var1, names_to = "var2", values_to = "r") %>%
+    mutate(var1  = recode(var1, !!!nice_names),
+           var2  = recode(var2, !!!nice_names),
+           label = sprintf("%.2f", r))
+
+  p_corr_key <- ggplot(key_long, aes(x = var1, y = var2, fill = r)) +
+    geom_tile(colour = "white", linewidth = 0.4) +
+    geom_text(aes(label = label), size = 3.6) +
+    scale_fill_gradient2(low = "#d62728", mid = "white", high = "#1f77b4",
+                         midpoint = 0, limits = c(-1, 1), name = "Pearson r") +
+    labs(title = "Pearson Correlation — Key Complexity Metrics",
+         subtitle = "Trimmed to the headline size, branching and structure metrics",
+         x = NULL, y = NULL) +
+    theme_minimal(base_size = 12) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          panel.grid  = element_blank())
+  sp(p_corr_key, DIR_CORR, "01b_correlation_heatmap_key.png", w = 9, h = 8)
+}
 
 # ── Scatter: CC vs each other metric (hex + lm) ───────────────────────────────
 
@@ -739,38 +825,45 @@ if (!is.null(repos)) {
               by = "project")
 }
 
-project_order <- project_stats %>% arrange(median_cc) %>% pull(project)
 ps <- function(x) str_extract(x, "[^/]+$")
 
-p_proj_box <- ggplot(df %>% filter(cc > 0),
-                     aes(x = factor(project, levels = project_order), y = cc)) +
+box_proj   <- top_projects(project_stats, "median_cc")
+box_order  <- project_stats %>% filter(project %in% box_proj) %>%
+  arrange(median_cc) %>% pull(project)
+p_proj_box <- ggplot(df %>% filter(cc > 0, project %in% box_proj),
+                     aes(x = factor(project, levels = box_order), y = cc)) +
   geom_boxplot(outlier.size = 0.4, outlier.alpha = 0.2, fill = "#4C72B0", alpha = 0.7) +
   coord_flip() +
   scale_y_log10(labels = label_comma()) +
   scale_x_discrete(labels = ps) +
-  labs(title = "CC Distribution per Project (sorted by median)",
+  labs(title = "CC Distribution per Project (highest median CC)",
+       subtitle = proj_subtitle(length(box_proj)),
        x = NULL, y = "Cyclomatic Complexity (log scale)") +
   theme_minimal(base_size = 8)
 sp(p_proj_box, DIR_PROJ, "01_cc_boxplot_per_project.png",
-   w = 12, h = max(6, n_proj * 0.28 + 2))
+   w = 12, h = proj_h(length(box_proj)))
 
-p_proj_bar <- ggplot(project_stats %>% mutate(proj = ps(project)),
+bar_proj <- top_projects(project_stats, "median_cc")
+p_proj_bar <- ggplot(project_stats %>% filter(project %in% bar_proj) %>% mutate(proj = ps(project)),
                      aes(x = reorder(proj, median_cc), y = median_cc)) +
   geom_col(fill = "#4C72B0", alpha = 0.8) +
   coord_flip() +
-  labs(title = "Median Cyclomatic Complexity per Project", x = NULL, y = "Median CC") +
+  labs(title = "Median Cyclomatic Complexity per Project",
+       subtitle = proj_subtitle(length(bar_proj)), x = NULL, y = "Median CC") +
   theme_minimal(base_size = 8)
 sp(p_proj_bar, DIR_PROJ, "02_median_cc_per_project.png",
-   w = 10, h = max(6, n_proj * 0.28 + 2))
+   w = 10, h = proj_h(length(bar_proj)))
 
-p_proj_pct <- ggplot(project_stats %>% mutate(proj = ps(project)),
+pct_proj <- top_projects(project_stats, "pct_cc_gt10")
+p_proj_pct <- ggplot(project_stats %>% filter(project %in% pct_proj) %>% mutate(proj = ps(project)),
                      aes(x = reorder(proj, pct_cc_gt10), y = pct_cc_gt10)) +
   geom_col(fill = "#d62728", alpha = 0.8) +
   coord_flip() +
-  labs(title = "% Methods with CC > 10 per Project", x = NULL, y = "% Methods CC > 10") +
+  labs(title = "% Methods with CC > 10 per Project",
+       subtitle = proj_subtitle(length(pct_proj)), x = NULL, y = "% Methods CC > 10") +
   theme_minimal(base_size = 8)
 sp(p_proj_pct, DIR_PROJ, "03_pct_high_cc_per_project.png",
-   w = 10, h = max(6, n_proj * 0.28 + 2))
+   w = 10, h = proj_h(length(pct_proj)))
 
 p_size_cc <- ggplot(project_stats, aes(x = n_methods, y = median_cc)) +
   geom_point(alpha = 0.6, size = 2, colour = "#4C72B0") +
@@ -987,20 +1080,21 @@ report <- c(
   "----------------------------------------------------------------",
   "  OUTPUT FOLDERS",
   "----------------------------------------------------------------",
-  "  01_distributions/  histograms (linear + log-log), ECDFs for every metric",
-  "  02_correlations/   full correlation heatmap + CC vs each metric scatterplots",
-  "  03_risk_bands/     boxplots per band, ridgelines, naming/comment by band",
-  "  04_projects/       per-project CC profiles + small multiples grid",
-  "  05_tables/         all CSVs (descriptive stats, correlations, summaries)",
-  "  06_cc_vs_cognitive CC vs cognitive comparisons and disagreement analysis",
-  "  07_nesting_drivers nesting depth as a complexity driver",
-  "  08_loc_vs_complexity LOC-based plots and CC density by method length",
+  "  data_tables/             all CSV tables + raw program output + this report",
+  "  graphs/01_distributions/ histograms (linear + log-log), ECDFs for every metric",
+  "  graphs/02_correlations/  full correlation heatmap + CC vs each metric scatterplots",
+  "  graphs/03_risk_bands/    boxplots per band, ridgelines, naming/comment by band",
+  "  graphs/04_projects/      per-project CC profiles + small multiples grid",
+  "  graphs/06_cc_vs_cognitive  CC vs cognitive comparisons and disagreement analysis",
+  "  graphs/07_nesting_drivers  nesting depth as a complexity driver",
+  "  graphs/08_loc_vs_complexity LOC-based plots and CC density by method length",
+  "  graphs/09_modelling/     regression, partial correlations, PCA, redundancy",
   "================================================================"
 )
 
 
-writeLines(report[!sapply(report, is.null)], file.path(OUT, "summary_report.txt"))
-cat("\nDone. Outputs written to:", OUT, "\n")
+writeLines(report[!sapply(report, is.null)], file.path(DATA_DIR, "summary_report.txt"))
+cat("\nDone. Tables ->", DATA_DIR, " | Graphs ->", GRAPHS_DIR, "\n")
 
 # =============================================================================
 # 9. CC VS COGNITIVE  →  06_cc_vs_cognitive
@@ -1090,16 +1184,18 @@ if (has_cog) {
     mutate(proj = str_extract(project, "[^/]+$"))
   write_csv(proj_cog_pct, file.path(DIR_TABLES, "project_cog_excess.csv"))
   
-  p <- ggplot(proj_cog_pct, aes(x = reorder(proj, pct_cog_higher), y = pct_cog_higher)) +
+  proj_cog_top <- proj_cog_pct %>% slice_max(pct_cog_higher, n = MAX_PROJ_BARS, with_ties = FALSE)
+  p <- ggplot(proj_cog_top, aes(x = reorder(proj, pct_cog_higher), y = pct_cog_higher)) +
     geom_col(fill = "#9467bd", alpha = 0.8) +
     geom_hline(yintercept = 50, linetype = "dashed", colour = "red", linewidth = 0.7) +
     coord_flip() +
     labs(title = "% of Methods Where Cognitive > Cyclomatic, by Project",
-         subtitle = "Red line = 50%; above means cognitive tends to score higher in this project",
+         subtitle = paste0(proj_subtitle(nrow(proj_cog_top)),
+                           "; red line = 50% (above = cognitive scores higher)"),
          x = NULL, y = "% Methods where Cognitive > Cyclomatic") +
     theme_minimal(base_size = 8)
   sp(p, DIR_CCVCOG, "05_pct_cog_higher_by_project.png",
-     w = 10, h = max(6, n_proj * 0.28 + 2))
+     w = 10, h = proj_h(nrow(proj_cog_top)))
 }
 
 # =============================================================================
@@ -1205,16 +1301,18 @@ if (has_loc) {
     mutate(proj = str_extract(project, "[^/]+$"))
   write_csv(proj_ccloc, file.path(DIR_TABLES, "project_cc_per_loc.csv"))
   
-  p <- ggplot(proj_ccloc, aes(x = reorder(proj, median_cc_per_loc),
+  proj_ccloc_top <- proj_ccloc %>% slice_max(median_cc_per_loc, n = MAX_PROJ_BARS, with_ties = FALSE)
+  p <- ggplot(proj_ccloc_top, aes(x = reorder(proj, median_cc_per_loc),
                               y = median_cc_per_loc)) +
     geom_col(fill = "#ff7f0e", alpha = 0.85) +
     coord_flip() +
     labs(title = "Median CC / LOC by Project",
-         subtitle = "High = short methods densely packed with branches; low = long methods few branches",
+         subtitle = paste0(proj_subtitle(nrow(proj_ccloc_top)),
+                           "; high = short methods densely packed with branches"),
          x = NULL, y = "Median CC per Line of Code") +
     theme_minimal(base_size = 8)
   sp(p, DIR_LOC, "01_cc_per_loc_by_project.png",
-     w = 10, h = max(6, n_proj * 0.28 + 2))
+     w = 10, h = proj_h(nrow(proj_ccloc_top)))
   
   
   
@@ -1240,6 +1338,39 @@ if (has_loc) {
     summarise(n = n(), median_cc = median(cc), mean_cc = mean(cc),
               pct_cc_gt10 = round(100 * mean(cc > 10), 1), .groups = "drop")
   write_csv(loc_band_stats, file.path(DIR_TABLES, "cc_by_loc_band.csv"))
+
+  # Spearman correlation — more appropriate than Pearson for these skewed distributions
+  spearman_cc_loc <- cor.test(df$cc, df$loc, method = "spearman", exact = FALSE)
+  cat(sprintf("Spearman correlation (CC vs LOC): rho = %.4f, p = %.4e\n",
+              spearman_cc_loc$estimate, spearman_cc_loc$p.value))
+
+  # Mann-Whitney U — tests whether CC is significantly different between the two LOC bands
+  cc_short <- df$cc[df$loc_band == "<=24 LOC"]
+  cc_long  <- df$cc[df$loc_band == ">24 LOC"]
+  mw <- wilcox.test(cc_short, cc_long, alternative = "two.sided")
+
+  # Effect size: with N this large p-values are meaningless, so report Cliff's
+  # delta (= rank-biserial correlation) derived from the U statistic.
+  n1 <- length(cc_short); n2 <- length(cc_long)
+  cliffs_delta <- 2 * as.numeric(mw$statistic) / (n1 * n2) - 1
+
+  cat(sprintf("Mann-Whitney U test (CC: <=24 vs >24 LOC):\n"))
+  cat(sprintf("  W = %.0f, p = %.4e\n",         mw$statistic, mw$p.value))
+  cat(sprintf("  Median CC (<=24 LOC) : %.1f\n", median(cc_short)))
+  cat(sprintf("  Median CC  (>24 LOC) : %.1f\n", median(cc_long)))
+  cat(sprintf("  n (<=24 LOC): %d,  n (>24 LOC): %d\n", n1, n2))
+  cat(sprintf("  Cliff's delta (effect size): %.4f\n", cliffs_delta))
+
+  write_csv(
+    tibble(
+      test        = c("Spearman (CC vs LOC)", "Mann-Whitney (CC: <=24 vs >24 LOC)"),
+      statistic   = c(round(as.numeric(spearman_cc_loc$estimate), 4), round(as.numeric(mw$statistic), 0)),
+      p_value     = c(spearman_cc_loc$p.value, mw$p.value),
+      effect_size = c(round(as.numeric(spearman_cc_loc$estimate), 4), round(cliffs_delta, 4)),
+      effect_type = c("Spearman rho", "Cliff's delta (rank-biserial)")
+    ),
+    file.path(DIR_TABLES, "statistical_tests.csv")
+  )
 }
 
 # =============================================================================
@@ -1319,12 +1450,19 @@ if (has_comments) {
     theme(legend.position = "top")
   sp(p, DIR_BANDS, "19_cc_density_by_comment_presence.png")
   
-  # Wilcoxon test result saved to table
-  wtest <- wilcox.test(cc ~ has_comment_flag, data = df %>% filter(!is.na(has_comment_flag)))
+  # Wilcoxon test result + effect size saved to table.
+  # Formula groups by factor(has_comment_flag): first level FALSE, so W is the
+  # U statistic for the "no comments" group; Cliff's delta = 2W/(n1*n2) - 1.
+  cmp_df  <- df %>% filter(!is.na(has_comment_flag))
+  wtest   <- wilcox.test(cc ~ has_comment_flag, data = cmp_df)
+  n_false <- sum(!cmp_df$has_comment_flag)
+  n_true  <- sum(cmp_df$has_comment_flag)
+  cliffs_delta_comment <- 2 * as.numeric(wtest$statistic) / (n_false * n_true) - 1
   write_csv(
     tibble(test = "Wilcoxon CC ~ has_comments",
            W    = wtest$statistic,
            p    = wtest$p.value,
+           cliffs_delta          = round(cliffs_delta_comment, 4),
            median_cc_commented   = median(df$cc[df$has_comment_flag  == TRUE],  na.rm = TRUE),
            median_cc_uncommented = median(df$cc[df$has_comment_flag  == FALSE], na.rm = TRUE)),
     file.path(DIR_TABLES, "wilcoxon_cc_comment_presence.csv")
@@ -1367,8 +1505,10 @@ if (has_comments) {
 cat("Generating project deep dive plots...\n")
 
 # 01: Small multiples — CC density for each project (faceted)
-# Keep only projects with enough methods to form a meaningful density
-proj_counts <- df %>% count(project) %>% filter(n >= 100)
+# Keep only projects with enough methods to form a meaningful density, and cap
+# the number of facets so the grid stays readable and within the device limit.
+proj_counts <- df %>% count(project) %>% filter(n >= 100) %>%
+  slice_max(n, n = MAX_PROJ_BARS, with_ties = FALSE)
 
 p <- ggplot(df %>% filter(project %in% proj_counts$project, cc > 0),
             aes(x = cc, fill = after_stat(x))) +
@@ -1379,7 +1519,8 @@ p <- ggplot(df %>% filter(project %in% proj_counts$project, cc > 0),
   facet_wrap(~ str_extract(project, "[^/]+$"),
              scales = "free_y", ncol = 6) +
   labs(title = "CC Distribution — Small Multiples per Project",
-       subtitle = "Projects with >= 100 methods; y-axis free (method count, log); x-axis fixed (CC, log)",
+       subtitle = sprintf("%d largest projects (>= 100 methods); y free (count, log), x fixed (CC, log)",
+                          nrow(proj_counts)),
        x = "CC (log scale)", y = "Count (log scale)") +
   theme_minimal(base_size = 7) +
   theme(strip.text = element_text(size = 5.5, face = "bold"),
@@ -1388,3 +1529,155 @@ p <- ggplot(df %>% filter(project %in% proj_counts$project, cc > 0),
 n_shown <- nrow(proj_counts)
 sp(p, DIR_PROJ,  "06_cc_small_multiples_per_project.png",
    w = 22, h = ceiling(n_shown / 6) * 2.5 + 2)
+
+# =============================================================================
+# 15. MODELLING: REGRESSION, PARTIAL CORRELATION, PCA, REDUNDANCY  →  09_modelling
+# =============================================================================
+
+cat("Running modelling / multivariate analysis...\n")
+
+# ── 15A. MULTIPLE REGRESSION — what independently predicts cognitive load? ─────
+# CC and LOC are confounded (longer methods have more branches), so a simple
+# CC-vs-cognitive correlation overstates CC's role. Regressing cognitive
+# complexity on CC, LOC and nesting together isolates each one's contribution.
+
+reg_inputs <- c("cognitive_complexity", "cc", "loc", "max_nesting")
+if (all(reg_inputs %in% names(df))) {
+  model_df <- df %>% select(all_of(reg_inputs)) %>% drop_na()
+
+  fit <- lm(cognitive_complexity ~ cc + loc + max_nesting, data = model_df)
+  fit_glance <- broom::glance(fit)
+  write_csv(broom::tidy(fit), file.path(DIR_TABLES, "regression_cognitive_coefficients.csv"))
+  write_csv(fit_glance,       file.path(DIR_TABLES, "regression_cognitive_fit.csv"))
+
+  cat(sprintf("  lm(cognitive ~ cc + loc + max_nesting): adj R^2 = %.3f\n",
+              fit_glance$adj.r.squared))
+
+  # Standardised coefficients make the predictors directly comparable.
+  std_df  <- model_df %>% mutate(across(everything(), ~ as.numeric(scale(.))))
+  fit_std <- lm(cognitive_complexity ~ cc + loc + max_nesting, data = std_df)
+  std_coefs <- broom::tidy(fit_std) %>% filter(term != "(Intercept)") %>%
+    mutate(term = recode(term, !!!nice_names))
+
+  p_coef <- ggplot(std_coefs, aes(x = reorder(term, estimate), y = estimate)) +
+    geom_col(fill = "#4C72B0", alpha = 0.85) +
+    geom_errorbar(aes(ymin = estimate - 1.96 * std.error,
+                      ymax = estimate + 1.96 * std.error), width = 0.2) +
+    coord_flip() +
+    labs(title = "Standardised Predictors of Cognitive Complexity",
+         subtitle = sprintf("lm(cognitive ~ cc + loc + max_nesting); adj R² = %.3f",
+                            fit_glance$adj.r.squared),
+         x = NULL, y = "Standardised coefficient (95% CI)") +
+    theme_minimal(base_size = 12)
+  sp(p_coef, DIR_MODEL, "01_cognitive_regression_coefficients.png", w = 8, h = 5)
+}
+
+# ── 15B. PARTIAL CORRELATIONS — correlation with confounders held constant ─────
+if (!requireNamespace("ppcor", quietly = TRUE)) install.packages("ppcor")
+
+pcor_cols <- intersect(
+  c("cc", "cognitive_complexity", "loc", "max_nesting", "halstead_volume", "fan_out"),
+  names(df))
+
+if (length(pcor_cols) >= 3) {
+  pcor_df <- df %>% select(all_of(pcor_cols)) %>% drop_na()
+  pcor_res <- tryCatch(
+    ppcor::pcor(pcor_df, method = "spearman"),
+    error = function(e) { cat("  Partial correlation failed:", conditionMessage(e), "\n"); NULL })
+
+  if (!is.null(pcor_res)) {
+    est <- pcor_res$estimate
+    dimnames(est) <- list(pcor_cols, pcor_cols)
+    write_csv(as_tibble(est, rownames = "metric"),
+              file.path(DIR_TABLES, "partial_correlations.csv"))
+
+    pcor_long <- as_tibble(est, rownames = "var1") %>%
+      pivot_longer(-var1, names_to = "var2", values_to = "r") %>%
+      mutate(var1 = recode(var1, !!!nice_names),
+             var2 = recode(var2, !!!nice_names),
+             label = sprintf("%.2f", r))
+    p_pcor <- ggplot(pcor_long, aes(x = var1, y = var2, fill = r)) +
+      geom_tile(colour = "white", linewidth = 0.3) +
+      geom_text(aes(label = label), size = 3) +
+      scale_fill_gradient2(low = "#d62728", mid = "white", high = "#1f77b4",
+                           midpoint = 0, limits = c(-1, 1), name = "Partial rho") +
+      labs(title = "Spearman Partial Correlations",
+           subtitle = "Each cell controls for all other metrics in the set",
+           x = NULL, y = NULL) +
+      theme_minimal(base_size = 11) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.grid = element_blank())
+    sp(p_pcor, DIR_MODEL, "02_partial_correlation_heatmap.png", w = 8, h = 7)
+  }
+}
+
+# ── 15C. PCA — how many independent dimensions do the metrics span? ────────────
+pca_cols <- intersect(
+  c("cc", "cognitive_complexity", "loc", "loc_physical", "avg_nesting", "max_nesting",
+    "avg_id_words", "abbreviated_ratio", "single_letter_ids", "longest_id",
+    "total_words", "comment_count", "comment_words",
+    "halstead_volume", "halstead_difficulty", "halstead_effort",
+    "maintainability_index", "param_count", "return_count", "fan_out",
+    "max_line_length", "avg_line_length"),
+  names(df))
+
+pca_data <- df %>% select(all_of(pca_cols)) %>% drop_na()
+pca_data <- pca_data[, vapply(pca_data, function(x) sd(x) > 0, logical(1)), drop = FALSE]
+
+if (ncol(pca_data) >= 3 && nrow(pca_data) >= 10) {
+  pca <- prcomp(pca_data, center = TRUE, scale. = TRUE)
+  var_explained <- pca$sdev^2 / sum(pca$sdev^2)
+
+  scree_df <- tibble(
+    pc  = factor(paste0("PC", seq_along(var_explained)),
+                 levels = paste0("PC", seq_along(var_explained))),
+    var = var_explained,
+    cum = cumsum(var_explained)
+  ) %>% slice_head(n = min(12, nrow(.)))
+
+  p_scree <- ggplot(scree_df, aes(x = pc)) +
+    geom_col(aes(y = var), fill = "#4C72B0", alpha = 0.85) +
+    geom_line(aes(y = cum, group = 1), colour = "orange", linewidth = 0.9) +
+    geom_point(aes(y = cum), colour = "orange", size = 2) +
+    scale_y_continuous(labels = percent_format()) +
+    labs(title = "PCA Scree Plot — Variance Explained",
+         subtitle = "Bars = per-component variance; line = cumulative",
+         x = NULL, y = "Proportion of variance") +
+    theme_minimal(base_size = 12)
+  sp(p_scree, DIR_MODEL, "03_pca_scree.png", w = 9, h = 5)
+
+  n_pc <- min(3, ncol(pca$rotation))
+  loadings <- as_tibble(pca$rotation[, seq_len(n_pc), drop = FALSE], rownames = "metric")
+  write_csv(loadings, file.path(DIR_TABLES, "pca_loadings.csv"))
+
+  if (n_pc >= 2) {
+    load_plot <- loadings %>% mutate(label = recode(metric, !!!nice_names))
+    p_load <- ggplot(load_plot, aes(x = PC1, y = PC2)) +
+      geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2),
+                   arrow = arrow(length = unit(0.18, "cm")), colour = "grey60") +
+      geom_text(aes(label = label), size = 3, vjust = -0.4, check_overlap = TRUE) +
+      geom_hline(yintercept = 0, linetype = "dashed", colour = "grey80") +
+      geom_vline(xintercept = 0, linetype = "dashed", colour = "grey80") +
+      labs(title = "PCA Variable Loadings (PC1 vs PC2)",
+           subtitle = sprintf("PC1 = %.1f%%, PC2 = %.1f%% of variance",
+                              100 * var_explained[1], 100 * var_explained[2]),
+           x = "PC1 loading", y = "PC2 loading") +
+      theme_minimal(base_size = 12)
+    sp(p_load, DIR_MODEL, "04_pca_loadings.png", w = 9, h = 7)
+  }
+
+  # ── 15D. METRIC REDUNDANCY DENDROGRAM — which metrics collapse together? ─────
+  # Distance = 1 - |Spearman rho|: metrics that move together cluster tightly.
+  cor_spear <- cor(pca_data, method = "spearman", use = "pairwise.complete.obs")
+  hc <- hclust(as.dist(1 - abs(cor_spear)), method = "average")
+  hc$labels <- recode(hc$labels, !!!nice_names)
+
+  png(file.path(DIR_MODEL, "05_metric_redundancy_dendrogram.png"),
+      width = 1100, height = 750, res = 130)
+  par(mar = c(3, 4, 4, 8))
+  plot(as.dendrogram(hc), horiz = TRUE,
+       main = "Metric Redundancy (1 - |Spearman rho|)",
+       xlab = "Distance")
+  dev.off()
+}
+
+cat("Modelling analysis complete.\n")

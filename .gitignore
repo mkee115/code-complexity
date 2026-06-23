@@ -2,10 +2,12 @@
 .Rproj.user/
 .Rhistory
 .RData
-.RDataTmp
+.RDataTmp*
 .Ruserdata
 .Rapp.history
 output/
+graphs/
+data_tables/
 **/*.csv
 **/*.png
 **/*.txt
