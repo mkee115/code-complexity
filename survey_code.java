@@ -113,6 +113,8 @@ public static int calc(int[] d) {
  * Complexities: CC 4 | Cognitive 4 | Nesting 2 | LOC 9 | FanOut 0
  * Isolating: nesting, by merging the two conditions with &&
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this might be too small a change to add, like i think everyone will 
+// pick the option that there was no change in how complex they found it idk
 public static int calc(int[] d) {
     int t = 0;
     for (int i = 0; i < d.length; i++) {
@@ -152,6 +154,8 @@ public static int calc(int[] d) {
  * Complexities: CC 4 | Cognitive 6 | Nesting 3 | LOC 11 | FanOut 0
  * Isolating: naming, structure identical to 01-ORIG
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i like this but the students might abuse the function name for the 'explain 
+// what this method does' question
 public static int sumPositiveEvenValues(int[] values) {
     int total = 0;
     for (int index = 0; index < values.length; index++) {
@@ -223,6 +227,8 @@ public static String grade(int s) {
  * Complexities: CC 5 | Cognitive 5 | Nesting 1 | LOC 15 | FanOut 0
  * Isolating: multiple exits, by flattening to an else-if chain but keeping one exit
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too similar to one above ^ , prob should keep one delete 
+// the other. i dont have a preference on which
 public static String grade(int s) {
     String r;
     if (s >= 90) {
@@ -295,6 +301,9 @@ public static String grade(int s) {
  *            comment restates the syntax of the line below it and adds nothing.
  *            Pair against 02-V4 to separate comment presence from comment usefulness
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i dont like this one or the one above ^ bc i think this method is too 
+// comprehensible to have comments. i think we get the comment results from other 
+// methods
 public static String grade(int s) {
     // declare the result variable
     String r;
@@ -332,6 +341,7 @@ public static String grade(int s) {
  * Complexities: CC 6 | Cognitive 2 | Nesting 1 | LOC 8 | FanOut 5
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this method could be good to add comments too as a variant 
 public static boolean check(String p) {
     boolean ok = false;
     if (p != null && p.length() >= 8 && !p.equals(p.toLowerCase())
@@ -375,6 +385,8 @@ public static boolean check(String p) {
  *               Helpers: CC 1, 2, 1 and LOC 3, 3, 3. Block totals CC 8, LOC 12
  * Isolating: extraction into named helpers
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE is it fine to make helper methods? just wanted to make sure since our study is
+// about method complexity and not class complexity
 public static boolean check(String p) {
     return p != null && hasMinLength(p) && hasLowerAndUpper(p) && hasDigit(p);
 }
@@ -398,6 +410,7 @@ private static boolean hasDigit(String p) {
  * Complexities: CC 6 | Cognitive 2 | Nesting 1 | LOC 7 | FanOut 5
  * Isolating: layout, identical tokens to 03-ORIG on one line instead of two
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too similar to 03-ORIG to be useful
 public static boolean check(String p) {
     boolean ok = false;
     if (p != null && p.length() >= 8 && !p.equals(p.toLowerCase()) && !p.equals(p.toUpperCase()) && p.matches(".*[0-9].*")) {
@@ -413,6 +426,7 @@ public static boolean check(String p) {
  * Complexities: CC 7 | Cognitive 4 | Nesting 2 | LOC 10 | FanOut 2
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE cbk to scrap this method entirely
 public static int count(String s) {
     int n = 0;
     for (int i = 0; i < s.length(); i++) {
@@ -456,6 +470,8 @@ public static int count(String s) {
  * Complexities: CC 3 | Cognitive 3 | Nesting 2 | LOC 9 | FanOut 3
  * Isolating: branch count, traded for implicit knowledge of what indexOf returns
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE too similar to originial i reckon, and .indexOf is just gonna make students
+// say its more complex than them comparing branches
 public static int count(String s) {
     int n = 0;
     for (int i = 0; i < s.length(); i++) {
@@ -473,6 +489,7 @@ public static int count(String s) {
  * Complexities: CC 7 | Cognitive 4 | Nesting 2 | LOC 11 | FanOut 2
  * Isolating: naming and layout, control flow identical to 04-ORIG
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE idk i think this ones a maybe
 public static int countVowels(String text) {
     int vowelCount = 0;
     for (int position = 0; position < text.length(); position++) {
@@ -559,6 +576,8 @@ public static int max(int[][] g) {
  * Complexities: CC 4 | Cognitive 6 | Nesting 3 | LOC 11 | FanOut 0
  * Isolating: volume alone, since enhanced for loops move only Halstead vocabulary
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE too similar to original, i think using other java features is not good for this
+// study, since it will make students think the complexity is higher
 public static int max(int[][] g) {
     int m = Integer.MIN_VALUE;
     for (int[] row : g) {
@@ -579,6 +598,9 @@ public static int max(int[][] g) {
  *               Helper rowMax: CC 3, Cognitive 3, Nesting 2, LOC 9. Block totals CC 5, LOC 16
  * Isolating: extraction, where summed CC exceeds the original but no method is as deep
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE as written before, idk if we should use helper methods. also i dont think
+// we should use a helper method for this method if we are including them, it makes it
+// sm more complicated i reckon
 public static int max(int[][] g) {
     int m = Integer.MIN_VALUE;
     for (int[] row : g) {
@@ -605,6 +627,9 @@ private static int rowMax(int[] row) {
  * Isolating: comment quality, helpful inline. Code token for token identical to 06-ORIG,
  *            each comment explains why rather than what
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i like having comments in this one, although i think the comments should be 
+// more comprehensible (also bc a lot of compsci students are international, may not 
+// have english as first language)
 public static int max(int[][] g) {
     // start below every possible value so the first cell always wins
     int m = Integer.MIN_VALUE;
@@ -627,6 +652,9 @@ public static int max(int[][] g) {
  * Complexities: CC 5 | Cognitive 11 | Nesting 3 | LOC 23 | FanOut 1
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think whole method may be a bit too complex for this study, maybe we could
+// remove the class and just have a double balance variable or smth, or just remove
+// this method entirely
 class Account {
     double balance;
 }
@@ -694,6 +722,8 @@ public static String withdraw(Account a, String amt) {
  * Isolating: exception handling swapped for a regex. Pair against 07-V1, not the original.
  *            Diverges from the original only on exponent notation such as 1e3
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i reckon too similar to above ^ , also i think 'matches("-?\\d+(\\.\\d+)?"' is too 
+// complex for our audience
 class Account {
     double balance;
 }
@@ -723,6 +753,8 @@ public static String withdraw(Account a, String amt) {
  * Complexities: CC 5 | Cognitive 8 | Nesting 3 | LOC 15 | FanOut 5
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE love this method (like including variants), def keep, also could be good
+// candidate for comments
 import java.util.ArrayList;
 import java.util.List;
 
@@ -769,6 +801,8 @@ public static List<String> dedupe(List<String> in) {
  * Complexities: CC 1 | Cognitive 0 | Nesting 0 | LOC 3 | FanOut 2
  * Isolating: library knowledge, at the floor of every structural metric
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE idk i think this one may be too based on utilising java libraries instead of 
+// the actual algorithm
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -834,6 +868,7 @@ public static int words(String t) {
  * Complexities: CC 3 | Cognitive 3 | Nesting 2 | LOC 9 | FanOut 3
  * Isolating: branch count and nesting, at the cost of knowing how split treats empty pieces
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE library method may be too complex for our audience
 public static int words(String t) {
     int c = 0;
     for (String part : t.split(" ")) {
@@ -851,6 +886,7 @@ public static int words(String t) {
  * Complexities: CC 4 | Cognitive 4 | Nesting 2 | LOC 12 | FanOut 2
  * Isolating: nesting, with the algorithm and CC both held fixed
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too similar to the original since nesting only changes by 1
 public static int words(String t) {
     int c = 0;
     boolean in = false;
@@ -875,6 +911,9 @@ public static int words(String t) {
  *            comment describes the wrong event. Pair against 09-ORIG to measure the
  *            cost of a wrong comment against no comment at all
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE should we do misleading comments? i dont think our study is large enough to
+// measure the effect of misleading comments, but i think helpful comments could be good
+// to include in this method bc i lowkey took forever to understand it
 public static int words(String t) {
     // number of spaces seen so far
     int c = 0;
