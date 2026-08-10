@@ -941,6 +941,10 @@ public static int words(String t) {
  * Complexities: CC 5 | Cognitive 11 | Nesting 3 | LOC 19 | FanOut 0
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE not a big fan of the method entirely, i think its very difficult to 
+// understand without context, like if i didnt read it was for a member ship id just think
+// its doing random math. I think if we are including this method, we should just have
+// the original against added comments / naming, and not the other variants. 
 public static double price(double p, int q, boolean m) {
     double r = p * q;
     if (q > 100) {
@@ -968,6 +972,9 @@ public static double price(double p, int q, boolean m) {
  * Complexities: CC 5 | Cognitive 11 | Nesting 3 | LOC 19 | FanOut 0
  * Isolating: magic numbers and naming, with every listed metric held constant
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE similar to what i said ab the helper methods, is it alg to have variables
+// outside the methods? idk if we can say we're comparing java methods if we're also 
+// comparing the variables outside of them
 private static final double MEMBER_BULK_RATE = 0.75;
 private static final double STANDARD_BULK_RATE = 0.85;
 private static final double MEMBER_VOLUME_RATE = 0.90;
@@ -1039,6 +1046,7 @@ public static double price(double p, int q, boolean m) {
  * Complexities: CC 3 | Cognitive 5 | Nesting 2 | LOC 13 | FanOut 0
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think method is too simple (including variants)
 public static int sign(int n) {
     int r;
     if (n > 0) {
@@ -1090,6 +1098,10 @@ public static int sign(int n) {
  * Complexities: CC 4 | Cognitive 9 | Nesting 3 | LOC 17 | FanOut 0
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE idk if im stupid but i didnt know that leap years cant be divisible by 100 
+// unless they are also divisible by 400, so i think this method may be confusing. but 
+// also i rlly dont know if its just me. if you reckon its common knowledge then i do 
+// think that this method and variants are pretty good
 public static boolean leap(int y) {
     boolean r;
     if (y % 4 == 0) {
@@ -1143,6 +1155,7 @@ public static boolean leap(int y) {
  * Complexities: CC 2 | Cognitive 1 | Nesting 1 | LOC 7 | FanOut 1
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE idk i dont love this method, cbk to remove entirely
 public static String rev(String s) {
     String r = "";
     for (int i = s.length() - 1; i >= 0; i--) {
@@ -1158,6 +1171,7 @@ public static String rev(String s) {
  * Complexities: CC 1 | Cognitive 0 | Nesting 0 | LOC 3 | FanOut 3
  * Isolating: control flow removal, traded entirely for library knowledge
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think again that this variant is based on knowledge of java libraries
 public static String rev(String s) {
     return new StringBuilder(s).reverse().toString();
 }
@@ -1221,6 +1235,8 @@ public static int find(int[] a, int t) {
  * Complexities: CC 4 | Cognitive 4 | Nesting 2 | LOC 9 | FanOut 0
  * Isolating: nesting only, with CC and the single exit point both held
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too similar to the original, like if it were me 
+// doing the survey id say i found them equally as complex
 public static int find(int[] a, int t) {
     int idx = -1;
     for (int i = 0; i < a.length; i++) {
@@ -1241,6 +1257,9 @@ public static int find(int[] a, int t) {
  *            explains nothing, on an easier method than 02-V5 so you can test whether
  *            comment noise costs more or less as structure gets harder
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i thought when we're comparing complexity by changing comments, it was 
+// more about adding helpful comments rather than none? if im wrong pls msg! but if so
+// i think scrap this variant 
 public static int find(int[] a, int t) {
     // set idx to minus one
     int idx = -1;
@@ -1309,6 +1328,7 @@ public static Map<String, Integer> tally(List<String> items) {
  * Complexities: CC 3 | Cognitive 4 | Nesting 2 | LOC 12 | FanOut 4
  * Isolating: naming, structure identical to 15-ORIG
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE rlly like this variant 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1368,6 +1388,8 @@ public static int[] merge(int[] a, int[] b) {
  * Complexities: CC 4 | Cognitive 5 | Nesting 2 | LOC 16 | FanOut 1
  * Isolating: branch count, by replacing the two tail loops with bulk copies
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i like this variant but im wary about the use of System.arraycopy, since 
+// it may be too complex for our audience
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;
@@ -1392,6 +1414,7 @@ public static int[] merge(int[] a, int[] b) {
  * Complexities: CC 1 | Cognitive 0 | Nesting 0 | LOC 7 | FanOut 2
  * Isolating: control flow removal, at the cost of doing asymptotically more work
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE relies on java libaries too much i reckon
 import java.util.Arrays;
 
 public static int[] merge(int[] a, int[] b) {
@@ -1411,6 +1434,7 @@ public static int[] merge(int[] a, int[] b) {
  *            identical to 16-ORIG. This is the largest method in the set, so it tests
  *            whether comments pay off more when there is more to hold in your head
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE love this one
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;
@@ -1471,6 +1495,7 @@ public static int[] sortIt(int[] input) {
  *               Helper swap: CC 1, LOC 5. Block totals CC 5, LOC 16
  * Isolating: volume, since extracting the swap leaves all three control flow metrics untouched
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE same thing ab helper methods
 public static int[] sortIt(int[] input) {
     int[] a = input.clone();
     for (int i = 0; i < a.length; i++) {
@@ -1520,6 +1545,8 @@ public static int[] sortIt(int[] input) {
  * Complexities: CC 1 | Cognitive 0 | Nesting 0 | LOC 5 | FanOut 2
  * Isolating: control flow removal, at the floor of every structural metric
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too reliant on java libraries so idk if it works 
+// for our study
 import java.util.Arrays;
 
 public static int[] sortIt(int[] input) {
@@ -1536,6 +1563,7 @@ public static int[] sortIt(int[] input) {
  *               Helper value: CC 8, LOC 12, held constant across all three variants
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE love this method
 public static int roman(String s) {
     int total = 0;
     for (int i = 0; i < s.length(); i++) {
@@ -1573,6 +1601,7 @@ private static int value(char c) {
  * Complexities: CC 4 | Cognitive 5 | Nesting 2 | LOC 12 | FanOut 3
  * Isolating: nesting, by merging the bounds check into the comparison with &&
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE love this bc it reduces cognitive by a lot but not cc
 public static int roman(String s) {
     int total = 0;
     for (int i = 0; i < s.length(); i++) {
@@ -1606,6 +1635,10 @@ private static int value(char c) {
  * Complexities: CC 3 | Cognitive 4 | Nesting 2 | LOC 14 | FanOut 3
  * Isolating: branch count, by scanning right to left against a running maximum
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think unless we also want to test having a reversed loop instead of a
+// forward loop, we should leave this one out bc itll probably increase cognitive 
+// complexity. but if we do want to test that, this is a good variant. idk if i explained
+// that well, ask me ab it if it doesnt
 public static int roman(String s) {
     int total = 0;
     int highest = 0;
@@ -1641,6 +1674,7 @@ private static int value(char c) {
  * Complexities: CC 4 | Cognitive 8 | Nesting 3 | LOC 17 | FanOut 0
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE prob shouldnt name it 'bs' for the study, love this method tho
 public static int bs(int[] a, int t) {
     int lo = 0;
     int hi = a.length - 1;
@@ -1689,6 +1723,7 @@ public static int bs(int[] a, int t) {
  * Complexities: CC 2 | Cognitive 1 | Nesting 0 | LOC 4 | FanOut 1
  * Isolating: control flow removal, traded for knowing what the library returns on a miss
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this one is too reliant on java libraries again
 import java.util.Arrays;
 
 public static int bs(int[] a, int t) {
@@ -1704,6 +1739,8 @@ public static int bs(int[] a, int t) {
  * Isolating: baseline. The hardest item in the set and the only one above McCabe's
  *            threshold of 10, so it doubles as a probe for RQ3
  * ---------------------------------------------------------------------------------- */
+// CHECK HERE i think this method is too complicated for the study, keen to scrap it all.
+// unless you think that they can get read two of these and write about it within 2 mins?
 import java.util.ArrayDeque;
 import java.util.Deque;
 
