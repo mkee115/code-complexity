@@ -20,6 +20,3 @@ public static List<String> dedupe(List<String> in) {
     }
     return out;
 }
-
-public static void main(String[] args) {
-}

@@ -1,21 +1,18 @@
-class S05_ORIG {
+import java.util.ArrayList;
+import java.util.List;
 
-/* ----------------------------------------------------------------------------------
- * ID: 05-ORIG
- * Function: Sums the decimal digits of an integer.
- * Complexities: CC 3 | Cognitive 4 | Nesting 1 | LOC 9 | FanOut 1
- * Isolating: baseline
- * ---------------------------------------------------------------------------------- */
-public static int sd(int n) {
-    if (n < 0) {
-        return sd(-n);
+public static List<String> dedupe(List<String> in) {
+    List<String> out = new ArrayList<>();
+    for (int i = 0; i < in.size(); i++) {
+        boolean found = false;
+        for (int j = 0; j < out.size(); j++) {
+            if (in.get(i).equals(out.get(j))) {
+                found = true;
+            }
+        }
+        if (!found) {
+            out.add(in.get(i));
+        }
     }
-    if (n < 10) {
-        return n;
-    }
-    return n % 10 + sd(n / 10);
-}
-
-    public static void main(String[] args) {
-    }
+    return out;
 }

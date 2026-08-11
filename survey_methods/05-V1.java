@@ -1,21 +1,12 @@
-class S05_V1 {
+import java.util.ArrayList;
+import java.util.List;
 
-/* ----------------------------------------------------------------------------------
- * ID: 05-V1
- * Function: Sums the decimal digits of an integer.
- * Complexities: CC 2 | Cognitive 1 | Nesting 1 | LOC 9 | FanOut 1
- * Isolating: recursion, with LOC identical on both sides so size cannot explain a preference
- * ---------------------------------------------------------------------------------- */
-public static int sd(int n) {
-    int remaining = Math.abs(n);
-    int total = 0;
-    while (remaining > 0) {
-        total = total + remaining % 10;
-        remaining = remaining / 10;
+public static List<String> dedupe(List<String> in) {
+    List<String> out = new ArrayList<>();
+    for (String s : in) {
+        if (!out.contains(s)) {
+            out.add(s);
+        }
     }
-    return total;
-}
-
-    public static void main(String[] args) {
-    }
+    return out;
 }

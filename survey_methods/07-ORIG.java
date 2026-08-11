@@ -1,11 +1,3 @@
-class S16_ORIG {
-
-/* ----------------------------------------------------------------------------------
- * ID: 16-ORIG
- * Function: Merges two sorted arrays into one sorted array.
- * Complexities: CC 6 | Cognitive 7 | Nesting 2 | LOC 27 | FanOut 0
- * Isolating: baseline
- * ---------------------------------------------------------------------------------- */
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;
@@ -32,8 +24,4 @@ public static int[] merge(int[] a, int[] b) {
         k++;
     }
     return out;
-}
-
-    public static void main(String[] args) {
-    }
 }

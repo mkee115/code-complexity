@@ -1,13 +1,3 @@
-class S16_V3 {
-
-/* ----------------------------------------------------------------------------------
- * ID: 16-V3
- * Function: Merges two sorted arrays into one sorted array.
- * Complexities: CC 6 | Cognitive 7 | Nesting 2 | LOC 27 | FanOut 0 | 3 comment lines
- * Isolating: comment quality, helpful inline on a long method. Code token for token
- *            identical to 16-ORIG. This is the largest method in the set, so it tests
- *            whether comments pay off more when there is more to hold in your head
- * ---------------------------------------------------------------------------------- */
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;
@@ -37,8 +27,4 @@ public static int[] merge(int[] a, int[] b) {
         k++;
     }
     return out;
-}
-
-    public static void main(String[] args) {
-    }
 }

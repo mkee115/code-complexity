@@ -1,12 +1,5 @@
-/* ----------------------------------------------------------------------------------
- * ID: 20-V1
- * Function: Checks whether brackets in a string are balanced and correctly nested.
- * Complexities: CC 6 | Cognitive 10 | Nesting 3 | LOC 17 | FanOut 6
- * Isolating: branch count, by replacing nine character comparisons with position lookups
- * ---------------------------------------------------------------------------------- */
 import java.util.ArrayDeque;
 import java.util.Deque;
-class S20_V1 {
 
 public static boolean balanced(String s) {
     Deque<Character> st = new ArrayDeque<>();
@@ -24,8 +17,4 @@ public static boolean balanced(String s) {
         }
     }
     return st.isEmpty();
-}
-
-    public static void main(String[] args) {
-    }
 }

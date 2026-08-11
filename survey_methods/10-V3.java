@@ -1,15 +1,5 @@
-/* ----------------------------------------------------------------------------------
- * ID: 20-V3
- * Function: Checks whether brackets in a string are balanced and correctly nested.
- * Complexities: CC 15 | Cognitive 28 | Nesting 4 | LOC 26 | FanOut 5 | 6 comment lines
- * Isolating: comment quality, accurate summary plus signposts, on the hardest method in
- *            the set. Code token for token identical to 20-ORIG. Pair against 20-ORIG to
- *            ask whether a good comment is worth more than a large structural improvement,
- *            since 20-V1 halves CC on the same method
- * ---------------------------------------------------------------------------------- */
 import java.util.ArrayDeque;
 import java.util.Deque;
-class S20_V3 {
 
 /**
  * Returns true when every bracket is closed by one of its own kind, in the right order.
@@ -42,8 +32,4 @@ public static boolean balanced(String s) {
         }
     }
     return st.isEmpty();
-}
-
-    public static void main(String[] args) {
-    }
 }

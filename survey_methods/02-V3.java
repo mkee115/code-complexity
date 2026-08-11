@@ -1,17 +1,16 @@
-class S02_V3 {
-
-/* ----------------------------------------------------------------------------------
- * ID: 02-V3
- * Function: Turns a numeric score into a letter grade.
- * Complexities: CC 5 | Cognitive 10 | Nesting 4 | LOC 3 | FanOut 0
- * Isolating: volume, by collapsing to a chained ternary at constant CC. Cognitive is
- *            10 under a strict reading of the nesting rule and 4 if a ternary chain is
- *            treated as flat, so measure it with your own extractor
- * ---------------------------------------------------------------------------------- */
-public static String grade(int s) {
-    return s >= 90 ? "A+" : s >= 80 ? "A" : s >= 65 ? "B" : s >= 50 ? "C" : "D";
-}
-
-    public static void main(String[] args) {
+/**
+ * Checks whether a password meets the minimum security requirements.
+ *
+ * @param p the password to validate
+ * @return true if the password is non-null, at least 8 characters long,
+ *         contains at least one uppercase letter, one lowercase letter,
+ *         and one digit; false otherwise
+ */
+public static boolean check(String p) {
+    boolean ok = false;
+    if (p != null && p.length() >= 8 && !p.equals(p.toLowerCase())
+            && !p.equals(p.toUpperCase()) && p.matches(".*[0-9].*")) {
+        ok = true;
     }
+    return ok;
 }

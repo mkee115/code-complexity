@@ -1,23 +1,25 @@
-/* ----------------------------------------------------------------------------------
- * ID: 08-V1
- * Function: Removes duplicates from a list, keeping first appearance order.
- * Complexities: CC 3 | Cognitive 3 | Nesting 2 | LOC 9 | FanOut 3
- * Isolating: branch count and nesting together, algorithm unchanged
- * ---------------------------------------------------------------------------------- */
-import java.util.ArrayList;
-import java.util.List;
-class S08_V1 {
-
-public static List<String> dedupe(List<String> in) {
-    List<String> out = new ArrayList<>();
-    for (String s : in) {
-        if (!out.contains(s)) {
-            out.add(s);
+public static int roman(String s) {
+    int total = 0;
+    for (int i = 0; i < s.length(); i++) {
+        int v = value(s.charAt(i));
+        if (i + 1 < s.length() && v < value(s.charAt(i + 1))) {
+            total = total - v;
+        } else {
+            total = total + v;
         }
     }
-    return out;
+    return total;
 }
 
-    public static void main(String[] args) {
+private static int value(char c) {
+    switch (c) {
+        case 'I': return 1;
+        case 'V': return 5;
+        case 'X': return 10;
+        case 'L': return 50;
+        case 'C': return 100;
+        case 'D': return 500;
+        case 'M': return 1000;
+        default: return 0;
     }
 }

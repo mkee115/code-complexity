@@ -1,29 +1,29 @@
-/* ----------------------------------------------------------------------------------
- * ID: 08-ORIG
- * Function: Removes duplicates from a list, keeping first appearance order.
- * Complexities: CC 5 | Cognitive 8 | Nesting 3 | LOC 15 | FanOut 5
- * Isolating: baseline
- * ---------------------------------------------------------------------------------- */
-import java.util.ArrayList;
-import java.util.List;
-class S08_ORIG {
-
-public static List<String> dedupe(List<String> in) {
-    List<String> out = new ArrayList<>();
-    for (int i = 0; i < in.size(); i++) {
-        boolean found = false;
-        for (int j = 0; j < out.size(); j++) {
-            if (in.get(i).equals(out.get(j))) {
-                found = true;
+public static int roman(String s) {
+    int total = 0;
+    for (int i = 0; i < s.length(); i++) {
+        int v = value(s.charAt(i));
+        if (i + 1 < s.length()) {
+            if (v < value(s.charAt(i + 1))) {
+                total = total - v;
+            } else {
+                total = total + v;
             }
-        }
-        if (!found) {
-            out.add(in.get(i));
+        } else {
+            total = total + v;
         }
     }
-    return out;
+    return total;
 }
 
-    public static void main(String[] args) {
+private static int value(char c) {
+    switch (c) {
+        case 'I': return 1;
+        case 'V': return 5;
+        case 'X': return 10;
+        case 'L': return 50;
+        case 'C': return 100;
+        case 'D': return 500;
+        case 'M': return 1000;
+        default: return 0;
     }
 }
