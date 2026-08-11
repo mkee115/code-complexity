@@ -4,8 +4,6 @@
  * Complexities: CC 5 | Cognitive 8 | Nesting 3 | LOC 15 | FanOut 5
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE love this method (like including variants), def keep, also could be good
-// candidate for comments
 import java.util.ArrayList;
 import java.util.List;
 class S08_ORIG {

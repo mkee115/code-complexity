@@ -7,9 +7,6 @@ class S06_V2 {
  *               Helper rowMax: CC 3, Cognitive 3, Nesting 2, LOC 9. Block totals CC 5, LOC 16
  * Isolating: extraction, where summed CC exceeds the original but no method is as deep
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE as written before, idk if we should use helper methods. also i dont think
-// we should use a helper method for this method if we are including them, it makes it
-// sm more complicated i reckon
 public static int max(int[][] g) {
     int m = Integer.MIN_VALUE;
     for (int[] row : g) {

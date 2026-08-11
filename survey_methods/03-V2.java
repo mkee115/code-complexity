@@ -7,8 +7,6 @@ class S03_V2 {
  *               Helpers: CC 1, 2, 1 and LOC 3, 3, 3. Block totals CC 8, LOC 12
  * Isolating: extraction into named helpers
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE is it fine to make helper methods? just wanted to make sure since our study is
-// about method complexity and not class complexity
 public static boolean check(String p) {
     return p != null && hasMinLength(p) && hasLowerAndUpper(p) && hasDigit(p);
 }

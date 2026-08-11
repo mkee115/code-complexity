@@ -6,7 +6,6 @@ class S19_ORIG {
  * Complexities: CC 4 | Cognitive 8 | Nesting 3 | LOC 17 | FanOut 0
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE prob shouldnt name it 'bs' for the study, love this method tho
 public static int bSearch(int[] a, int t) {
     int lo = 0;
     int hi = a.length - 1;

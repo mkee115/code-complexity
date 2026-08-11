@@ -5,8 +5,6 @@
  * Isolating: baseline. The hardest item in the set and the only one above McCabe's
  *            threshold of 10, so it doubles as a probe for RQ3
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE i think this method is too complicated for the study, keen to scrap it all.
-// unless you think that they can get read two of these and write about it within 2 mins?
 import java.util.ArrayDeque;
 import java.util.Deque;
 class S20_ORIG {

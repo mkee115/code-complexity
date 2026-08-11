@@ -8,7 +8,6 @@ class S16_V3 {
  *            identical to 16-ORIG. This is the largest method in the set, so it tests
  *            whether comments pay off more when there is more to hold in your head
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE love this one
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;

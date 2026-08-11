@@ -4,7 +4,6 @@
  * Complexities: CC 1 | Cognitive 0 | Nesting 0 | LOC 7 | FanOut 2
  * Isolating: control flow removal, at the cost of doing asymptotically more work
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE relies on java libaries too much i reckon
 import java.util.Arrays;
 class S16_V2 {
 

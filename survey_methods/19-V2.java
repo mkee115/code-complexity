@@ -4,7 +4,6 @@
  * Complexities: CC 2 | Cognitive 1 | Nesting 0 | LOC 4 | FanOut 1
  * Isolating: control flow removal, traded for knowing what the library returns on a miss
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE i think this one is too reliant on java libraries again
 import java.util.Arrays;
 class S19_V2 {
 

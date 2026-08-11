@@ -7,7 +7,6 @@ class S18_ORIG {
  *               Helper value: CC 8, LOC 12, held constant across all three variants
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE love this method
 public static int roman(String s) {
     int total = 0;
     for (int i = 0; i < s.length(); i++) {

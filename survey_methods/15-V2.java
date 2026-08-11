@@ -4,7 +4,6 @@
  * Complexities: CC 3 | Cognitive 4 | Nesting 2 | LOC 12 | FanOut 4
  * Isolating: naming, structure identical to 15-ORIG
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE rlly like this variant 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

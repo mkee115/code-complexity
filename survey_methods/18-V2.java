@@ -6,10 +6,6 @@ class S18_V2 {
  * Complexities: CC 3 | Cognitive 4 | Nesting 2 | LOC 14 | FanOut 3
  * Isolating: branch count, by scanning right to left against a running maximum
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE i think unless we also want to test having a reversed loop instead of a
-// forward loop, we should leave this one out bc itll probably increase cognitive 
-// complexity. but if we do want to test that, this is a good variant. idk if i explained
-// that well, ask me ab it if it doesnt
 public static int roman(String s) {
     int total = 0;
     int highest = 0;

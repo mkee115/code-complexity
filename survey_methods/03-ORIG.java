@@ -6,7 +6,6 @@ class S03_ORIG {
  * Complexities: CC 6 | Cognitive 2 | Nesting 1 | LOC 8 | FanOut 5
  * Isolating: baseline
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE i think this method could be good to add comments too as a variant 
 public static boolean check(String p) {
     boolean ok = false;
     if (p != null && p.length() >= 8 && !p.equals(p.toLowerCase())

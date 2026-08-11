@@ -6,7 +6,6 @@ class S18_V1 {
  * Complexities: CC 4 | Cognitive 5 | Nesting 2 | LOC 12 | FanOut 3
  * Isolating: nesting, by merging the bounds check into the comparison with &&
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE love this bc it reduces cognitive by a lot but not cc
 public static int roman(String s) {
     int total = 0;
     for (int i = 0; i < s.length(); i++) {

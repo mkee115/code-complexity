@@ -6,8 +6,6 @@ class S16_V1 {
  * Complexities: CC 4 | Cognitive 5 | Nesting 2 | LOC 16 | FanOut 1
  * Isolating: branch count, by replacing the two tail loops with bulk copies
  * ---------------------------------------------------------------------------------- */
-// CHECK HERE i like this variant but im wary about the use of System.arraycopy, since 
-// it may be too complex for our audience
 public static int[] merge(int[] a, int[] b) {
     int[] out = new int[a.length + b.length];
     int i = 0;
