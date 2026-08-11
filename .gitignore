@@ -9,7 +9,7 @@ output/
 graphs/
 data_tables/
 **/*.csv
-**/*.png
+analysis/**/*.png
 **/*.txt
 
 # GitHub Token
