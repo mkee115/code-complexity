@@ -4,10 +4,13 @@ library(scales)
 
 # 0. CONFIGURATION
 
-INPUT_FILE <- "repos.csv"
-OUTPUT_DIR <- "output"
+# CSV inputs/tables live in data_tables/; plots go to graphs/.
+DATA_DIR   <- "data_tables"
+OUTPUT_DIR <- "graphs"          # plots
+INPUT_FILE <- file.path(DATA_DIR, "repos.csv")
 
-dir.create(OUTPUT_DIR, showWarnings = FALSE)
+dir.create(DATA_DIR, showWarnings = FALSE, recursive = TRUE)
+dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # 1. DATA LOADING
 
@@ -127,72 +130,79 @@ report_lines <- c(
   paste(sprintf("  %s (%d)", top_java$full_name, top_java$java_file_count), collapse = "\n")
 )
 
-writeLines(report_lines, file.path(OUTPUT_DIR, "repos_summary.txt"))
+writeLines(report_lines, file.path(DATA_DIR, "repos_summary.txt"))
 
 # 4. PLOTS
 
 cat("\nGenerating plots...\n")
 
-# 4a. Stars histogram (log scale)
-p_stars <- suppressWarnings(
-  ggplot(df, aes(x = stars)) +
+# repos_01: Stars histogram (log-log)
+suppressWarnings(
+  p_stars <- ggplot(df, aes(x = stars)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Star Count Distribution",
-         x = "Stars (log scale)", y = "Count") +
+         x = "Stars (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_01_stars_hist.png"), p_stars,
        width = 8, height = 5, dpi = 150)
 
-# 4b. Forks histogram (log scale)
-p_forks <- suppressWarnings(
-  ggplot(df %>% filter(forks > 0), aes(x = forks)) +
+# repos_02: Forks histogram (log-log)
+suppressWarnings(
+  p_forks <- ggplot(df %>% filter(forks > 0), aes(x = forks)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Fork Count Distribution",
-         x = "Forks (log scale)", y = "Count") +
+         x = "Forks (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_02_forks_hist.png"), p_forks,
        width = 8, height = 5, dpi = 150)
 
-# 4c. Size histogram (log scale)
-p_size <- suppressWarnings(
-  ggplot(df %>% filter(size_kb > 0), aes(x = size_kb)) +
+# repos_03: Size histogram (log-log)
+suppressWarnings(
+  p_size <- ggplot(df %>% filter(size_kb > 0), aes(x = size_kb)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Size Distribution",
-         x = "Size (KB, log scale)", y = "Count") +
+         x = "Size (KB, log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_03_size_hist.png"), p_size,
        width = 8, height = 5, dpi = 150)
 
-# 4d. Commit count histogram (log scale, exclude -1)
-p_commits <- suppressWarnings(
-  ggplot(df %>% filter(commit_count > 0), aes(x = commit_count)) +
+# repos_04: Commit count histogram (log-log)
+suppressWarnings(
+  p_commits <- ggplot(df %>% filter(commit_count > 0), aes(x = commit_count)) +
     geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
     scale_x_log10(labels = label_comma()) +
+    scale_y_log10(labels = label_comma()) +
     labs(title = "Repository Commit Count Distribution",
-         x = "Commits (log scale)", y = "Count") +
+         x = "Commits (log scale)", y = "Count (log scale)") +
     theme_minimal(base_size = 12)
 )
 ggsave(file.path(OUTPUT_DIR, "repos_04_commits_hist.png"), p_commits,
        width = 8, height = 5, dpi = 150)
 
-# 4e. Repo age histogram (linear)
-p_age <- ggplot(df, aes(x = age_days)) +
-  geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
-  labs(title = "Repository Age Distribution",
-       x = "Age (days)", y = "Count") +
-  theme_minimal(base_size = 12)
+# repos_05: Repo age histogram (log y)
+suppressWarnings(
+  p_age <- ggplot(df, aes(x = age_days)) +
+    geom_histogram(fill = "#4C72B0", colour = "white", linewidth = 0.2, bins = 40) +
+    scale_y_log10(labels = label_comma()) +
+    labs(title = "Repository Age Distribution",
+         x = "Age (days)", y = "Count (log scale)") +
+    theme_minimal(base_size = 12)
+)
 ggsave(file.path(OUTPUT_DIR, "repos_05_age_hist.png"), p_age,
        width = 8, height = 5, dpi = 150)
 
-# 4f. Stars vs forks scatter (both log scale)
-p_sf <- suppressWarnings(
-  ggplot(df %>% filter(stars > 0, forks > 0), aes(x = stars, y = forks)) +
+# repos_06: Stars vs forks scatter (both log scale)
+suppressWarnings(
+  p_sf <- ggplot(df %>% filter(stars > 0, forks > 0), aes(x = stars, y = forks)) +
     geom_point(alpha = 0.4, size = 0.8, colour = "#4C72B0") +
     scale_x_log10(labels = label_comma()) +
     scale_y_log10(labels = label_comma()) +
@@ -203,10 +213,10 @@ p_sf <- suppressWarnings(
 ggsave(file.path(OUTPUT_DIR, "repos_06_stars_vs_forks.png"), p_sf,
        width = 8, height = 5, dpi = 150)
 
-# 4g. Commits vs Java file count scatter (both log scale)
-p_cj <- suppressWarnings(
-  ggplot(df %>% filter(commit_count > 0, java_file_count > 0),
-         aes(x = commit_count, y = java_file_count)) +
+# repos_07: Commits vs Java file count scatter (both log scale)
+suppressWarnings(
+  p_cj <- ggplot(df %>% filter(commit_count > 0, java_file_count > 0),
+                 aes(x = commit_count, y = java_file_count)) +
     geom_point(alpha = 0.4, size = 0.8, colour = "#4C72B0") +
     scale_x_log10(labels = label_comma()) +
     scale_y_log10(labels = label_comma()) +
@@ -216,5 +226,93 @@ p_cj <- suppressWarnings(
 )
 ggsave(file.path(OUTPUT_DIR, "repos_07_commits_vs_javafiles.png"), p_cj,
        width = 8, height = 5, dpi = 150)
+
+# 5. COMPLEXITY STRATIFIED BY REPO AGE & RECENCY
+# Joins per-method complexity (cc_data.csv) back to repo metadata so we can ask:
+# does code complexity differ between old vs young, or stale vs actively-pushed
+# repositories?
+
+CC_DATA_FILE <- file.path(DATA_DIR, "cc_data.csv")
+
+if (file.exists(CC_DATA_FILE)) {
+  cat("\nStratifying complexity by repo age / recency...\n")
+
+  cc <- read_csv(CC_DATA_FILE, show_col_types = FALSE)
+
+  # aggregate to one row per project (full_name)
+  agg_cols <- intersect(c("cc", "cognitive_complexity", "loc",
+                          "maintainability_index", "halstead_volume"), names(cc))
+  proj_cc <- cc %>%
+    group_by(project) %>%
+    summarise(across(all_of(agg_cols),
+                     ~ median(as.numeric(.), na.rm = TRUE),
+                     .names = "median_{.col}"),
+              n_methods = n(), .groups = "drop")
+
+  joined <- df %>%
+    select(full_name, age_days, days_since_push, stars) %>%
+    inner_join(proj_cc, by = c("full_name" = "project")) %>%
+    mutate(
+      age_band = cut(age_days,
+                     breaks = c(-Inf, 365, 1095, 1825, Inf),
+                     labels = c("<1y", "1-3y", "3-5y", "5y+")),
+      recency_band = cut(days_since_push,
+                         breaks = c(-Inf, 30, 180, 365, Inf),
+                         labels = c("<30d", "30-180d", "180-365d", "1y+"))
+    )
+
+  if (nrow(joined) > 0 && "median_cc" %in% names(joined)) {
+
+    band_box <- function(data, band_col, title, file) {
+      d <- data %>% filter(!is.na(.data[[band_col]]))
+      meds <- d %>% group_by(.data[[band_col]]) %>%
+        summarise(med = median(median_cc, na.rm = TRUE), .groups = "drop")
+      p <- ggplot(d, aes(x = .data[[band_col]], y = median_cc)) +
+        geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.3,
+                     fill = "#4C72B0", alpha = 0.75) +
+        geom_text(data = meds, aes(x = .data[[band_col]], y = med,
+                                   label = sprintf("%.1f", med)),
+                  vjust = -0.6, size = 3, inherit.aes = FALSE) +
+        labs(title = title, x = NULL, y = "Project Median Cyclomatic CC") +
+        theme_minimal(base_size = 12)
+      ggsave(file.path(OUTPUT_DIR, file), p, width = 8, height = 5, dpi = 150)
+    }
+
+    band_box(joined, "age_band",
+             "Project Median CC by Repository Age", "repos_08_cc_by_age_band.png")
+    band_box(joined, "recency_band",
+             "Project Median CC by Days Since Last Push", "repos_09_cc_by_recency_band.png")
+
+    # Kruskal-Wallis across bands + Spearman vs the raw continuous variables.
+    strat_tests <- tibble(
+      test = c("Kruskal-Wallis (median CC ~ age_band)",
+               "Kruskal-Wallis (median CC ~ recency_band)",
+               "Spearman (median CC vs age_days)",
+               "Spearman (median CC vs days_since_push)",
+               "Spearman (median CC vs stars)"),
+      statistic = c(
+        kruskal.test(median_cc ~ age_band, data = joined)$statistic,
+        kruskal.test(median_cc ~ recency_band, data = joined)$statistic,
+        cor(joined$median_cc, joined$age_days,        method = "spearman", use = "complete.obs"),
+        cor(joined$median_cc, joined$days_since_push, method = "spearman", use = "complete.obs"),
+        cor(joined$median_cc, joined$stars,           method = "spearman", use = "complete.obs")
+      ),
+      p_value = c(
+        kruskal.test(median_cc ~ age_band, data = joined)$p.value,
+        kruskal.test(median_cc ~ recency_band, data = joined)$p.value,
+        cor.test(joined$median_cc, joined$age_days,        method = "spearman", exact = FALSE)$p.value,
+        cor.test(joined$median_cc, joined$days_since_push, method = "spearman", exact = FALSE)$p.value,
+        cor.test(joined$median_cc, joined$stars,           method = "spearman", exact = FALSE)$p.value
+      )
+    )
+    write_csv(strat_tests, file.path(DATA_DIR, "repos_stratification_tests.csv"))
+    write_csv(joined,      file.path(DATA_DIR, "repos_complexity_joined.csv"))
+    print(strat_tests, n = Inf)
+  } else {
+    cat("  No overlap between repos.csv and cc_data.csv projects; skipping.\n")
+  }
+} else {
+  cat("\nNote: cc_data.csv not found; skipping age/recency stratification.\n")
+}
 
 cat("\nDone\n")

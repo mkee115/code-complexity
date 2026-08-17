@@ -20,19 +20,29 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GitHubSearcher
+public class GitHubRepositorySearcher
 {
     private static final String API = "https://api.github.com";
     private static final int PER_PAGE = 100;
     private static final int MAX_PAGES = 10;
     private static final LocalDate GITHUB_EPOCH = LocalDate.of(2008, 1, 1);
-    private static final long API_DELAY_MS = 750;
+
+    private static final int MAX_RETRIES = 5;
+    // Minimum gap between consecutive API calls. GitHub's abuse/secondary limits
+    // are triggered by bursts of back-to-back requests, so we pace ourselves.
+    // The Search API has a much lower budget (~30 req/min) than the core API
+    // (~5000 req/hr), so search calls are paced more slowly to stay under it and
+    // avoid the rate-limit waits that dominate chunk planning.
+    private static final long MIN_REQUEST_INTERVAL_MS = 750;
+    private static final long SEARCH_MIN_REQUEST_INTERVAL_MS = 2200;   // ~27/min, under the 30/min cap
+    private static final long MAX_WAIT_MS = 3_600_000;   // never sleep more than an hour
 
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper json = new ObjectMapper();
     private final String token;
+    private long lastRequestTimeMs = 0;
 
-    public GitHubSearcher(String token)
+    public GitHubRepositorySearcher(String token)
     {
         this.token = token;
     }
@@ -153,20 +163,12 @@ public class GitHubSearcher
 
     private int countResultsRaw(String query) throws IOException, InterruptedException
     {
-        Thread.sleep(API_DELAY_MS);
         String url = API + "/search/repositories?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&per_page=1&page=1";
 
         HttpResponse<String> response = send(url);
 
         if (response.statusCode() == 422) return 0;
-
-        if (response.statusCode() == 403 || response.statusCode() == 429)
-        {
-            System.err.println("\nRate limited, waiting 60s...");
-            Thread.sleep(60_000);
-            response = send(url);
-        }
 
         if (response.statusCode() != 200)
             throw new IOException("Count request failed: " + response.statusCode() + " " + response.body());
@@ -184,18 +186,10 @@ public class GitHubSearcher
 
         for (int page = 1; page <= MAX_PAGES; page++)
         {
-            Thread.sleep(API_DELAY_MS);
             String url = API + "/search/repositories?q=" + URLEncoder.encode(cleanedQuery, StandardCharsets.UTF_8)
                     + "&per_page=" + PER_PAGE + "&page=" + page;
 
             HttpResponse<String> response = send(url);
-
-            if (response.statusCode() == 403 || response.statusCode() == 429)
-            {
-                System.err.println("\nRate limited during search, waiting 60s...");
-                Thread.sleep(60_000);
-                response = send(url);
-            }
 
             if (response.statusCode() != 200)
                 throw new IOException("Search failed: " + response.statusCode() + " " + response.body());
@@ -207,12 +201,14 @@ public class GitHubSearcher
             for (JsonNode item : items)
             {
                 Repo repo = buildRepo(item);
-                repo.commitCount = fetchCommitCount(repo.fullName);
 
-                if (commitFilter.isActive() && !commitFilter.matches(repo.commitCount))
+                // Apply the cheap pom.xml existence check first; only spend a
+                // commit-count API call on repos that actually qualify.
+                if (!hasPomXml(repo.fullName))
                     continue;
 
-                if (!hasPomXml(repo.fullName))
+                repo.commitCount = fetchCommitCount(repo.fullName);
+                if (commitFilter.isActive() && !commitFilter.matches(repo.commitCount))
                     continue;
 
                 results.add(repo);
@@ -264,14 +260,135 @@ public class GitHubSearcher
         return response.statusCode() == 200;
     }
 
-    private HttpResponse<String> send(String url) throws IOException, InterruptedException
+    /**
+     * Sends a request, transparently handling GitHub's rate limits. The method
+     * is synchronized so request pacing and retries are coordinated across the
+     * whole searcher. It:
+     *   - paces calls so they never fire closer than MIN_REQUEST_INTERVAL_MS apart;
+     *   - on a rate-limit response, waits for exactly as long as GitHub asks
+     *     (Retry-After, else X-RateLimit-Reset, else exponential backoff) and retries;
+     *   - after a success, proactively waits if the bucket is now exhausted, so the
+     *     next call doesn't immediately fail.
+     */
+    private synchronized HttpResponse<String> send(String url) throws IOException, InterruptedException
     {
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(url))
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28");
         if (token != null && !token.isEmpty())
             builder.header("Authorization", "Bearer " + token);
-        return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = builder.build();
+
+        for (int attempt = 1; ; attempt++)
+        {
+            throttle(url);
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            lastRequestTimeMs = System.currentTimeMillis();
+
+            if (!isRateLimited(response))
+            {
+                waitIfBudgetExhausted(response);
+                return response;
+            }
+
+            if (attempt > MAX_RETRIES)
+            {
+                System.err.println("Still rate limited after " + MAX_RETRIES
+                        + " retries; returning last response.");
+                return response;
+            }
+
+            long waitMs = rateLimitWaitMs(response, attempt);
+            String resource = response.headers().firstValue("X-RateLimit-Resource").orElse("?");
+            System.err.printf("%nRate limited (HTTP %d, resource=%s). Waiting %.1fs [retry %d/%d]...%n",
+                    response.statusCode(), resource, waitMs / 1000.0, attempt, MAX_RETRIES);
+            Thread.sleep(waitMs);
+        }
+    }
+
+    /** Enforces a minimum spacing between consecutive requests (slower for search). */
+    private void throttle(String url) throws InterruptedException
+    {
+        long minInterval = url.contains("/search/")
+                ? SEARCH_MIN_REQUEST_INTERVAL_MS
+                : MIN_REQUEST_INTERVAL_MS;
+        long sinceLast = System.currentTimeMillis() - lastRequestTimeMs;
+        if (sinceLast < minInterval)
+            Thread.sleep(minInterval - sinceLast);
+    }
+
+    /** True only for responses that are genuinely rate-limit rejections. */
+    private boolean isRateLimited(HttpResponse<String> response)
+    {
+        int status = response.statusCode();
+        if (status != 403 && status != 429)
+            return false;
+
+        // Retry-After accompanies secondary limits; remaining==0 marks a primary limit.
+        if (response.headers().firstValue("Retry-After").isPresent())
+            return true;
+        if (response.headers().firstValue("X-RateLimit-Remaining")
+                .map(v -> v.trim().equals("0")).orElse(false))
+            return true;
+
+        String body = response.body();
+        return body != null
+                && (body.contains("secondary rate limit") || body.contains("API rate limit"));
+    }
+
+    /**
+     * How long to wait before retrying, in priority order:
+     *   1. Retry-After  — GitHub's explicit secondary-limit back-off (seconds)
+     *   2. X-RateLimit-Reset — when the primary bucket refills (epoch seconds)
+     *   3. exponential backoff fallback
+     */
+    private long rateLimitWaitMs(HttpResponse<?> response, int attempt)
+    {
+        long retryAfter = headerLong(response, "Retry-After", -1);
+        if (retryAfter >= 0)
+            return Math.max(1000L, retryAfter * 1000 + 1000);
+
+        long untilReset = millisUntilReset(response);
+        if (untilReset > 0)
+            return Math.min(untilReset, MAX_WAIT_MS);
+
+        return Math.min(60_000L, (long) Math.pow(2, attempt) * 1000L);
+    }
+
+    /** Proactively pause when the current bucket is empty so the next call won't 403. */
+    private void waitIfBudgetExhausted(HttpResponse<String> response) throws InterruptedException
+    {
+        long remaining = headerLong(response, "X-RateLimit-Remaining", Long.MAX_VALUE);
+        if (remaining > 1)
+            return;
+
+        long waitMs = millisUntilReset(response);
+        if (waitMs <= 0)
+            return;
+
+        String resource = response.headers().firstValue("X-RateLimit-Resource").orElse("?");
+        System.err.printf("%nBudget exhausted (resource=%s, remaining=%d); waiting %.1fs for reset...%n",
+                resource, remaining, waitMs / 1000.0);
+        Thread.sleep(Math.min(waitMs, MAX_WAIT_MS));
+    }
+
+    private long millisUntilReset(HttpResponse<?> response)
+    {
+        long reset = headerLong(response, "X-RateLimit-Reset", -1);
+        if (reset < 0)
+            return -1;
+        return (reset - System.currentTimeMillis() / 1000) * 1000 + 2000;
+    }
+
+    private static long headerLong(HttpResponse<?> response, String name, long def)
+    {
+        return response.headers().firstValue(name)
+                .map(v ->
+                {
+                    try { return Long.parseLong(v.trim()); }
+                    catch (NumberFormatException e) { return def; }
+                })
+                .orElse(def);
     }
 
     public static class SearchChunk

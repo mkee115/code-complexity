@@ -1,187 +1,189 @@
 package com.complexity;
 
-import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LambdaExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.stmt.CatchClause;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
-/**
- * Computes SonarSource cognitive complexity for a single method.
- *
- * Rules (from G. Ann Campbell, "Cognitive Complexity", SonarSource 2023):
- *   - Structural increments (if, else-if, loops, switch, catch, ternary):
- *       +1 + current nesting level.  Each such construct also raises the
- *       nesting level for its body by 1.
- *   - else (plain): flat +1, no nesting penalty.
- *   - Logical-operator sequences (&&, ||): flat +1 per contiguous run of
- *       the same operator — "a && b && c" scores 1, not 2.
- *   - Lambdas / anonymous-class bodies: raise nesting by 1 but score nothing.
- *
- * counter[0] = accumulated score
- * counter[1] = current nesting depth
- */
-public class CognitiveComplexityVisitor extends VoidVisitorAdapter<int[]>
+import java.util.Optional;
+
+public class CognitiveComplexityVisitor extends VoidVisitorAdapter<Void>
 {
-    // ------------------------------------------------------------------ if/else
+    private final String methodName;
+    private int complexity = 0;
+    private int nestingLevel = 0;
 
-    @Override
-    public void visit(IfStmt n, int[] counter)
+    private CognitiveComplexityVisitor(String methodName)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        n.getCondition().accept(this, counter);
-        n.getThenStmt().accept(this, counter);
-        counter[1]--;
-
-        n.getElseStmt().ifPresent(elseStmt -> {
-            if (elseStmt instanceof IfStmt) {
-                visitElseIf((IfStmt) elseStmt, counter);
-            } else {
-                counter[0] += 1;        // plain else: flat +1, no nesting penalty
-                counter[1]++;
-                elseStmt.accept(this, counter);
-                counter[1]--;
-            }
-        });
+        this.methodName = methodName;
     }
 
-    /** Handles "else if" chains at the same nesting level as the opening "if". */
-    private void visitElseIf(IfStmt n, int[] counter)
+    public static int compute(MethodDeclaration method)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        n.getCondition().accept(this, counter);
-        n.getThenStmt().accept(this, counter);
-        counter[1]--;
-
-        n.getElseStmt().ifPresent(elseStmt -> {
-            if (elseStmt instanceof IfStmt) {
-                visitElseIf((IfStmt) elseStmt, counter);
-            } else {
-                counter[0] += 1;
-                counter[1]++;
-                elseStmt.accept(this, counter);
-                counter[1]--;
-            }
-        });
-    }
-
-    // ------------------------------------------------------------------ loops
-
-    @Override
-    public void visit(ForStmt n, int[] counter)
-    {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
+        CognitiveComplexityVisitor visitor = new CognitiveComplexityVisitor(method.getNameAsString());
+        visitor.visit(method, null);
+        return visitor.complexity;
     }
 
     @Override
-    public void visit(ForEachStmt n, int[] counter)
+    public void visit(IfStmt n, Void arg)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
+        boolean elseIf = isElseIf(n);
+
+        if (elseIf)
+            complexity += 1;
+        else
+            complexity += 1 + nestingLevel;
+
+        if (n.getElseStmt().isPresent() && !(n.getElseStmt().get() instanceof IfStmt))
+            complexity += 1;
+
+        if (!elseIf)
+            nestingLevel++;
+
+        super.visit(n, arg);
+
+        if (!elseIf)
+            nestingLevel--;
     }
 
     @Override
-    public void visit(WhileStmt n, int[] counter)
+    public void visit(ForStmt n, Void arg)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
     }
 
     @Override
-    public void visit(DoStmt n, int[] counter)
+    public void visit(ForEachStmt n, Void arg)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
-    }
-
-    // ------------------------------------------------------------------ switch
-
-    @Override
-    public void visit(SwitchStmt n, int[] counter)
-    {
-        counter[0] += 1 + counter[1];   // whole switch counts once, not per case
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
     }
 
     @Override
-    public void visit(SwitchExpr n, int[] counter)
+    public void visit(WhileStmt n, Void arg)
     {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
-    }
-
-    // ------------------------------------------------------------------ catch
-
-    @Override
-    public void visit(CatchClause n, int[] counter)
-    {
-        counter[0] += 1 + counter[1];
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
-    }
-
-    // ------------------------------------------------------------------ ternary
-
-    @Override
-    public void visit(ConditionalExpr n, int[] counter)
-    {
-        counter[0] += 1 + counter[1];   // penalised for nesting, but doesn't add to it
-        super.visit(n, counter);
-    }
-
-    // ------------------------------------------------------------------ logical operators
-
-    @Override
-    public void visit(BinaryExpr n, int[] counter)
-    {
-        BinaryExpr.Operator op = n.getOperator();
-        if (op == BinaryExpr.Operator.AND || op == BinaryExpr.Operator.OR) {
-            // Count once per contiguous run of the same operator.
-            // "a && b && c" → 1;  "a && b || c" → 2.
-            boolean partOfSameRun = n.getParentNode()
-                    .filter(p -> p instanceof BinaryExpr)
-                    .map(p -> ((BinaryExpr) p).getOperator() == op)
-                    .orElse(false);
-            if (!partOfSameRun) {
-                counter[0]++;   // flat +1, no nesting penalty
-            }
-        }
-        super.visit(n, counter);
-    }
-
-    // ------------------------------------------------------------------ lambdas / anon classes
-
-    @Override
-    public void visit(LambdaExpr n, int[] counter)
-    {
-        counter[1]++;
-        super.visit(n, counter);
-        counter[1]--;
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
     }
 
     @Override
-    public void visit(ObjectCreationExpr n, int[] counter)
+    public void visit(DoStmt n, Void arg)
     {
-        if (n.getAnonymousClassBody().isPresent()) {
-            counter[1]++;
-            super.visit(n, counter);
-            counter[1]--;
-        } else {
-            super.visit(n, counter);
-        }
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
+    }
+
+    @Override
+    public void visit(CatchClause n, Void arg)
+    {
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
+    }
+
+    @Override
+    public void visit(SwitchStmt n, Void arg)
+    {
+        complexity += 1 + nestingLevel;
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
+    }
+
+    @Override
+    public void visit(ConditionalExpr n, Void arg)
+    {
+        complexity += 1 + nestingLevel;
+        super.visit(n, arg);
+    }
+
+    @Override
+    public void visit(LambdaExpr n, Void arg)
+    {
+        nestingLevel++;
+        super.visit(n, arg);
+        nestingLevel--;
+    }
+
+    @Override
+    public void visit(BinaryExpr n, Void arg)
+    {
+        if (isLogicalOperator(n.getOperator()) && isLogicalChainRoot(n))
+            complexity += countLogicalSequences(n, null);
+
+        super.visit(n, arg);
+    }
+
+    @Override
+    public void visit(MethodCallExpr n, Void arg)
+    {
+        if (n.getNameAsString().equals(methodName))
+            complexity += 1;
+
+        super.visit(n, arg);
+    }
+
+    private boolean isElseIf(IfStmt n)
+    {
+        Optional<Node> parent = n.getParentNode();
+        if (parent.isEmpty() || !(parent.get() instanceof IfStmt parentIf))
+            return false;
+
+        return parentIf.getElseStmt().map(elseStmt -> elseStmt == n).orElse(false);
+    }
+
+    private boolean isLogicalChainRoot(BinaryExpr n)
+    {
+        Optional<Node> parent = n.getParentNode();
+        while (parent.isPresent() && parent.get() instanceof EnclosedExpr)
+            parent = parent.get().getParentNode();
+
+        return parent
+                .filter(p -> p instanceof BinaryExpr)
+                .map(p -> (BinaryExpr) p)
+                .filter(parentBinary -> isLogicalOperator(parentBinary.getOperator()))
+                .isEmpty();
+    }
+
+    private int countLogicalSequences(Expression expr, BinaryExpr.Operator parentOperator)
+    {
+        if (expr instanceof EnclosedExpr enclosed)
+            return countLogicalSequences(enclosed.getInner(), parentOperator);
+
+        if (!(expr instanceof BinaryExpr binary) || !isLogicalOperator(binary.getOperator()))
+            return 0;
+
+        int count = (parentOperator == null || binary.getOperator() != parentOperator) ? 1 : 0;
+        count += countLogicalSequences(binary.getLeft(), binary.getOperator());
+        count += countLogicalSequences(binary.getRight(), binary.getOperator());
+        return count;
+    }
+
+    private boolean isLogicalOperator(BinaryExpr.Operator op)
+    {
+        return op == BinaryExpr.Operator.AND || op == BinaryExpr.Operator.OR;
     }
 }

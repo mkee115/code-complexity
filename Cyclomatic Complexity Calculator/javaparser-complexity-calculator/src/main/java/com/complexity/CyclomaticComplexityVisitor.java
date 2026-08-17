@@ -1,11 +1,22 @@
 package com.complexity;
 
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class CyclomaticComplexityVisitor extends VoidVisitorAdapter<int[]>
 {
+    /**
+     * Computes the cyclomatic complexity of a method, starting from the
+     * baseline of 1 and adding 1 for each decision point.
+     */
+    public static int compute(MethodDeclaration method)
+    {
+        int[] counter = {1};
+        new CyclomaticComplexityVisitor().visit(method, counter);
+        return counter[0];
+    }
 
     @Override
     public void visit(IfStmt n, int[] counter)

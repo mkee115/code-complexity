@@ -6,13 +6,15 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LOCCalculator
+public class MethodLocCalculator
 {
-    /**
-     * Counts non-blank, non-comment lines in a method by iterating over
-     * its AST token range and recording the line numbers of any token that
-     * is not whitespace, an end-of-line marker, or a comment.
-     */
+    public static int computePhysicalLOC(MethodDeclaration method)
+    {
+        return method.getRange()
+                .map(r -> r.end.line - r.begin.line + 1)
+                .orElse(0);
+    }
+
     public static int computeLOC(MethodDeclaration method)
     {
         return method.getTokenRange().map(tokenRange ->

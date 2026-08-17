@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 public class LOCCalculatorTest
 {
-    /** Builds a properly formatted multi-line method so each body line is on its own line. */
     private static int loc(String... bodyLines)
     {
         StringBuilder sb = new StringBuilder("class T {\n  void m() {\n");
@@ -16,7 +15,7 @@ public class LOCCalculatorTest
         sb.append("  }\n}\n");
         MethodDeclaration method = StaticJavaParser.parse(sb.toString())
                 .findFirst(MethodDeclaration.class).get();
-        return LOCCalculator.computeLOC(method);
+        return MethodLocCalculator.computeLOC(method);
     }
 
     @Test

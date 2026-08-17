@@ -2,12 +2,14 @@
 .Rproj.user/
 .Rhistory
 .RData
-.RDataTmp
+.RDataTmp*
 .Ruserdata
 .Rapp.history
 output/
+graphs/
+data_tables/
 **/*.csv
-**/*.png
+analysis/**/*.png
 **/*.txt
 
 # GitHub Token
@@ -15,3 +17,5 @@ output/
 
 # Target
 target/
+.Rproj.user
+.positai

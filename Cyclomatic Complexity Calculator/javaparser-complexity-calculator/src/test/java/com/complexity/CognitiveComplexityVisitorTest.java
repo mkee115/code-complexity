@@ -12,9 +12,7 @@ public class CognitiveComplexityVisitorTest
         String src = "class T { void m() { " + methodBody + " } }";
         MethodDeclaration method = StaticJavaParser.parse(src)
                 .findFirst(MethodDeclaration.class).get();
-        int[] counter = {0, 0};
-        new CognitiveComplexityVisitor().visit(method, counter);
-        return counter[0];
+        return CognitiveComplexityVisitor.compute(method);
     }
 
     @Test
