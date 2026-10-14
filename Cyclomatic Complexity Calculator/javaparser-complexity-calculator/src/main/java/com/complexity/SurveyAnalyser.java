@@ -5,11 +5,17 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,10 +41,33 @@ public class SurveyAnalyser
     // Split point: just before every banner comment ( /* ----... )
     private static final Pattern BANNER_SPLIT = Pattern.compile("(?=/\\* -{10,})");
 
+    private static final Set<String> UNUSED_IDS = Set.of("01-V1", "01-V5", "04-V1", "04-V3", "10-V3");
+
+    private static final Map<String, String> SURVEY_IDS = Map.of(
+            "01-V2", "01-V1",
+            "01-V3", "01-V2",
+            "01-V4", "01-V3",
+            "04-V2", "04-V1");
+
+    private record Metrics(int cc, int cognitive, int loc, int maxNest, double avgNest,
+                           int fanOut, int params, double halVol, double halEff, double avgIdW,
+                           int commentCount, int recursiveCalls) {}
+
+    private record CsvRow(String id, String method, Metrics metrics) {}
+
+    private static final List<CsvRow> CSV_ROWS = new ArrayList<>();
+
     public static void main(String[] args) throws IOException
     {
-        String path = args.length > 0 ? args[0]
-                : System.getenv().getOrDefault("SURVEY_FILE", "survey_code.java");
+        String path = System.getenv().getOrDefault("SURVEY_FILE", "survey_code.java");
+        String csvPath = null;
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i].equals("--csv") && i + 1 < args.length)
+                csvPath = args[++i];
+            else
+                path = args[i];
+        }
 
         String source = Files.readString(Paths.get(path));
 
@@ -48,6 +77,34 @@ public class SurveyAnalyser
             if (!block.isBlank())
                 processBlock(block);
         }
+
+        if (csvPath != null)
+            writeCsv(csvPath);
+    }
+
+    private static void writeCsv(String csvPath) throws IOException
+    {
+        List<CsvRow> rows = new ArrayList<>();
+        for (CsvRow row : CSV_ROWS)
+        {
+            if (UNUSED_IDS.contains(row.id())) continue;
+            rows.add(new CsvRow(SURVEY_IDS.getOrDefault(row.id(), row.id()), row.method(), row.metrics()));
+        }
+        rows.sort(Comparator.comparing(CsvRow::id));
+
+        StringBuilder out = new StringBuilder("group,variant,id,method,cc,cognitive,loc,max_nesting,"
+                + "avg_nesting,fan_out,params,hal_vol,hal_eff,avg_id_words,comment_count,recursive_calls\n");
+        for (CsvRow row : rows)
+        {
+            String[] parts = row.id().split("-", 2);
+            Metrics m = row.metrics();
+            out.append(String.format(Locale.ROOT, "%d,%s,%s,%s,%d,%d,%d,%d,%.2f,%d,%d,%.2f,%.2f,%.2f,%d,%d\n",
+                    Integer.parseInt(parts[0]), parts[1], row.id(), row.method(),
+                    m.cc(), m.cognitive(), m.loc(), m.maxNest(), m.avgNest(),
+                    m.fanOut(), m.params(), m.halVol(), m.halEff(), m.avgIdW(),
+                    m.commentCount(), m.recursiveCalls()));
+        }
+        Files.writeString(Paths.get(csvPath), out.toString());
     }
 
     // -------------------------------------------------------------------------
@@ -85,39 +142,65 @@ public class SurveyAnalyser
         }
 
         CompilationUnit cu = parsed.getResult().get();
-        for (MethodDeclaration method : cu.findAll(MethodDeclaration.class))
-            printRow(id, method.getNameAsString(), method);
+        List<MethodDeclaration> methods = cu.findAll(MethodDeclaration.class);
+        for (MethodDeclaration method : methods)
+        {
+            Metrics metrics = computeMetrics(method);
+            printRow(id, method.getNameAsString(), metrics);
+            if (method == methods.get(0))
+                CSV_ROWS.add(new CsvRow(id, method.getNameAsString(), metrics));
+        }
     }
 
-    private static void printRow(String id, String methodName, MethodDeclaration method)
+    private static Metrics computeMetrics(MethodDeclaration method)
     {
-        int cc        = CyclomaticComplexityVisitor.compute(method);
-        int cognitive = CognitiveComplexityVisitor.compute(method);
-        int loc       = MethodLocCalculator.computeLOC(method);
-        int maxNest   = (int) MethodNestingCalculator.computeNesting(method)[1];
-
+        double[] nesting = MethodNestingCalculator.computeNesting(method);
         MethodStructureCalculator.Metrics struct = MethodStructureCalculator.compute(method);
         HalsteadCalculator.Metrics        hal    = HalsteadCalculator.compute(method);
         IdentifierMetricsCalculator.Metrics id_m = IdentifierMetricsCalculator.compute(method);
 
-        System.out.printf(Locale.ROOT,
-                "%-12s %-26s %4d %9d %5d %8d %7d %7d %9.1f %9.1f %6.2f%n",
-                id, methodName,
-                cc, cognitive, loc, maxNest,
+        return new Metrics(
+                CyclomaticComplexityVisitor.compute(method),
+                CognitiveComplexityVisitor.compute(method),
+                MethodLocCalculator.computeLOC(method),
+                (int) nesting[1], nesting[0],
                 struct.fanOut(), struct.paramCount(),
                 hal.volume(), hal.effort(),
-                id_m.avgIdentifierWords());
+                id_m.avgIdentifierWords(),
+                id_m.commentCount(),
+                recursiveCalls(method));
+    }
+
+    private static int recursiveCalls(MethodDeclaration method)
+    {
+        int params = method.getParameters().size();
+        return (int) method.findAll(MethodCallExpr.class).stream()
+                .filter(call -> call.getNameAsString().equals(method.getNameAsString())
+                        && call.getArguments().size() == params)
+                .count();
+    }
+
+    private static void printRow(String id, String methodName, Metrics m)
+    {
+        System.out.printf(Locale.ROOT,
+                "%-12s %-26s %4d %9d %5d %8d %8.2f %7d %7d %9.1f %9.1f %6.2f %9d %8d%n",
+                id, methodName,
+                m.cc(), m.cognitive(), m.loc(), m.maxNest(), m.avgNest(),
+                m.fanOut(), m.params(),
+                m.halVol(), m.halEff(),
+                m.avgIdW(),
+                m.commentCount(), m.recursiveCalls());
     }
 
     private static void printHeader()
     {
-        System.out.printf("%-12s %-26s %4s %9s %5s %8s %7s %7s %9s %9s %6s%n",
+        System.out.printf("%-12s %-26s %4s %9s %5s %8s %8s %7s %7s %9s %9s %6s %9s %8s%n",
                 "ID", "Method",
-                "CC", "Cognitive", "LOC", "MaxNest",
+                "CC", "Cognitive", "LOC", "MaxNest", "AvgNest",
                 "FanOut", "Params",
                 "HalVol", "HalEff",
-                "AvgIdW");
-        System.out.println("-".repeat(110));
+                "AvgIdW", "Comments", "RecCalls");
+        System.out.println("-".repeat(139));
     }
 
     private static String firstProblem(ParseResult<?> parsed)

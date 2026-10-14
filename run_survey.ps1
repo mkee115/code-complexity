@@ -6,6 +6,7 @@ $mvnCmd  = (Get-ChildItem "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.1
 $base    = Join-Path $PSScriptRoot "Cyclomatic Complexity Calculator\javaparser-complexity-calculator"
 $pom     = Join-Path $base "pom.xml"
 $survey  = Join-Path $PSScriptRoot "survey_code.java"
+$csv     = Join-Path $PSScriptRoot "Cyclomatic Complexity Calculator\analysis\Survey_Response_Analysis\variant_metrics.csv"
 
 Write-Host "Building..."
 & $mvnCmd -f $pom package dependency:copy-dependencies -DskipTests -q
@@ -13,4 +14,4 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Build failed"; exit 1 }
 
 Write-Host "Analysing $survey`n"
 $cp = "$base\target\classes;$base\target\dependency\*"
-& java -cp $cp com.complexity.SurveyAnalyser $survey
+& java -cp $cp com.complexity.SurveyAnalyser $survey --csv $csv
