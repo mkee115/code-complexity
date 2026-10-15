@@ -10,6 +10,9 @@ public class CyclomaticComplexityVisitorTest
     private static int cc(String methodBody)
     {
         String src = "class T { void m() { " + methodBody + " } }";
+        // Same language level as the pipeline, so newer syntax (case A, B ->) parses
+        StaticJavaParser.getParserConfiguration()
+                .setLanguageLevel(com.github.javaparser.ParserConfiguration.LanguageLevel.BLEEDING_EDGE);
         MethodDeclaration method = StaticJavaParser.parse(src)
                 .findFirst(MethodDeclaration.class).get();
         int[] counter = {1};
@@ -117,5 +120,12 @@ public class CyclomaticComplexityVisitorTest
     public void nestedIf()
     {
         assertEquals(3, cc("if (a) { if (b) {} }"));
+    }
+
+    @Test
+    public void multiLabelCaseCountsEachLabel()
+    {
+        // case 1, 2 is two outcomes, the same as case 1: case 2:
+        assertEquals(3, cc("switch (x) { case 1, 2 -> y(); default -> z(); }"));
     }
 }

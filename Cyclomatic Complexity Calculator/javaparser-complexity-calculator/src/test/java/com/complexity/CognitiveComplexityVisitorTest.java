@@ -15,6 +15,13 @@ public class CognitiveComplexityVisitorTest
         return CognitiveComplexityVisitor.compute(method);
     }
 
+    private static int scoreClass(String classBody)
+    {
+        MethodDeclaration method = StaticJavaParser.parse("class T { " + classBody + " }")
+                .findFirst(MethodDeclaration.class).get();
+        return CognitiveComplexityVisitor.compute(method);
+    }
+
     @Test
     public void emptyMethod()
     {
@@ -97,5 +104,65 @@ public class CognitiveComplexityVisitorTest
     {
         // catch at nesting=0: +1
         assertEquals(1, score("try {} catch (Exception e) {}"));
+    }
+
+    @Test
+    public void chainedTernaryIsNested()
+    {
+        // each ternary sits in the previous one's else branch: 1 + 2 + 3 + 4
+        assertEquals(10, score("String g = a ? \"A\" : b ? \"B\" : c ? \"C\" : d ? \"D\" : \"E\";"));
+    }
+
+    @Test
+    public void labelledBreakAdds()
+    {
+        // for +1, inner for +2, labelled break +1
+        assertEquals(4, score("outer: for (;;) { for (;;) { break outer; } }"));
+    }
+
+    @Test
+    public void unlabelledBreakAddsNothing()
+    {
+        assertEquals(1, score("for (;;) { break; }"));
+    }
+
+    @Test
+    public void recursionCountsOncePerMethod()
+    {
+        // if +1, recursion +1 (two recursive calls still count once)
+        assertEquals(2, scoreClass("int f(int n) { if (n < 2) return n; return f(n - 1) + f(n - 2); }"));
+    }
+
+    @Test
+    public void callToSameNamedLibraryMethodIsNotRecursion()
+    {
+        // Math.max inside max is a different method
+        assertEquals(1, scoreClass("int max(int[] a) { int m = 0; for (int x : a) m = Math.max(m, x); return m; }"));
+    }
+
+    @Test
+    public void callWithDifferentArgCountIsNotRecursion()
+    {
+        assertEquals(0, scoreClass("int f(int a) { return f(a, 0); }"));
+    }
+
+    @Test
+    public void thisQualifiedSelfCallIsRecursion()
+    {
+        assertEquals(1, scoreClass("int f(int a) { return this.f(a - 1); }"));
+    }
+
+    @Test
+    public void lambdaIncreasesNesting()
+    {
+        // if inside a lambda is at nesting 1: +2
+        assertEquals(2, score("Runnable r = () -> { if (a) {} };"));
+    }
+
+    @Test
+    public void anonymousClassIncreasesNesting()
+    {
+        // if inside the anonymous class's method is at nesting 1: +2
+        assertEquals(2, score("Runnable r = new Runnable() { public void run() { if (a) {} } };"));
     }
 }

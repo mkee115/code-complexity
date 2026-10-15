@@ -1,12 +1,14 @@
 # run_survey.ps1
-# Builds the calculator then prints all complexity metrics for every method in survey_code.java.
+# Builds the calculator then prints all complexity metrics for every survey snippet,
+# and writes one row per snippet to snippet_metrics.csv.
 # Run from the repo root:  .\run_survey.ps1
 
 $mvnCmd  = (Get-ChildItem "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.11" -Recurse -Filter "mvn.cmd").FullName
 $base    = Join-Path $PSScriptRoot "Cyclomatic Complexity Calculator\javaparser-complexity-calculator"
 $pom     = Join-Path $base "pom.xml"
-$survey  = Join-Path $PSScriptRoot "survey_code.java"
-$csv     = Join-Path $PSScriptRoot "Cyclomatic Complexity Calculator\analysis\Survey_Response_Analysis\variant_metrics.csv"
+$snips   = Join-Path $PSScriptRoot "Cyclomatic Complexity Calculator\report_analysis\data\survey\snippets"
+$survey  = Join-Path $snips "survey_code.java"
+$csv     = Join-Path $snips "snippet_metrics.csv"
 
 Write-Host "Building..."
 & $mvnCmd -f $pom package dependency:copy-dependencies -DskipTests -q

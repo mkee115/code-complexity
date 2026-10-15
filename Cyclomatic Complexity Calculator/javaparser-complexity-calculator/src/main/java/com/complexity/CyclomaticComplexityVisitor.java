@@ -1,20 +1,27 @@
 package com.complexity;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+/**
+ * Extended cyclomatic complexity (McCabe 1976, with Myers' 1977 extension):
+ * 1 plus one for every decision point. Decision points are if / else if,
+ * for, for-each, while, do, each non-default case label, catch, the ternary
+ * operator, and each && or || (each short-circuit operator is a hidden branch).
+ * else, default, try, finally, throw and return are not decision points.
+ */
 public class CyclomaticComplexityVisitor extends VoidVisitorAdapter<int[]>
 {
     /**
-     * Computes the cyclomatic complexity of a method, starting from the
-     * baseline of 1 and adding 1 for each decision point.
+     * Computes the cyclomatic complexity of a method or constructor, starting
+     * from the baseline of 1 and adding 1 for each decision point.
      */
-    public static int compute(MethodDeclaration method)
+    public static int compute(CallableDeclaration<?> method)
     {
         int[] counter = {1};
-        new CyclomaticComplexityVisitor().visit(method, counter);
+        method.accept(new CyclomaticComplexityVisitor(), counter);
         return counter[0];
     }
 
@@ -56,10 +63,9 @@ public class CyclomaticComplexityVisitor extends VoidVisitorAdapter<int[]>
     @Override
     public void visit(SwitchEntry n, int[] counter)
     {
-        if (!n.getLabels().isEmpty())
-        {
-            counter[0]++;
-        }
+        // Each label is a separate outcome, so "case A, B ->" adds 2, the same
+        // as the classic "case A: case B:". default has no label and adds 0.
+        counter[0] += n.getLabels().size();
         super.visit(n, counter);
     }
 

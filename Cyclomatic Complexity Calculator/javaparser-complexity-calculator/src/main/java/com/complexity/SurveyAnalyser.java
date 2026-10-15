@@ -5,28 +5,27 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Reads survey_code.java, splits it into its labelled method blocks,
+ * Reads a survey code file, splits it into its labelled snippet blocks,
  * wraps each snippet in a throwaway class so JavaParser can parse it,
  * then prints all complexity metrics for every method found.
  *
- * Usage: pass the path to survey_code.java as the first argument, or
- * set the SURVEY_FILE environment variable; defaults to "survey_code.java"
- * in the working directory.
+ * Every block's ID is used exactly as written in the file, and every block is
+ * measured; the file should therefore hold only the snippets to be measured.
+ * Metrics come from the same calculator classes as the corpus pipeline.
+ *
+ * Usage: SurveyAnalyser <survey file> [--csv <path>]
+ * The CSV has one row per snippet, measuring its main (first) method only.
  */
 public class SurveyAnalyser
 {
@@ -41,17 +40,9 @@ public class SurveyAnalyser
     // Split point: just before every banner comment ( /* ----... )
     private static final Pattern BANNER_SPLIT = Pattern.compile("(?=/\\* -{10,})");
 
-    private static final Set<String> UNUSED_IDS = Set.of("01-V1", "01-V5", "04-V1", "04-V3", "10-V3");
-
-    private static final Map<String, String> SURVEY_IDS = Map.of(
-            "01-V2", "01-V1",
-            "01-V3", "01-V2",
-            "01-V4", "01-V3",
-            "04-V2", "04-V1");
-
     private record Metrics(int cc, int cognitive, int loc, int maxNest, double avgNest,
                            int fanOut, int params, double halVol, double halEff, double avgIdW,
-                           int commentCount, int recursiveCalls) {}
+                           int commentCount, boolean hasJavadoc, boolean recursive) {}
 
     private record CsvRow(String id, String method, Metrics metrics) {}
 
@@ -84,25 +75,19 @@ public class SurveyAnalyser
 
     private static void writeCsv(String csvPath) throws IOException
     {
-        List<CsvRow> rows = new ArrayList<>();
-        for (CsvRow row : CSV_ROWS)
-        {
-            if (UNUSED_IDS.contains(row.id())) continue;
-            rows.add(new CsvRow(SURVEY_IDS.getOrDefault(row.id(), row.id()), row.method(), row.metrics()));
-        }
-        rows.sort(Comparator.comparing(CsvRow::id));
-
         StringBuilder out = new StringBuilder("group,variant,id,method,cc,cognitive,loc,max_nesting,"
-                + "avg_nesting,fan_out,params,hal_vol,hal_eff,avg_id_words,comment_count,recursive_calls\n");
-        for (CsvRow row : rows)
+                + "avg_nesting,fan_out,params,hal_vol,hal_eff,avg_id_words,comment_count,"
+                + "has_javadoc,recursive\n");
+        for (CsvRow row : CSV_ROWS)
         {
             String[] parts = row.id().split("-", 2);
             Metrics m = row.metrics();
-            out.append(String.format(Locale.ROOT, "%d,%s,%s,%s,%d,%d,%d,%d,%.2f,%d,%d,%.2f,%.2f,%.2f,%d,%d\n",
+            out.append(String.format(Locale.ROOT,
+                    "%d,%s,%s,%s,%d,%d,%d,%d,%.2f,%d,%d,%.2f,%.2f,%.2f,%d,%d,%d\n",
                     Integer.parseInt(parts[0]), parts[1], row.id(), row.method(),
                     m.cc(), m.cognitive(), m.loc(), m.maxNest(), m.avgNest(),
                     m.fanOut(), m.params(), m.halVol(), m.halEff(), m.avgIdW(),
-                    m.commentCount(), m.recursiveCalls()));
+                    m.commentCount(), m.hasJavadoc() ? 1 : 0, m.recursive() ? 1 : 0));
         }
         Files.writeString(Paths.get(csvPath), out.toString());
     }
@@ -129,9 +114,7 @@ public class SurveyAnalyser
                 body.append(line).append("\n");
         }
 
-        // Wrap in a synthetic class so JavaParser sees a valid compilation unit.
-        // Inner-class declarations (e.g. "class Account { double balance; }") and
-        // static field declarations (constants blocks) are valid class members.
+        // Wrap in a synthetic class so JavaParser sees a valid compilation unit
         String wrapped = imports + "class _Survey {\n" + body + "}";
 
         ParseResult<CompilationUnit> parsed = PARSER.parse(wrapped);
@@ -167,40 +150,31 @@ public class SurveyAnalyser
                 struct.fanOut(), struct.paramCount(),
                 hal.volume(), hal.effort(),
                 id_m.avgIdentifierWords(),
-                id_m.commentCount(),
-                recursiveCalls(method));
-    }
-
-    private static int recursiveCalls(MethodDeclaration method)
-    {
-        int params = method.getParameters().size();
-        return (int) method.findAll(MethodCallExpr.class).stream()
-                .filter(call -> call.getNameAsString().equals(method.getNameAsString())
-                        && call.getArguments().size() == params)
-                .count();
+                id_m.commentCount(), id_m.hasJavadoc(),
+                CognitiveComplexityVisitor.isRecursive(method));
     }
 
     private static void printRow(String id, String methodName, Metrics m)
     {
         System.out.printf(Locale.ROOT,
-                "%-12s %-26s %4d %9d %5d %8d %8.2f %7d %7d %9.1f %9.1f %6.2f %9d %8d%n",
+                "%-12s %-26s %4d %9d %5d %8d %8.2f %7d %7d %9.1f %9.1f %6.2f %9d %8s %6s%n",
                 id, methodName,
                 m.cc(), m.cognitive(), m.loc(), m.maxNest(), m.avgNest(),
                 m.fanOut(), m.params(),
                 m.halVol(), m.halEff(),
                 m.avgIdW(),
-                m.commentCount(), m.recursiveCalls());
+                m.commentCount(), m.hasJavadoc() ? "yes" : "no", m.recursive() ? "yes" : "no");
     }
 
     private static void printHeader()
     {
-        System.out.printf("%-12s %-26s %4s %9s %5s %8s %8s %7s %7s %9s %9s %6s %9s %8s%n",
+        System.out.printf("%-12s %-26s %4s %9s %5s %8s %8s %7s %7s %9s %9s %6s %9s %8s %6s%n",
                 "ID", "Method",
                 "CC", "Cognitive", "LOC", "MaxNest", "AvgNest",
                 "FanOut", "Params",
                 "HalVol", "HalEff",
-                "AvgIdW", "Comments", "RecCalls");
-        System.out.println("-".repeat(139));
+                "AvgIdW", "Comments", "Javadoc", "Recur");
+        System.out.println("-".repeat(146));
     }
 
     private static String firstProblem(ParseResult<?> parsed)

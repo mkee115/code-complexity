@@ -76,4 +76,27 @@ public class MethodNestingCalculatorTest
         double[] result = nesting("try {} catch (Exception e) {}");
         assertEquals(1.0, result[1], DELTA);
     }
+
+    @Test
+    public void elseIfChainIsFlat()
+    {
+        // an else-if chain is one level, however long it is
+        double[] result = nesting("if (a) { x(); } else if (b) { x(); } else if (c) { x(); } else { x(); }");
+        assertEquals(1.0, result[1], DELTA);
+    }
+
+    @Test
+    public void ifInsideElseIfIsNested()
+    {
+        double[] result = nesting("if (a) {} else if (b) { if (c) { x(); } }");
+        assertEquals(2.0, result[1], DELTA);
+    }
+
+    @Test
+    public void ifInsidePlainElseIsNested()
+    {
+        // else { if } is a real nested if, unlike else if
+        double[] result = nesting("if (a) {} else { if (b) { x(); } }");
+        assertEquals(2.0, result[1], DELTA);
+    }
 }

@@ -4,6 +4,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class IdentifierMetricsCalculatorTest
 {
@@ -88,5 +89,17 @@ public class IdentifierMetricsCalculatorTest
         // string literal "hello world" → +2
         IdentifierMetricsCalculator.Metrics result = metrics("String message = \"hello world\";");
         assertEquals(6, result.totalWordCount());
+    }
+
+    @Test
+    public void javadocCountsAsComment()
+    {
+        String src = "class T {\n  /** Returns one. */\n  int m() { return 1; }\n}\n";
+        MethodDeclaration method = StaticJavaParser.parse(src)
+                .findFirst(MethodDeclaration.class).get();
+        IdentifierMetricsCalculator.Metrics result = IdentifierMetricsCalculator.compute(method);
+        assertEquals(1, result.commentCount());
+        assertEquals(2, result.commentWordCount());
+        assertTrue(result.hasJavadoc());
     }
 }
