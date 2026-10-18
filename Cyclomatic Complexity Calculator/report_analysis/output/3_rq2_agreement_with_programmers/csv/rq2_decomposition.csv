@@ -1,0 +1,21 @@
+metric_label,decomp,n,total,prop
+CC,Both take a side and agree,294,750,0.392
+CC,Both take a side but disagree,134,750,0.17866666666666667
+CC,"Metric ties, participant takes a side",247,750,0.3293333333333333
+CC,"Metric takes a side, participant says no difference",49,750,0.06533333333333333
+CC,Both say no difference,26,750,0.034666666666666665
+CogC,Both take a side and agree,417,750,0.556
+CogC,Both take a side but disagree,160,750,0.21333333333333335
+CogC,"Metric ties, participant takes a side",98,750,0.13066666666666665
+CogC,"Metric takes a side, participant says no difference",64,750,0.08533333333333333
+CogC,Both say no difference,11,750,0.014666666666666666
+LOC,Both take a side and agree,394,750,0.5253333333333333
+LOC,Both take a side but disagree,184,750,0.24533333333333332
+LOC,"Metric ties, participant takes a side",97,750,0.12933333333333333
+LOC,"Metric takes a side, participant says no difference",65,750,0.08666666666666667
+LOC,Both say no difference,10,750,0.013333333333333334
+MaxNest,Both take a side and agree,333,750,0.444
+MaxNest,Both take a side but disagree,111,750,0.148
+MaxNest,"Metric ties, participant takes a side",231,750,0.308
+MaxNest,"Metric takes a side, participant says no difference",48,750,0.064
+MaxNest,Both say no difference,27,750,0.036

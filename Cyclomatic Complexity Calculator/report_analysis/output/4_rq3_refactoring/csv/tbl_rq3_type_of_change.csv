@@ -1,0 +1,13 @@
+Kind of change,Variants,Responses,Mean net preference for refactor,Decisive responses preferring refactor
+branch count and nesting,05-V1,8,+1.25,100%
+control-flow removal,"07-V2, 09-V2",38,+1.11,86%
+comment quality,"01-V3, 02-V3, 05-V4, 07-V3",43,+1.00,90%
+multiple exits,01-V1,7,+1.00,71%
+nesting,"08-V1, 09-V1",50,+0.82,97%
+library knowledge,05-V2,8,+0.50,67%
+branch count,"10-V1, 06-V1, 07-V1, 08-V2",88,+0.32,67%
+naming,"05-V3, 06-V2",32,+0.31,70%
+extraction,"10-V2, 02-V2, 04-V1",113,+0.12,60%
+recursion,03-V1,24,-0.29,36%
+volume,"01-V2, 03-V2",32,-0.41,31%
+cognitive vs CC,02-V1,13,-1.08,15%

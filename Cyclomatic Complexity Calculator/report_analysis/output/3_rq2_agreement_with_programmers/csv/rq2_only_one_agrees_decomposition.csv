@@ -1,0 +1,13 @@
+comparison,direction,cc,participant,other_metric,responses,pairs
+CogC vs CC,Only CC agrees,CC ties,participant: no difference,CogC separates,15,3
+CogC vs CC,Only CogC agrees,CC ties,participant chose a side,CogC separates,123,10
+LOC vs CC,Only CC agrees,CC separates,participant chose a side,LOC separates,24,2
+LOC vs CC,Only CC agrees,CC separates,participant chose a side,LOC ties,8,1
+LOC vs CC,Only CC agrees,CC ties,participant: no difference,LOC separates,18,4
+LOC vs CC,Only LOC agrees,CC separates,participant chose a side,LOC separates,18,2
+LOC vs CC,Only LOC agrees,CC separates,participant: no difference,LOC ties,2,1
+LOC vs CC,Only LOC agrees,CC ties,participant chose a side,LOC separates,114,11
+MaxNest vs CC,Only CC agrees,CC separates,participant chose a side,MaxNest ties,44,5
+MaxNest vs CC,Only CC agrees,CC ties,participant: no difference,MaxNest separates,12,2
+MaxNest vs CC,Only MaxNest agrees,CC separates,participant: no difference,MaxNest ties,13,5
+MaxNest vs CC,Only MaxNest agrees,CC ties,participant chose a side,MaxNest separates,83,7

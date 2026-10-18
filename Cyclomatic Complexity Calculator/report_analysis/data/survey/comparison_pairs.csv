@@ -1,0 +1,45 @@
+item,rating_column,group,task,method_a,method_b,method_a_id,method_b_id,pair_image
+Q1A,Q1Ai_1,1,Letter grade,ORIG,V1,01-ORIG,01-V1,01-ORIG_01-V1.png
+Q1B,Q1Bi_1,1,Letter grade,ORIG,V2,01-ORIG,01-V2,01-ORIG_01-V2.png
+Q1C,Q1Ci_1,1,Letter grade,ORIG,V3,01-ORIG,01-V3,01-ORIG_01-V3.png
+Q1D,Q1Di_1,1,Letter grade,V1,V2,01-V1,01-V2,01-V1_01-V2.png
+Q1E,Q1Ei_1,1,Letter grade,V1,V3,01-V1,01-V3,01-V1_01-V3.png
+Q1F,Q1Fi_1,1,Letter grade,V2,V3,01-V2,01-V3,01-V2_01-V3.png
+Q2A,Q2Ai_1,2,Password check,ORIG,V1,02-ORIG,02-V1,02-ORIG_02-V1.png
+Q2B,Q2Bi_1,2,Password check,ORIG,V2,02-ORIG,02-V2,02-ORIG_02-V2.png
+Q2C,Q2Ci_1,2,Password check,ORIG,V3,02-ORIG,02-V3,02-ORIG_02-V3.png
+Q2D,Q2Di_1,2,Password check,V1,V2,02-V1,02-V2,02-V1_02-V2.png
+Q2E,Q2Ei_1,2,Password check,V1,V3,02-V1,02-V3,02-V1_02-V3.png
+Q2F,Q2Fi_1,2,Password check,V2,V3,02-V2,02-V3,02-V2_02-V3.png
+Q3A,Q3Ai_1,3,Sum of digits,ORIG,V1,03-ORIG,03-V1,03-ORIG_03-V1.png
+Q3B,Q3Bi_1,3,Sum of digits,ORIG,V2,03-ORIG,03-V2,03-ORIG_03-V2.png
+Q3C,Q3Ci_1,3,Sum of digits,V1,V2,03-V1,03-V2,03-V1_03-V2.png
+Q4A,Q4Ai_1,4,Max in 2D array,ORIG,V1,04-ORIG,04-V1,04-ORIG_04-V1.png
+Q5A,Q5Ai_1,5,Remove duplicates,ORIG,V1,05-ORIG,05-V1,05-ORIG_05-V1.png
+Q5B,Q5Bi_1,5,Remove duplicates,ORIG,V2,05-ORIG,05-V2,05-ORIG_05-V2.png
+Q5C,Q5Ci_1,5,Remove duplicates,ORIG,V3,05-ORIG,05-V3,05-ORIG_05-V3.png
+Q5D,Q5Di_1,5,Remove duplicates,ORIG,V4,05-ORIG,05-V4,05-ORIG_05-V4.png
+Q5E,Q5Ei_1,5,Remove duplicates,V1,V2,05-V1,05-V2,05-V1_05-V2.png
+Q5F,Q5Fi_1,5,Remove duplicates,V1,V3,05-V1,05-V3,05-V1_05-V3.png
+Q5G,Q5Gi_1,5,Remove duplicates,V1,V4,05-V1,05-V4,05-V1_05-V4.png
+Q5H,Q5Hi_1,5,Remove duplicates,V2,V3,05-V2,05-V3,05-V2_05-V3.png
+Q5I,Q5Ii_1,5,Remove duplicates,V2,V4,05-V2,05-V4,05-V2_05-V4.png
+Q5J,Q5Ji_1,5,Remove duplicates,V3,V4,05-V3,05-V4,05-V3_05-V4.png
+Q6A,Q6Ai_1,6,Frequency count,ORIG,V1,06-ORIG,06-V1,06-ORIG_06-V1.png
+Q6B,Q6Bi_1,6,Frequency count,ORIG,V2,06-ORIG,06-V2,06-ORIG_06-V2.png
+Q6C,Q6Ci_1,6,Frequency count,V1,V2,06-V1,06-V2,06-V1_06-V2.png
+Q7A,Q7Ai_1,7,Merge sorted arrays,ORIG,V1,07-ORIG,07-V1,07-ORIG_07-V1.png
+Q7B,Q7Bi_1,7,Merge sorted arrays,ORIG,V2,07-ORIG,07-V2,07-ORIG_07-V2.png
+Q7C,Q7Ci_1,7,Merge sorted arrays,ORIG,V3,07-ORIG,07-V3,07-ORIG_07-V3.png
+Q7D,Q7Di_1,7,Merge sorted arrays,V1,V2,07-V1,07-V2,07-V1_07-V2.png
+Q7E,Q7Ei_1,7,Merge sorted arrays,V1,V3,07-V1,07-V3,07-V1_07-V3.png
+Q7F,Q126_1,7,Merge sorted arrays,V2,V3,07-V2,07-V3,07-V2_07-V3.png
+Q8A,Q8Ai_1,8,Roman numeral,ORIG,V1,08-ORIG,08-V1,08-ORIG_08-V1.png
+Q8B,Q8Bi_1,8,Roman numeral,ORIG,V2,08-ORIG,08-V2,08-ORIG_08-V2.png
+Q8C,Q8Ci_1,8,Roman numeral,V1,V2,08-V1,08-V2,08-V1_08-V2.png
+Q9A,Q9Ai_1,9,Binary search,ORIG,V1,09-ORIG,09-V1,09-ORIG_09-V1.png
+Q9B,Q9Bi_1,9,Binary search,ORIG,V2,09-ORIG,09-V2,09-ORIG_09-V2.png
+Q9C,Q9Ci_1,9,Binary search,V1,V2,09-V1,09-V2,09-V1_09-V2.png
+Q10A,Q10Ai_1,10,Balanced brackets,ORIG,V1,10-ORIG,10-V1,10-ORIG_10-V1.png
+Q10B,Q10Bi_1,10,Balanced brackets,ORIG,V2,10-ORIG,10-V2,10-ORIG_10-V2.png
+Q10C,Q10Ci_1,10,Balanced brackets,V1,V2,10-V1,10-V2,10-V1_10-V2.png

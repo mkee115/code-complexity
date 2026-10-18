@@ -1,0 +1,7 @@
+Metric pair,Concordant,"One ties, other separates",Both tie,Discordant,Total
+CC – CogC,26,10,8,0,44
+CC – LOC,23,12,7,2,44
+CC – MaxNest,21,12,11,0,44
+CogC – LOC,32,2,7,3,44
+CogC – MaxNest,27,8,8,1,44
+LOC – MaxNest,28,8,8,0,44

@@ -1,0 +1,9 @@
+Pair,Responses,Chose A,No difference,Chose B,Expressed a preference
+01-ORIG vs 01-V3,12,0,0,12,100%
+02-ORIG vs 02-V3,13,2,1,10,92%
+05-ORIG vs 05-V3,8,4,0,4,100%
+05-ORIG vs 05-V4,6,1,0,5,100%
+05-V3 vs 05-V4,8,2,2,4,75%
+06-ORIG vs 06-V2,24,4,5,15,79%
+07-ORIG vs 07-V3,12,1,0,11,100%
+All pairs,83,14,8,61,90%

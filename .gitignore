@@ -19,3 +19,10 @@ analysis/**/*.png
 target/
 .Rproj.user
 .positai
+
+# Track report_analysis contents except RStudio project metadata and file
+!/Cyclomatic Complexity Calculator/report_analysis/
+!/Cyclomatic Complexity Calculator/report_analysis/**
+Cyclomatic Complexity Calculator/report_analysis/.Rproj.user/
+Cyclomatic Complexity Calculator/report_analysis/report_analysis.Rproj
+Cyclomatic Complexity Calculator/report_analysis/data/corpus/cc_data.csv

@@ -10,10 +10,8 @@ report_analysis/
 │   ├── corpus/  GitHub mining output, October 2026 harvest with the corrected calculator
 │   ├── survey/      Qualtrics responses + which pair each question showed
 │       └── snippets/  the 34 survey snippets: code, metrics, screenshots and pair images
-├── scripts/         your analysis scripts go here
-└── output/
-    ├── figures/
-    └── tables/
+├── scripts/         the analysis pipeline (run_all.R, lib/)
+└── output/          figures, tables and CSVs, one folder per report section
 ```
 
 **One ID scheme throughout:** every snippet is identified by its **survey ID** (`01-ORIG`, `01-V1`, … `10-V2`), the label participants' questions were built from. The code, metrics, screenshots, pair images and pair map all use it. Only the 34 snippets shown to participants are in this folder.

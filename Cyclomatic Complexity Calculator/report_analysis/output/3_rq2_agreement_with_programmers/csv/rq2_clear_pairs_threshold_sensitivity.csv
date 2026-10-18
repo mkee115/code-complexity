@@ -1,0 +1,109 @@
+metric_label,state,n,share_threshold,min_decisive,clear_pairs
+CC,Metric agrees with the majority,11,0.7,8,24
+CC,Metric points the other way,1,0.7,8,24
+CC,Metric ties,12,0.7,8,24
+CogC,Metric agrees with the majority,17,0.7,8,24
+CogC,Metric points the other way,2,0.7,8,24
+CogC,Metric ties,5,0.7,8,24
+LOC,Metric agrees with the majority,16,0.7,8,24
+LOC,Metric points the other way,4,0.7,8,24
+LOC,Metric ties,4,0.7,8,24
+MaxNest,Metric agrees with the majority,14,0.7,8,24
+MaxNest,Metric points the other way,1,0.7,8,24
+MaxNest,Metric ties,9,0.7,8,24
+CC,Metric agrees with the majority,10,0.7,10,23
+CC,Metric points the other way,1,0.7,10,23
+CC,Metric ties,12,0.7,10,23
+CogC,Metric agrees with the majority,16,0.7,10,23
+CogC,Metric points the other way,2,0.7,10,23
+CogC,Metric ties,5,0.7,10,23
+LOC,Metric agrees with the majority,15,0.7,10,23
+LOC,Metric points the other way,4,0.7,10,23
+LOC,Metric ties,4,0.7,10,23
+MaxNest,Metric agrees with the majority,13,0.7,10,23
+MaxNest,Metric points the other way,1,0.7,10,23
+MaxNest,Metric ties,9,0.7,10,23
+CC,Metric agrees with the majority,10,0.7,12,23
+CC,Metric points the other way,1,0.7,12,23
+CC,Metric ties,12,0.7,12,23
+CogC,Metric agrees with the majority,16,0.7,12,23
+CogC,Metric points the other way,2,0.7,12,23
+CogC,Metric ties,5,0.7,12,23
+LOC,Metric agrees with the majority,15,0.7,12,23
+LOC,Metric points the other way,4,0.7,12,23
+LOC,Metric ties,4,0.7,12,23
+MaxNest,Metric agrees with the majority,13,0.7,12,23
+MaxNest,Metric points the other way,1,0.7,12,23
+MaxNest,Metric ties,9,0.7,12,23
+CC,Metric agrees with the majority,10,0.75,8,23
+CC,Metric points the other way,1,0.75,8,23
+CC,Metric ties,12,0.75,8,23
+CogC,Metric agrees with the majority,16,0.75,8,23
+CogC,Metric points the other way,2,0.75,8,23
+CogC,Metric ties,5,0.75,8,23
+LOC,Metric agrees with the majority,15,0.75,8,23
+LOC,Metric points the other way,4,0.75,8,23
+LOC,Metric ties,4,0.75,8,23
+MaxNest,Metric agrees with the majority,13,0.75,8,23
+MaxNest,Metric points the other way,1,0.75,8,23
+MaxNest,Metric ties,9,0.75,8,23
+CC,Metric agrees with the majority,9,0.75,10,22
+CC,Metric points the other way,1,0.75,10,22
+CC,Metric ties,12,0.75,10,22
+CogC,Metric agrees with the majority,15,0.75,10,22
+CogC,Metric points the other way,2,0.75,10,22
+CogC,Metric ties,5,0.75,10,22
+LOC,Metric agrees with the majority,14,0.75,10,22
+LOC,Metric points the other way,4,0.75,10,22
+LOC,Metric ties,4,0.75,10,22
+MaxNest,Metric agrees with the majority,12,0.75,10,22
+MaxNest,Metric points the other way,1,0.75,10,22
+MaxNest,Metric ties,9,0.75,10,22
+CC,Metric agrees with the majority,9,0.75,12,22
+CC,Metric points the other way,1,0.75,12,22
+CC,Metric ties,12,0.75,12,22
+CogC,Metric agrees with the majority,15,0.75,12,22
+CogC,Metric points the other way,2,0.75,12,22
+CogC,Metric ties,5,0.75,12,22
+LOC,Metric agrees with the majority,14,0.75,12,22
+LOC,Metric points the other way,4,0.75,12,22
+LOC,Metric ties,4,0.75,12,22
+MaxNest,Metric agrees with the majority,12,0.75,12,22
+MaxNest,Metric points the other way,1,0.75,12,22
+MaxNest,Metric ties,9,0.75,12,22
+CC,Metric agrees with the majority,6,0.8,8,17
+CC,Metric points the other way,0,0.8,8,17
+CC,Metric ties,11,0.8,8,17
+CogC,Metric agrees with the majority,12,0.8,8,17
+CogC,Metric points the other way,1,0.8,8,17
+CogC,Metric ties,4,0.8,8,17
+LOC,Metric agrees with the majority,10,0.8,8,17
+LOC,Metric points the other way,4,0.8,8,17
+LOC,Metric ties,3,0.8,8,17
+MaxNest,Metric agrees with the majority,9,0.8,8,17
+MaxNest,Metric points the other way,1,0.8,8,17
+MaxNest,Metric ties,7,0.8,8,17
+CC,Metric agrees with the majority,5,0.8,10,16
+CC,Metric points the other way,0,0.8,10,16
+CC,Metric ties,11,0.8,10,16
+CogC,Metric agrees with the majority,11,0.8,10,16
+CogC,Metric points the other way,1,0.8,10,16
+CogC,Metric ties,4,0.8,10,16
+LOC,Metric agrees with the majority,9,0.8,10,16
+LOC,Metric points the other way,4,0.8,10,16
+LOC,Metric ties,3,0.8,10,16
+MaxNest,Metric agrees with the majority,8,0.8,10,16
+MaxNest,Metric points the other way,1,0.8,10,16
+MaxNest,Metric ties,7,0.8,10,16
+CC,Metric agrees with the majority,5,0.8,12,16
+CC,Metric points the other way,0,0.8,12,16
+CC,Metric ties,11,0.8,12,16
+CogC,Metric agrees with the majority,11,0.8,12,16
+CogC,Metric points the other way,1,0.8,12,16
+CogC,Metric ties,4,0.8,12,16
+LOC,Metric agrees with the majority,9,0.8,12,16
+LOC,Metric points the other way,4,0.8,12,16
+LOC,Metric ties,3,0.8,12,16
+MaxNest,Metric agrees with the majority,8,0.8,12,16
+MaxNest,Metric points the other way,1,0.8,12,16
+MaxNest,Metric ties,7,0.8,12,16

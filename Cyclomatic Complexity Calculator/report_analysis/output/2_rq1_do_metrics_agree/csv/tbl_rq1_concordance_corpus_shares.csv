@@ -1,0 +1,13 @@
+Sample,Metric pair,Concordant,"One ties, other separates",Both tie,Discordant
+Corpus: random method pairs,CC – CogC,55.0%,2.5%,42.0%,0.4%
+Corpus: random method pairs,CC – LOC,49.2%,35.0%,10.4%,5.3%
+Corpus: random method pairs,CC – MaxNest,47.8%,8.6%,42.7%,0.9%
+Corpus: random method pairs,CogC – LOC,49.5%,34.6%,10.2%,5.7%
+Corpus: random method pairs,CogC – MaxNest,48.2%,9.5%,41.9%,0.5%
+Corpus: random method pairs,LOC – MaxNest,45.1%,39.8%,11.4%,3.7%
+Corpus: non-trivial methods (CC ≥ 3),CC – CogC,70.0%,16.7%,5.7%,7.6%
+Corpus: non-trivial methods (CC ≥ 3),CC – LOC,65.1%,18.5%,0.9%,15.5%
+Corpus: non-trivial methods (CC ≥ 3),CC – MaxNest,43.9%,35.0%,7.8%,13.3%
+Corpus: non-trivial methods (CC ≥ 3),CogC – LOC,69.3%,12.4%,0.6%,17.7%
+Corpus: non-trivial methods (CC ≥ 3),CogC – MaxNest,56.0%,30.9%,6.4%,6.6%
+Corpus: non-trivial methods (CC ≥ 3),LOC – MaxNest,48.0%,33.6%,1.3%,17.2%

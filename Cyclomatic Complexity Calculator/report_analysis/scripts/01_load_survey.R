@@ -5,7 +5,7 @@
 # joined to the pair map and the snippet measurements. Every data check is
 # recorded in the validation log; a failed check stops the pipeline.
 #
-# Outputs (output/work/): participants.rds, responses.rds, scored.rds
+# Outputs (output/_pipeline/): participants.rds, responses.rds, scored.rds
 #   responses: one row per participant x comparison
 #   scored:    responses x 4 key metrics, with the metric's prediction and
 #              whether it agrees with the participant
@@ -103,7 +103,6 @@ validate("34 snippets have measurements", nrow(snip) == 34 && !anyDuplicated(sni
 validate("every pair's two snippets have measurements",
          all(c(pairs$method_a_id, pairs$method_b_id) %in% snip$id))
 validate("no missing metric values after the join", !anyNA(scored$value_a) && !anyNA(scored$value_b))
-validate("responses per pair: min / max", all(per_pair$n >= 1), paste(range(per_pair$n), collapse = " / "))
 validate("each participant saw one pair per task",
          all(count(responses, pid, group)$n == 1))
 validate("Q4A seen by every participant", sum(responses$item == "Q4A") == 75)
@@ -145,6 +144,9 @@ record("distinct pairs", n_distinct(responses$item), section = "Method: survey")
 record("median duration (min)", median(participants$duration_min), section = "Method: survey")
 record("responses per pair (min)", min(per_pair$n), section = "Method: survey")
 record("responses per pair (max)", max(per_pair$n), section = "Method: survey")
+record("responses per pair (median)", median(per_pair$n), ci_low = unname(quantile(per_pair$n, 0.25)),
+       ci_high = unname(quantile(per_pair$n, 0.75)), n = nrow(per_pair), section = "Method: survey",
+       note = "interval = interquartile range across the 44 pairs, not a confidence interval")
 record("all three screening questions correct", sum(participants$java_correct == 3),
        n = nrow(participants), section = "Method: survey")
 for (v in c("java_q1_correct", "java_q2_correct", "java_q3_correct"))

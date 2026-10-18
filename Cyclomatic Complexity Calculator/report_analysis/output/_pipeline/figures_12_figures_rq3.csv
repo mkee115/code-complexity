@@ -1,0 +1,10 @@
+figure,folder,importance,research_question,purpose
+fig14_rq3_win_rates.png,4_rq3_refactoring,important,RQ3,Ranks every version by how often participants judged it less complex
+fig14a_rq3_win_rates_by_cc.png,4_rq3_refactoring,optional,RQ3,"Win-rate leaderboard shaded by each version's CC within its task, to see whether higher measurements go with being judged more complex"
+fig14b_rq3_win_rates_by_cogc.png,4_rq3_refactoring,optional,RQ3,"Win-rate leaderboard shaded by each version's CogC within its task, to see whether higher measurements go with being judged more complex"
+fig14c_rq3_win_rates_by_loc.png,4_rq3_refactoring,optional,RQ3,"Win-rate leaderboard shaded by each version's LOC within its task, to see whether higher measurements go with being judged more complex"
+fig14d_rq3_win_rates_by_maxnest.png,4_rq3_refactoring,optional,RQ3,"Win-rate leaderboard shaded by each version's MaxNest within its task, to see whether higher measurements go with being judged more complex"
+fig15_rq3_original_vs_refactor.png,4_rq3_refactoring,important,RQ3,"Direct test, pair by pair, of whether each refactor was preferred to its original"
+diag_rq3_reduction_scatter.png,4_rq3_refactoring,optional,RQ3,Scatter behind the reduction-vs-preference result
+fig16_rq3_preference_by_measurement_change.png,4_rq3_refactoring,important,RQ3,Whether refactors that lowered a measurement were preferred more than those that did not
+fig17_rq3_type_of_change.png,4_rq3_refactoring,optional,RQ3,Descriptive view of which kinds of change were preferred

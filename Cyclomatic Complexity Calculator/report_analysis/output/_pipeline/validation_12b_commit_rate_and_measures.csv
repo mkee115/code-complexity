@@ -1,0 +1,5 @@
+check,passed,detail,time
+decomposition input has 750 responses,TRUE,,2026-10-17 23:09
+only-one-agrees counts: CogC-only minus CC-only equals the agreement gap (428 - 320 = 108),TRUE,,2026-10-17 23:09
+13-measure table: the four key metrics reproduce the main agreement and its interval,TRUE,,2026-10-17 23:09
+13-measure table: commit rate and tie rate are consistent for the key metrics (separating responses <= decisive),TRUE,,2026-10-17 23:09

@@ -1,0 +1,23 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+"CC: agreement leaving one task out, lowest",0.3985185185185185,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 9 dropped
+"CC: agreement leaving one task out, highest",0.4740740740740741,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 1 dropped
+"CogC: agreement leaving one task out, lowest",0.5407407407407407,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 9 dropped
+"CogC: agreement leaving one task out, highest",0.5881481481481482,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 3 dropped
+"LOC: agreement leaving one task out, lowest",0.5051851851851852,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 9 dropped
+"LOC: agreement leaving one task out, highest",0.5851851851851851,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 3 dropped
+"MaxNest: agreement leaving one task out, lowest",0.44,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 9 dropped
+"MaxNest: agreement leaving one task out, highest",0.5244444444444445,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 3 dropped
+leave-one-task-out: tasks whose removal keeps CogC the highest,10,NA,NA,NA,10,NA,NA,RQ2: task robustness,NA,NA
+leave-one-task-out: tasks whose removal keeps the full ranking,9,NA,NA,NA,10,NA,NA,RQ2: task robustness,NA,full-data ranking: CogC > LOC > MaxNest > CC
+"leave-one-task-out: CogC minus LOC, smallest across the 10 drops",0.002962962962963056,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 3 dropped
+"leave-one-task-out: CogC minus LOC, largest across the 10 drops",0.0503703703703704,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,NA
+"leave-one-task-out: CogC minus CC, smallest across the 10 drops",0.07407407407407407,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,task 1 dropped
+"leave-one-task-out: CogC minus CC, largest across the 10 drops",0.16000000000000003,NA,NA,10,NA,NA,NA,RQ2: task robustness,NA,NA
+"agreement difference, task-level bootstrap: CogC minus CC",0.14399999999999996,0.019973368841544655,0.3214739935680768,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.119 to +0.169
+"agreement difference, task-level bootstrap: CogC minus LOC",0.03200000000000003,-0.042056886997754284,0.1260162601626016,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.009 to +0.053
+"agreement difference, task-level bootstrap: CogC minus MaxNest",0.09066666666666667,0.010652109244411668,0.19654771415656638,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.065 to +0.116
+"agreement difference, task-level bootstrap: LOC minus CC",0.11199999999999993,-0.03768506056527588,0.28258035214817023,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.079 to +0.145
+"agreement difference, task-level bootstrap: LOC minus MaxNest",0.058666666666666645,0.006639886079026065,0.13182423435419438,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.036 to +0.081
+"agreement difference, task-level bootstrap: MaxNest minus CC",0.05333333333333329,-0.09638992477847896,0.22985965211220089,750,NA,"three-stage cluster bootstrap (tasks, pairs within tasks, participants within pairs), 10,000 resamples",NA,RQ2: task robustness,NA,participant-only 95% CI +0.025 to +0.080
+task-level bootstrap: share of resamples in which CogC has the highest agreement,0.8025,NA,NA,10000,NA,NA,NA,RQ2: task robustness,NA,NA
+task-level bootstrap: share of resamples with the full ranking,0.5586,NA,NA,10000,NA,NA,NA,RQ2: task robustness,NA,ranking: CogC > LOC > MaxNest > CC

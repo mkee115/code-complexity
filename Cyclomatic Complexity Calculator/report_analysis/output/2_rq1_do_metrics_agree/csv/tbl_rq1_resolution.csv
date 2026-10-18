@@ -1,0 +1,5 @@
+Metric,Distinct values (corpus),Most common value,Two random methods tie,Distinct values (34 snippets),Survey pairs tied,Survey responses on a tied pair
+CC,313,1 (64% of methods),44%,7,18/44 (41%),273/750 (36%)
+CogC,483,0 (64% of methods),43%,12,8/44 (18%),109/750 (15%)
+LOC,765,3 (25% of methods),12%,16,8/44 (18%),107/750 (14%)
+MaxNest, 18,0 (67% of methods),50%,5,16/44 (36%),258/750 (34%)

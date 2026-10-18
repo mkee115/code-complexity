@@ -1,0 +1,19 @@
+Metric pair,Cells,Distinct pairs,Decisive responses,On the separating metric's side,Holm p
+CC vs CogC,CC and CogC point in opposite directions,0,0,–,
+CC vs CogC,"CC ties, CogC separates",10,149,123 (83%),< .001
+CC vs CogC,"CogC ties, CC separates",0,0,–,
+CC vs LOC,CC and LOC point in opposite directions,2,42,18 (43%),1.000
+CC vs LOC,"CC ties, LOC separates",11,172,114 (66%),< .001
+CC vs LOC,"LOC ties, CC separates",1,22,8 (36%),1.000
+CC vs MaxNest,CC and MaxNest point in opposite directions,0,0,–,
+CC vs MaxNest,"CC ties, MaxNest separates",7,101,83 (82%),< .001
+CC vs MaxNest,"MaxNest ties, CC separates",5,85,44 (52%),1.000
+CogC vs LOC,CogC and LOC point in opposite directions,3,58,20 (34%),.173
+CogC vs LOC,"CogC ties, LOC separates",1,23,3 (13%),.004
+CogC vs LOC,"LOC ties, CogC separates",1,22,8 (36%),1.000
+CogC vs MaxNest,CogC and MaxNest point in opposite directions,1,16,2 (12%),.033
+CogC vs MaxNest,"CogC ties, MaxNest separates",0,0,–,
+CogC vs MaxNest,"MaxNest ties, CogC separates",8,133,72 (54%),1.000
+LOC vs MaxNest,LOC and MaxNest point in opposite directions,0,0,–,
+LOC vs MaxNest,"LOC ties, MaxNest separates",0,0,–,
+LOC vs MaxNest,"MaxNest ties, LOC separates",8,134,61 (46%),1.000

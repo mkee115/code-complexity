@@ -1,0 +1,6 @@
+rule,all_rows,not_flagged_at_harvest,removed_from_main,removed_only_by_this_rule
+DFA<number> classes / specialStateTransition,1076,1062,666,441
+jj_ methods (JavaCC),6679,1524,1524,1524
+src-gen/ or generated-sources/ paths,107278,64705,46384,46159
+File-level propagation (file holds a DFA / specialStateTransition / jj_ method),26158,18956,18350,6406
+Any added rule,123007,73474,54755,NA

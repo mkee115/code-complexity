@@ -49,6 +49,60 @@ for (mp in METRIC_PAIRS) {
          section = "RQ1: corpus", subset = "main corpus", note = paste0(prov))
 }
 
+# Tie rates among methods with CC >= 3 (so not the straight-line methods that dominate the corpus).
+# Exact over all pairs of distinct methods, not sampled: for a metric, P(tie) = sum n_v (n_v - 1) / (n (n - 1))
+# over its values v. "Only X ties" = X ties and the other metric separates the pair.
+m3 <- m[cc >= 3]
+n3 <- nrow(m3)
+pair_tie <- function(counts) sum(counts * (counts - 1)) / (n3 * (n3 - 1))
+p3_cc <- pair_tie(m3[, .N, by = cc]$N)
+p3_cogc <- pair_tie(m3[, .N, by = cognitive]$N)
+p3_both <- pair_tie(m3[, .N, by = .(cc, cognitive)]$N)
+p3_loc <- pair_tie(m3[, .N, by = loc]$N)
+p3_max <- pair_tie(m3[, .N, by = max_nesting]$N)
+tie3 <- tibble::tibble(
+  quantity = c("CC ties", "CogC ties", "LOC ties", "MaxNest ties", "Both CC and CogC tie",
+               "Only CC ties (CogC separates)", "Only CogC ties (CC separates)"),
+  probability = c(p3_cc, p3_cogc, p3_loc, p3_max, p3_both, p3_cc - p3_both, p3_cogc - p3_both))
+save_table(tie3, "rq1_corpus_tie_rates_cc_ge3")
+for (i in seq_len(nrow(tie3)))
+  record(paste0("corpus, CC >= 3: probability two methods tie: ", tie3$quantity[i]), tie3$probability[i], n = n3,
+         test = "exact over all pairs of distinct methods", section = "RQ1: corpus", subset = "main corpus, CC >= 3",
+         note = prov)
+# Where the 34 survey snippets sit among real methods: the mid-rank percentile of each snippet's measurement
+# in the main corpus (share of corpus methods below it, plus half the share equal to it, because so many
+# corpus methods share the lowest values).
+snippets <- read_csv(PATHS$snippets, show_col_types = FALSE)
+mid_pct <- function(v, x) 100 * (sum(x < v) + 0.5 * sum(x == v)) / length(x)
+snip_pct <- snippets |> select(id, all_of(METRICS)) |>
+  rowwise() |>
+  mutate(across(all_of(METRICS), ~ mid_pct(.x, m[[cur_column()]]), .names = "pct_{.col}")) |>
+  ungroup()
+validate("snippet percentiles cover 34 snippets and lie between 0 and 100",
+         nrow(snip_pct) == 34 && all(snip_pct |> select(starts_with("pct_")) >= 0, na.rm = FALSE) &&
+           all(snip_pct |> select(starts_with("pct_")) <= 100))
+save_table(snip_pct, "rq1_snippet_percentiles_in_corpus")
+for (k in METRICS) {
+  v <- snip_pct[[paste0("pct_", k)]]
+  record(paste0(METRIC_LABELS[k], ": median corpus percentile of the 34 survey snippets"), median(v), ci_low = min(v), ci_high = max(v),
+         n = length(v), section = "RQ1: corpus", subset = "main corpus",
+         note = "mid-rank percentile of each snippet's measurement among main-corpus methods; interval = range over the snippets")
+  record(paste0(METRIC_LABELS[k], ": survey snippets above the corpus 90th percentile"), mean(v > 90), n = sum(v > 90),
+         denominator = length(v), section = "RQ1: corpus", subset = "main corpus")
+}
+record("corpus, CC >= 3: ratio of 'only CC ties' to 'only CogC ties'", (p3_cc - p3_both) / (p3_cogc - p3_both), n = n3,
+       test = "exact over all pairs of distinct methods", section = "RQ1: corpus", subset = "main corpus, CC >= 3", note = prov)
+
+# The same correlations using only methods above the lowest value of both metrics
+rho_above <- spearman_above_lowest(X)
+save_table(rho_above, "rq1_corpus_spearman_above_lowest")
+for (k in seq_len(nrow(rho_above))) if (rho_above$metric_1[k] < rho_above$metric_2[k]) {
+  r <- rho_above[k, ]
+  record(paste0("corpus Spearman without the lowest values: ", r$metric_1, " – ", r$metric_2), r$rho, n = r$n,
+         test = "Spearman rho on methods above the lowest value of both metrics", section = "RQ1: corpus",
+         subset = "main corpus, both metrics above their lowest value", note = prov)
+}
+
 # Within-repository Spearman: does the pattern hold inside individual repositories?
 pair_names <- c("CC – CogC", "CC – LOC", "CogC – LOC", "CC – MaxNest", "CogC – MaxNest", "LOC – MaxNest")
 within_repo <- m[, if (.N >= 200) {
@@ -78,7 +132,7 @@ validate("sample Spearman for the 4 key metrics is within 0.01 of the full corpu
 rho_broad <- cor(broad, method = "spearman")
 dimnames(rho_broad) <- list(BROAD_LABELS[BROAD], BROAD_LABELS[BROAD])
 save_table(as_tibble(rho_broad, rownames = "metric"), "rq1_corpus_spearman_broad")
-saveRDS(list(key = rho, broad = rho_broad, n_sample = nrow(broad)), file.path(PATHS$work, "rq1_corpus_corr.rds"))
+saveRDS(list(key = rho, key_above = rho_above, broad = rho_broad, n_sample = nrow(broad)), file.path(PATHS$work, "rq1_corpus_corr.rds"))
 
 # ---- b. CC and LOC: Spearman and partial association ---------------------------------
 P <- solve(rho)
@@ -146,20 +200,9 @@ saveRDS(list(key_var = pca_key$var, key_load = load_key, key_rank_var = pca_key_
              broad_var = pb_var, broad_load = pb_load), file.path(PATHS$work, "rq1_corpus_pca.rds"))
 
 # ---- d. Pairwise concordance on sampled method pairs ----------------------------------------
-sample_pairs <- function(n, k, seed) {
-  set.seed(seed)
-  over <- ceiling(k * 1.02) + 1000
-  i <- sample.int(n, over, replace = TRUE); j <- sample.int(n, over, replace = TRUE)
-  ok <- i != j                                           # a method is never paired with itself
-  lo <- pmin(i, j)[ok]; hi <- pmax(i, j)[ok]
-  key <- as.numeric(lo) * (n + 1) + as.numeric(hi)       # unordered-pair key, so no pair repeats
-  first <- !duplicated(key)
-  stopifnot(sum(first) >= k)
-  list(i = lo[first][seq_len(k)], j = hi[first][seq_len(k)])
-}
 N_PAIRS <- 1e6
 concordance_counts <- function(mat, label) {
-  pr <- sample_pairs(nrow(mat), N_PAIRS, SEED)
+  pr <- sample_pairs(nrow(mat), N_PAIRS)
   validate(paste0("pair sample (", label, "): no self-pairs and no repeated unordered pair"),
            all(pr$i != pr$j) && !anyDuplicated(as.numeric(pr$i) * (nrow(mat) + 1) + pr$j) && length(pr$i) == N_PAIRS)
   S <- apply(mat, 2, function(x) sign(x[pr$i] - x[pr$j]))
@@ -176,16 +219,46 @@ concordance_counts <- function(mat, label) {
   conc <- conc |> mutate(ci_low = ci[, "low"], ci_high = ci[, "high"], source = label)
   ties <- tibble::tibble(metric = METRIC_LABELS[METRICS], source = label,
                          pair_tie_rate = colMeans(S == 0))
-  list(conc = conc, ties = ties)
+  list(conc = conc, ties = ties, S = S)
 }
-nontrivial <- (m$loc >= 10) | (m$cc >= 3)
+nontrivial <- m$cc >= 3          # non-trivial = CC >= 3
 Xnt <- X[nontrivial, , drop = FALSE]
 res_all <- concordance_counts(X, "Corpus: random method pairs")
-res_nt <- concordance_counts(Xnt, "Corpus: non-trivial methods (LOC ≥ 10 or CC ≥ 3)")
+res_nt <- concordance_counts(Xnt, "Corpus: non-trivial methods (CC ≥ 3)")
 validate("concordance classes sum to the number of sampled pairs",
          all((res_all$conc |> group_by(metric_pair) |> summarise(s = sum(n)))$s == N_PAIRS))
-record("non-trivial methods (LOC >= 10 or CC >= 3): share of main corpus", mean(nontrivial), n = sum(nontrivial),
+record("non-trivial methods (CC >= 3): share of main corpus", mean(nontrivial), n = sum(nontrivial),
        denominator = n_main, section = "RQ1: corpus")
+# Whole-pair agreement across all four metrics, on the same 1,000,000 non-trivial pairs as the concordance above.
+# S holds sign(value_i - value_j) per metric (-1, 0, 1). A pair is discordant when two metrics give opposite signs.
+S_nt <- res_nt$S
+has_pos <- function(cols) rowSums(S_nt[, cols, drop = FALSE] > 0) > 0
+has_neg <- function(cols) rowSums(S_nt[, cols, drop = FALSE] < 0) > 0
+has_zero <- function(cols) rowSums(S_nt[, cols, drop = FALSE] == 0) > 0
+all4 <- colnames(S_nt)
+disc4 <- has_pos(all4) & has_neg(all4)
+partly <- !disc4 & has_zero(all4) & (has_pos(all4) | has_neg(all4))
+fully <- !disc4 & !partly
+disc3 <- has_pos(c("CC", "CogC", "MaxNest")) & has_neg(c("CC", "CogC", "MaxNest"))
+validate("four-metric classes (discordant, partly, fully) partition the pairs",
+         all(disc4 + partly + fully == 1) && length(disc4) == N_PAIRS)
+validate("four-metric discordance matches the six pairwise results (any discordant pair)",
+         sum(disc4) == sum(Reduce(`|`, lapply(METRIC_PAIRS, function(mp)
+           S_nt[, METRIC_LABELS[mp[1]]] * S_nt[, METRIC_LABELS[mp[2]]] < 0))))
+all_tie <- rowSums(S_nt == 0) == 4
+four_tbl <- tibble::tibble(
+  class = c("Discordant: at least one metric combination orders the pair in opposite directions",
+            "Partly agreeing: no combination discordant, but a metric ties while another orders the pair",
+            "Fully agreeing: all four order the pair the same way, or all four tie",
+            "   of which all four tie",
+            "Discordant among CC, CogC and MaxNest only (ignoring LOC)"),
+  n = c(sum(disc4), sum(partly), sum(fully), sum(fully & all_tie), sum(disc3)), total = N_PAIRS) |>
+  mutate(prop = n / total)
+save_table(four_tbl, "rq1_concordance_corpus_four_metrics_cc_ge3")
+for (i in seq_len(nrow(four_tbl)))
+  record(paste0("corpus, CC >= 3 pairs, all four metrics: ", trimws(four_tbl$class[i])), four_tbl$prop[i], n = four_tbl$n[i],
+         denominator = N_PAIRS, section = "RQ1: corpus", subset = "1,000,000 random pairs, both CC >= 3",
+         note = if (i == 5) "overlaps the first three classes; not part of the partition" else if (i == 4) "subset of fully agreeing" else NA)
 conc_corpus <- bind_rows(res_all$conc, res_nt$conc)
 save_table(conc_corpus, "rq1_concordance_corpus")
 for (i in seq_len(nrow(conc_corpus))) {
@@ -225,10 +298,6 @@ for (i in seq_len(nrow(res_tbl))) {
 }
 saveRDS(list(conc = conc_corpus, resolution = res_tbl), file.path(PATHS$work, "rq1_corpus_concordance.rds"))
 
-print(rho); print(within_summary); print(partial["CC", "LOC"]); print(pca_key$var); print(pb_var[1:4, ])
-print(conc_corpus |> filter(class %in% c("Discordant", "One ties, other separates")) |>
-        select(source, metric_pair, class, prop), n = 24)
-print(res_tbl)
 save_numbers("03_rq1_corpus")
 save_validation("03_rq1_corpus")
 cat("Corpus RQ1 analyses done", prov, "\n")

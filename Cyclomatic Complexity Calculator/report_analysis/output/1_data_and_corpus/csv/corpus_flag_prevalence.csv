@@ -1,0 +1,7 @@
+attribute,n,share
+Constructors,629779,0.09046892853233474
+Methods without a body,519246,0.07459065682517309
+Nested in another method,150033,0.02155252041508494
+Generated code,1447851,0.20798649787380874
+"Generated code (added rules, not flagged at harvest)",73474,0.010554677204201415
+Duplicate code (identical to an earlier method),1638856,0.23542472254360336
