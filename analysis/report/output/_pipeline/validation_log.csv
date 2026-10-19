@@ -1,113 +1,113 @@
 check,passed,detail,time
-identifying survey columns removed on load,TRUE,NA,2026-10-19 14:47
-every pair's rating column exists in the export,TRUE,NA,2026-10-19 14:47
-every rating text matches the 5-point scale,TRUE,NA,2026-10-19 14:47
-"participants = 75 (completed, non-preview)",TRUE,75,2026-10-19 14:47
-comparisons = 750,TRUE,750,2026-10-19 14:47
-exactly 10 responses per participant,TRUE,10-10,2026-10-19 14:47
-44 distinct pairs have responses,TRUE,44,2026-10-19 14:47
-pair map covers the 44 pairs once,TRUE,NA,2026-10-19 14:47
-34 snippets have measurements,TRUE,34,2026-10-19 14:47
-every pair's two snippets have measurements,TRUE,NA,2026-10-19 14:47
-no missing metric values after the join,TRUE,NA,2026-10-19 14:47
-each participant saw one pair per task,TRUE,NA,2026-10-19 14:47
-Q4A seen by every participant,TRUE,NA,2026-10-19 14:47
-10-V3 absent from the pair map and snippets,TRUE,NA,2026-10-19 14:47
-Q10C is V1 vs V2,TRUE,NA,2026-10-19 14:47
-"coding: A lower, participant says A less complex -> agree",TRUE,NA,2026-10-19 14:47
-"coding: A lower, participant says B less complex -> disagree",TRUE,NA,2026-10-19 14:47
-coding: metric tie agrees with No difference,TRUE,NA,2026-10-19 14:47
-coding: metric tie does not agree with a stated preference,TRUE,NA,2026-10-19 14:47
-"coding: metric separates, participant says No difference -> disagree",TRUE,NA,2026-10-19 14:47
-"coding on real data: Q3A CC 3 vs 2, 'B slightly less complex' -> agree",TRUE,NA,2026-10-19 14:47
-corpus files exist,TRUE,NA,2026-10-19 14:47
-October harvest finished (EXIT 0): corpus results are final,TRUE,complete,2026-10-19 14:47
-corpus has the expected columns,TRUE,NA,2026-10-19 14:47
-excluded metrics are never loaded (maintainability index),TRUE,NA,2026-10-19 14:47
-no missing key metric values,TRUE,0 rows with a missing key metric,2026-10-19 14:47
-"metric ranges are valid (CC >= 1, others >= 0)",TRUE,NA,2026-10-19 14:47
-kind is method or constructor,TRUE,NA,2026-10-19 14:47
-flag columns are 0/1,TRUE,NA,2026-10-19 14:47
-bodyless methods have CC 1 (sanity check on has_body),TRUE,NA,2026-10-19 14:47
-every corpus project is in repos.csv,TRUE,0 projects with methods but no repository row,2026-10-19 14:47
-repos.csv has no duplicate repositories,TRUE,NA,2026-10-19 14:47
-repo identifying/contributor columns present,TRUE,NA,2026-10-19 14:47
-repositories contributing methods <= repositories harvested,TRUE,NA,2026-10-19 14:47
-no repository processed twice (share of rows on a shared file/line is small in every repo),TRUE,693 rows share a file/line overall (0.0100%); highest repository share 13.1%,2026-10-19 14:47
-added generated-code rules remove methods and none are left in the main corpus,TRUE,NA,2026-10-19 14:48
-main corpus is non-empty and the filter steps nest,TRUE,6961274 > 6331495 > 5812249 > 5662672 > 4370540 > 4315785,2026-10-19 14:48
-Spearman matrix is symmetric with a unit diagonal,TRUE,NA,2026-10-19 14:48
-snippet percentiles cover 34 snippets and lie between 0 and 100,TRUE,NA,2026-10-19 14:48
-broad metric sample has the expected size and no missing values,TRUE,1000000,2026-10-19 14:48
-sample Spearman for the 4 key metrics is within 0.01 of the full corpus,TRUE,max difference 0.0007,2026-10-19 14:48
-pair sample (Corpus: random method pairs): no self-pairs and no repeated unordered pair,TRUE,NA,2026-10-19 14:48
-pair sample (Corpus: non-trivial methods (CC ≥ 3)): no self-pairs and no repeated unordered pair,TRUE,NA,2026-10-19 14:48
-concordance classes sum to the number of sampled pairs,TRUE,NA,2026-10-19 14:48
-"four-metric classes (discordant, partly, fully) partition the pairs",TRUE,NA,2026-10-19 14:48
-four-metric discordance matches the six pairwise results (any discordant pair),TRUE,NA,2026-10-19 14:48
-survey pair table has 44 rows and no missing measurements,TRUE,NA,2026-10-19 14:48
-concordance classifier: same sign,TRUE,NA,2026-10-19 14:48
-concordance classifier: opposite sign,TRUE,NA,2026-10-19 14:48
-concordance classifier: one ties,TRUE,NA,2026-10-19 14:48
-concordance classifier: both tie,TRUE,NA,2026-10-19 14:48
-survey concordance classes sum to 44 for each metric pair,TRUE,NA,2026-10-19 14:48
-agreement for CC matches an independent re-computation,TRUE,320 vs 320,2026-10-19 14:48
-agreement for CogC matches an independent re-computation,TRUE,428 vs 428,2026-10-19 14:48
-agreement for LOC matches an independent re-computation,TRUE,404 vs 404,2026-10-19 14:48
-agreement for MaxNest matches an independent re-computation,TRUE,360 vs 360,2026-10-19 14:48
-kappa for CC matches irr::kappa2,TRUE,NA,2026-10-19 14:48
-kappa for CogC matches irr::kappa2,TRUE,NA,2026-10-19 14:48
-kappa for LOC matches irr::kappa2,TRUE,NA,2026-10-19 14:48
-kappa for MaxNest matches irr::kappa2,TRUE,NA,2026-10-19 14:48
-decomposition categories are exclusive and sum to 750 for every metric,TRUE,NA,2026-10-19 14:48
-'both agree' + 'both say no difference' equals overall agreement for every metric,TRUE,NA,2026-10-19 14:48
-decisive breakdown sums to 675 responses for every metric,TRUE,NA,2026-10-19 14:48
-tie-status groups partition the 750 responses for every metric,TRUE,NA,2026-10-19 14:48
-position: V-vs-V comparisons cover 20 pairs,TRUE,20,2026-10-19 14:48
-position: A + B + no-difference counts sum to the responses,TRUE,NA,2026-10-19 14:48
-common subset: every metric is judged on the same responses and none tie,TRUE,"21 pairs, 343 decisive responses",2026-10-19 14:48
-consensus ceiling is at least as high as the best metric,TRUE,"in-sample 0.697, leave-one-out 0.669, best metric 0.571",2026-10-19 14:48
-clear-pair sensitivity grid reproduces the main result at 75% / 10,TRUE,22 clear pairs; CC ties on 12,2026-10-19 14:48
-grid categories: A higher than B means B lower,TRUE,NA,2026-10-19 14:48
-grid input has 750 responses,TRUE,NA,2026-10-19 14:48
-grid CC vs CogC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid CC vs CogC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 428 vs 320 / 428,2026-10-19 14:48
-grid CC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid CC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 404 vs 320 / 404,2026-10-19 14:48
-grid CC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid CC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 360 vs 320 / 360,2026-10-19 14:48
-grid CogC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid CogC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 404 vs 428 / 404,2026-10-19 14:48
-grid CogC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid CogC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 360 vs 428 / 360,2026-10-19 14:48
-grid LOC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:48
-grid LOC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,404 / 360 vs 404 / 360,2026-10-19 14:48
-win-rate comparisons: every response contributes one result to each of its two snippets,TRUE,NA,2026-10-19 14:48
-"24 original-vs-refactor pairs, all with the original as Method A",TRUE,NA,2026-10-19 14:48
-screening subset: 10 responses for every retained participant,TRUE,38 participants,2026-10-19 14:48
-sensitivity table lists each metric's own response count where they differ,TRUE,428 / 577 / 578 / 444,2026-10-19 14:48
-"task robustness: 750 responses, 10 tasks, 44 pairs",TRUE,NA,2026-10-19 14:49
-leave-one-task-out: the full-data agreement matches the main analysis,TRUE,NA,2026-10-19 14:49
-task bootstrap: the resampled agreement is centred on the observed agreement,TRUE,largest gap 0.0008,2026-10-19 14:49
-decomposition input has 750 responses,TRUE,NA,2026-10-19 14:49
-only-one-agrees counts: CogC-only minus CC-only equals the agreement gap (428 - 320 = 108),TRUE,NA,2026-10-19 14:49
-13-measure table: the four key metrics reproduce the main agreement and its interval,TRUE,NA,2026-10-19 14:49
-13-measure table: commit rate and tie rate are consistent for the key metrics (separating responses <= decisive),TRUE,NA,2026-10-19 14:49
-ordinal models: 750 responses with ratings 1-5,TRUE,NA,2026-10-19 14:49
-cumulative-link mixed model converged (largest gradient below 0.01),TRUE,5.53e-04,2026-10-19 14:49
-likelihood-ratio tests each drop exactly one parameter,TRUE,NA,2026-10-19 14:49
-Bradley-Terry model converged (largest gradient below 0.01),TRUE,1.85e-03,2026-10-19 14:50
-"Bradley-Terry: 34 snippets, one reference (original = 0) per task",TRUE,NA,2026-10-19 14:50
-"forest: every pair where CC ties and the metric separates is shown, with decisive responses",TRUE,31 rows,2026-10-19 14:51
-tie rate by strength: the strength groups partition the 750 responses for every metric,TRUE,NA,2026-10-19 14:51
-biplot: the PCA reproduces the corpus PC1 share recorded in the corpus script (88.7%),TRUE,0.8873,2026-10-19 14:51
-biplot: the 90% ellipse holds about 90% of the sampled corpus methods,TRUE,0.877,2026-10-19 14:51
-all-tie forest: the seven all-tie pairs are the ones described in the snippet catalogue,TRUE,"Q1C, Q2C, Q5C, Q5D, Q5J, Q6B, Q7C",2026-10-19 14:51
-all-tie forest: pooled counts match the all-tie numbers recorded earlier (61 of 75),TRUE,61 of 75,2026-10-19 14:51
-report_numbers: every number has a name and a section,TRUE,,2026-10-19 14:51
-report_numbers: no duplicated entries,TRUE,0 duplicates,2026-10-19 14:51
-every figure on disk is in the figure index,TRUE,,2026-10-19 14:51
-every figure has a suggested takeaway,TRUE,,2026-10-19 14:51
-main and supporting figures: every source file exists,TRUE,,2026-10-19 14:51
-main and supporting figures: every title-free version exists,TRUE,,2026-10-19 14:51
-no identifying survey columns or IP addresses in any output file,TRUE,,2026-10-19 14:51
+identifying survey columns removed on load,TRUE,NA,2026-10-19 14:58
+every pair's rating column exists in the export,TRUE,NA,2026-10-19 14:58
+every rating text matches the 5-point scale,TRUE,NA,2026-10-19 14:58
+"participants = 75 (completed, non-preview)",TRUE,75,2026-10-19 14:58
+comparisons = 750,TRUE,750,2026-10-19 14:58
+exactly 10 responses per participant,TRUE,10-10,2026-10-19 14:58
+44 distinct pairs have responses,TRUE,44,2026-10-19 14:58
+pair map covers the 44 pairs once,TRUE,NA,2026-10-19 14:58
+34 snippets have measurements,TRUE,34,2026-10-19 14:58
+every pair's two snippets have measurements,TRUE,NA,2026-10-19 14:58
+no missing metric values after the join,TRUE,NA,2026-10-19 14:58
+each participant saw one pair per task,TRUE,NA,2026-10-19 14:58
+Q4A seen by every participant,TRUE,NA,2026-10-19 14:58
+10-V3 absent from the pair map and snippets,TRUE,NA,2026-10-19 14:58
+Q10C is V1 vs V2,TRUE,NA,2026-10-19 14:58
+"coding: A lower, participant says A less complex -> agree",TRUE,NA,2026-10-19 14:58
+"coding: A lower, participant says B less complex -> disagree",TRUE,NA,2026-10-19 14:58
+coding: metric tie agrees with No difference,TRUE,NA,2026-10-19 14:58
+coding: metric tie does not agree with a stated preference,TRUE,NA,2026-10-19 14:58
+"coding: metric separates, participant says No difference -> disagree",TRUE,NA,2026-10-19 14:58
+"coding on real data: Q3A CC 3 vs 2, 'B slightly less complex' -> agree",TRUE,NA,2026-10-19 14:58
+corpus files exist,TRUE,NA,2026-10-19 14:58
+October harvest finished (EXIT 0): corpus results are final,TRUE,complete,2026-10-19 14:58
+corpus has the expected columns,TRUE,NA,2026-10-19 14:58
+excluded metrics are never loaded (maintainability index),TRUE,NA,2026-10-19 14:58
+no missing key metric values,TRUE,0 rows with a missing key metric,2026-10-19 14:58
+"metric ranges are valid (CC >= 1, others >= 0)",TRUE,NA,2026-10-19 14:58
+kind is method or constructor,TRUE,NA,2026-10-19 14:58
+flag columns are 0/1,TRUE,NA,2026-10-19 14:58
+bodyless methods have CC 1 (sanity check on has_body),TRUE,NA,2026-10-19 14:58
+every corpus project is in repos.csv,TRUE,0 projects with methods but no repository row,2026-10-19 14:58
+repos.csv has no duplicate repositories,TRUE,NA,2026-10-19 14:58
+repo identifying/contributor columns present,TRUE,NA,2026-10-19 14:58
+repositories contributing methods <= repositories harvested,TRUE,NA,2026-10-19 14:58
+no repository processed twice (share of rows on a shared file/line is small in every repo),TRUE,693 rows share a file/line overall (0.0100%); highest repository share 13.1%,2026-10-19 14:58
+added generated-code rules remove methods and none are left in the main corpus,TRUE,NA,2026-10-19 14:59
+main corpus is non-empty and the filter steps nest,TRUE,6961274 > 6331495 > 5812249 > 5662672 > 4370540 > 4315785,2026-10-19 14:59
+Spearman matrix is symmetric with a unit diagonal,TRUE,NA,2026-10-19 14:59
+snippet percentiles cover 34 snippets and lie between 0 and 100,TRUE,NA,2026-10-19 14:59
+broad metric sample has the expected size and no missing values,TRUE,1000000,2026-10-19 14:59
+sample Spearman for the 4 key metrics is within 0.01 of the full corpus,TRUE,max difference 0.0007,2026-10-19 14:59
+pair sample (Corpus: random method pairs): no self-pairs and no repeated unordered pair,TRUE,NA,2026-10-19 14:59
+pair sample (Corpus: non-trivial methods (CC ≥ 3)): no self-pairs and no repeated unordered pair,TRUE,NA,2026-10-19 14:59
+concordance classes sum to the number of sampled pairs,TRUE,NA,2026-10-19 14:59
+"four-metric classes (discordant, partly, fully) partition the pairs",TRUE,NA,2026-10-19 14:59
+four-metric discordance matches the six pairwise results (any discordant pair),TRUE,NA,2026-10-19 14:59
+survey pair table has 44 rows and no missing measurements,TRUE,NA,2026-10-19 14:59
+concordance classifier: same sign,TRUE,NA,2026-10-19 14:59
+concordance classifier: opposite sign,TRUE,NA,2026-10-19 14:59
+concordance classifier: one ties,TRUE,NA,2026-10-19 14:59
+concordance classifier: both tie,TRUE,NA,2026-10-19 14:59
+survey concordance classes sum to 44 for each metric pair,TRUE,NA,2026-10-19 14:59
+agreement for CC matches an independent re-computation,TRUE,320 vs 320,2026-10-19 14:59
+agreement for CogC matches an independent re-computation,TRUE,428 vs 428,2026-10-19 14:59
+agreement for LOC matches an independent re-computation,TRUE,404 vs 404,2026-10-19 14:59
+agreement for MaxNest matches an independent re-computation,TRUE,360 vs 360,2026-10-19 14:59
+kappa for CC matches irr::kappa2,TRUE,NA,2026-10-19 14:59
+kappa for CogC matches irr::kappa2,TRUE,NA,2026-10-19 14:59
+kappa for LOC matches irr::kappa2,TRUE,NA,2026-10-19 14:59
+kappa for MaxNest matches irr::kappa2,TRUE,NA,2026-10-19 14:59
+decomposition categories are exclusive and sum to 750 for every metric,TRUE,NA,2026-10-19 14:59
+'both agree' + 'both say no difference' equals overall agreement for every metric,TRUE,NA,2026-10-19 14:59
+decisive breakdown sums to 675 responses for every metric,TRUE,NA,2026-10-19 14:59
+tie-status groups partition the 750 responses for every metric,TRUE,NA,2026-10-19 14:59
+position: V-vs-V comparisons cover 20 pairs,TRUE,20,2026-10-19 14:59
+position: A + B + no-difference counts sum to the responses,TRUE,NA,2026-10-19 14:59
+common subset: every metric is judged on the same responses and none tie,TRUE,"21 pairs, 343 decisive responses",2026-10-19 14:59
+consensus ceiling is at least as high as the best metric,TRUE,"in-sample 0.697, leave-one-out 0.669, best metric 0.571",2026-10-19 14:59
+clear-pair sensitivity grid reproduces the main result at 75% / 10,TRUE,22 clear pairs; CC ties on 12,2026-10-19 14:59
+grid categories: A higher than B means B lower,TRUE,NA,2026-10-19 14:59
+grid input has 750 responses,TRUE,NA,2026-10-19 14:59
+grid CC vs CogC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid CC vs CogC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 428 vs 320 / 428,2026-10-19 14:59
+grid CC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid CC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 404 vs 320 / 404,2026-10-19 14:59
+grid CC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid CC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 360 vs 320 / 360,2026-10-19 14:59
+grid CogC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid CogC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 404 vs 428 / 404,2026-10-19 14:59
+grid CogC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid CogC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 360 vs 428 / 360,2026-10-19 14:59
+grid LOC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,NA,2026-10-19 14:59
+grid LOC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,404 / 360 vs 404 / 360,2026-10-19 14:59
+win-rate comparisons: every response contributes one result to each of its two snippets,TRUE,NA,2026-10-19 14:59
+"24 original-vs-refactor pairs, all with the original as Method A",TRUE,NA,2026-10-19 14:59
+screening subset: 10 responses for every retained participant,TRUE,38 participants,2026-10-19 14:59
+sensitivity table lists each metric's own response count where they differ,TRUE,428 / 577 / 578 / 444,2026-10-19 14:59
+"task robustness: 750 responses, 10 tasks, 44 pairs",TRUE,NA,2026-10-19 15:00
+leave-one-task-out: the full-data agreement matches the main analysis,TRUE,NA,2026-10-19 15:00
+task bootstrap: the resampled agreement is centred on the observed agreement,TRUE,largest gap 0.0008,2026-10-19 15:00
+decomposition input has 750 responses,TRUE,NA,2026-10-19 15:00
+only-one-agrees counts: CogC-only minus CC-only equals the agreement gap (428 - 320 = 108),TRUE,NA,2026-10-19 15:00
+13-measure table: the four key metrics reproduce the main agreement and its interval,TRUE,NA,2026-10-19 15:00
+13-measure table: commit rate and tie rate are consistent for the key metrics (separating responses <= decisive),TRUE,NA,2026-10-19 15:00
+ordinal models: 750 responses with ratings 1-5,TRUE,NA,2026-10-19 15:00
+cumulative-link mixed model converged (largest gradient below 0.01),TRUE,5.53e-04,2026-10-19 15:00
+likelihood-ratio tests each drop exactly one parameter,TRUE,NA,2026-10-19 15:00
+Bradley-Terry model converged (largest gradient below 0.01),TRUE,1.85e-03,2026-10-19 15:01
+"Bradley-Terry: 34 snippets, one reference (original = 0) per task",TRUE,NA,2026-10-19 15:01
+"forest: every pair where CC ties and the metric separates is shown, with decisive responses",TRUE,31 rows,2026-10-19 15:02
+tie rate by strength: the strength groups partition the 750 responses for every metric,TRUE,NA,2026-10-19 15:02
+biplot: the PCA reproduces the corpus PC1 share recorded in the corpus script (88.7%),TRUE,0.8873,2026-10-19 15:02
+biplot: the 90% ellipse holds about 90% of the sampled corpus methods,TRUE,0.877,2026-10-19 15:02
+all-tie forest: the seven all-tie pairs are the ones described in the snippet catalogue,TRUE,"Q1C, Q2C, Q5C, Q5D, Q5J, Q6B, Q7C",2026-10-19 15:02
+all-tie forest: pooled counts match the all-tie numbers recorded earlier (61 of 75),TRUE,61 of 75,2026-10-19 15:02
+report_numbers: every number has a name and a section,TRUE,,2026-10-19 15:02
+report_numbers: no duplicated entries,TRUE,0 duplicates,2026-10-19 15:02
+every figure on disk is in the figure index,TRUE,,2026-10-19 15:02
+every figure has a suggested takeaway,TRUE,,2026-10-19 15:02
+main and supporting figures: every source file exists,TRUE,,2026-10-19 15:02
+main and supporting figures: every title-free version exists,TRUE,,2026-10-19 15:02
+no identifying survey columns or IP addresses in any output file,TRUE,,2026-10-19 15:02

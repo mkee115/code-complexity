@@ -12,7 +12,7 @@ code-complexity/
 │   ├── config.properties        run mode, search filters, output location
 │   ├── src/main, src/test       calculators (CC, cognitive, LOC, nesting, Halstead, ...) and unit tests
 │   ├── scripts/                 run_survey.ps1, check_corpus_progress.ps1
-│   └── docs/                    METRIC_DEFINITIONS.md: how every metric is calculated, and why
+│   └── docs/                    metric_definitions.md: how every metric is calculated, and why
 ├── data/
 │   ├── corpus/                  GitHub harvest, October 2026: cc_data.csv, repos.csv, skipped.csv, run_log.txt
 │   └── survey/                  Qualtrics definition (.qsf), raw responses, which pair each question showed
@@ -30,12 +30,12 @@ code-complexity/
     └── poster/                  poster script and figures
 ```
 
-Each of `data/`, `data/survey/`, `snippets/` and `analysis/report/` has its own README with the detail.
+Detail lives in three READMEs: [data/README.md](data/README.md) (corpus, survey, snippets), [analysis/README.md](analysis/README.md) (all analyses) and [tool/docs/metric_definitions.md](tool/docs/metric_definitions.md).
 
 ## Requirements
 
 - **JDK 17+** and **Maven** (the extractor)
-- **R 4.x** (the report pipeline lists its packages in `analysis/report/README.md`; versions used are in `analysis/report/output/sessionInfo.txt`)
+- **R 4.x** (the report pipeline lists its packages in `analysis/README.md`; versions used are in `analysis/report/output/sessionInfo.txt`)
 - **Python 3** with pandas, numpy, matplotlib, scipy (only for `analysis/survey_graphs/`)
 - A **GitHub personal access token** in `tool/.token` (only for the `GITHUB_SEARCH` and `GITHUB_REPO` modes; never commit it)
 
@@ -73,7 +73,7 @@ cd tool && mvn test
 
 ## Metrics
 
-See [tool/docs/METRIC_DEFINITIONS.md](tool/docs/METRIC_DEFINITIONS.md) for the definition of each metric and the reasoning behind it. The columns of `cc_data.csv` are described in [data/README.md](data/README.md).
+See [tool/docs/metric_definitions.md](tool/docs/metric_definitions.md) for the definition of each metric and the reasoning behind it. The columns of `cc_data.csv` are described in [data/README.md](data/README.md).
 
 | Metric                  | Source class                     |
 |-------------------------|----------------------------------|

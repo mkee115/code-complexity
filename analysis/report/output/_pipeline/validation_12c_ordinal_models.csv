@@ -1,6 +1,6 @@
 check,passed,detail,time
-ordinal models: 750 responses with ratings 1-5,TRUE,,2026-10-19 14:49
-cumulative-link mixed model converged (largest gradient below 0.01),TRUE,5.53e-04,2026-10-19 14:49
-likelihood-ratio tests each drop exactly one parameter,TRUE,,2026-10-19 14:49
-Bradley-Terry model converged (largest gradient below 0.01),TRUE,1.85e-03,2026-10-19 14:50
-"Bradley-Terry: 34 snippets, one reference (original = 0) per task",TRUE,,2026-10-19 14:50
+ordinal models: 750 responses with ratings 1-5,TRUE,,2026-10-19 15:00
+cumulative-link mixed model converged (largest gradient below 0.01),TRUE,5.53e-04,2026-10-19 15:00
+likelihood-ratio tests each drop exactly one parameter,TRUE,,2026-10-19 15:00
+Bradley-Terry model converged (largest gradient below 0.01),TRUE,1.85e-03,2026-10-19 15:01
+"Bradley-Terry: 34 snippets, one reference (original = 0) per task",TRUE,,2026-10-19 15:01
