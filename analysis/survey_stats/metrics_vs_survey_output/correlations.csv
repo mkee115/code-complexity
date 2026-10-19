@@ -1,0 +1,4 @@
+"metric","delta_col","n_pairs","pearson_r","pearson_p","r_squared","spearman_rho","spearman_p","slope","intercept"
+"Cyclomatic","d_CC",39,0.334,0.0377,0.112,0.378,0.0176,15.99,-14.8
+"Cognitive","d_Cognitive",39,0.568,0.000163,0.322,0.695,9.24e-07,12.25,6.08
+"Max nesting","d_MaxNest",39,0.485,0.00177,0.235,0.562,0.000199,36.64,-4.96

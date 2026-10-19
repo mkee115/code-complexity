@@ -1,0 +1,132 @@
+================================================================
+  COMPLEXITY ANALYSIS SUMMARY
+================================================================
+  Generated : 2026-06-23 11:55:51
+  Methods   : 7,295,624
+  Projects  : 1881
+
+----------------------------------------------------------------
+  CYCLOMATIC COMPLEXITY (CC)
+----------------------------------------------------------------
+  Min      : 1
+  P5       : 1
+  Q1       : 1
+  Median   : 1
+  Mean     : 1.98
+  Q3       : 2
+  P95      : 6
+  Max      : 3418
+  SD       : 5.97
+  Skewness : 171.49
+  Kurtosis : 58570.2
+
+  Risk Band Distribution:
+    CC 1-5     94.44%   (6,890,241 methods)
+    CC 6-10     3.86%   (281,338 methods)
+    CC 11-15    0.91%   (66,495 methods)
+    CC 16-25    0.52%   (37,579 methods)
+    CC 25+      0.27%   (19,971 methods)
+  % with CC > 5  : 5.6%
+  % with CC > 10 : 1.7%
+  % with CC > 25 : 0.3%
+
+----------------------------------------------------------------
+  COGNITIVE COMPLEXITY
+----------------------------------------------------------------
+  Min      : 0
+  P5       : 0
+  Median   : 0
+  Mean     : 1.50
+  P95      : 7
+  Max      : 30628
+  SD       : 15.73
+  Skewness : 1113.18
+  r(CC, Cognitive)  : 0.428
+  Median cog excess : -1.00  (cognitive - cyclomatic)
+  % methods cog > cc : 7.2%
+
+----------------------------------------------------------------
+  LINES OF CODE (NBNC LOC)
+----------------------------------------------------------------
+  Min      : 1
+  P5       : 1
+  Median   : 4
+  Mean     : 8.04
+  P95      : 25
+  Max      : 13296
+  SD       : 19.08
+  Skewness : 141.40
+  r(CC, LOC)        : 0.681
+  % methods > 24 LOC : 5.3%
+  r(LOC, LOC_phys)  : 0.987
+
+----------------------------------------------------------------
+  NESTING DEPTH
+----------------------------------------------------------------
+  Max Nesting — Median : 0
+  Max Nesting — Mean   : 0.40
+  Max Nesting — P95    : 2
+  Max Nesting — Max    : 264
+  Avg Nesting — Median : 0.00
+  r(CC, max_nesting)   : 0.405
+  r(Cog, max_nesting)  : 0.393
+  % methods nesting=0  : 74.4%
+  % methods nesting>=3 : 3.1%
+
+----------------------------------------------------------------
+  IDENTIFIER & NAMING METRICS
+----------------------------------------------------------------
+  Avg ID words — Median   : 1.80
+  Avg ID words — Mean     : 1.91
+  Abbrev ratio — Median   : 0.000
+  Abbrev ratio — Mean     : 0.078
+  Single-letter IDs — Med : 0
+  Longest ID — Median     : 18
+  Naming score — Median   : 1.670
+  r(CC, naming_score)     : -0.054
+  r(CC, abbrev_ratio)     : 0.067
+
+----------------------------------------------------------------
+  COMMENT METRICS
+----------------------------------------------------------------
+  % methods with comments    : 9.3%
+  Comment words — Median     : 0
+  Comment words — Mean       : 1.60
+  Comment words — P95        : 7
+  r(CC, comment_words)       : 0.257
+  Median CC (commented)      : 3
+  Median CC (not commented)  : 1
+
+----------------------------------------------------------------
+  PROJECT-LEVEL SUMMARY
+----------------------------------------------------------------
+  Median project method count : 628
+  Median project median CC    : 1.00
+  Project with highest median CC : tools-in-ruanyf-weekly (median CC = 8)
+  Project with lowest median CC  : ai-tourism (median CC = 1)
+  Project with highest max CC    : alfresco-community-repo (max CC = 3418)
+
+----------------------------------------------------------------
+  KEY CORRELATIONS WITH CC
+----------------------------------------------------------------
+  CC vs Cognitive CC   : r = 0.428
+  CC vs LOC            : r = 0.681
+  CC vs max nesting    : r = 0.405
+  CC vs naming score   : r = -0.054
+  CC vs abbrev ratio   : r = 0.067
+  CC vs comment words  : r = 0.257
+  Cognitive vs nesting : r = 0.393
+
+----------------------------------------------------------------
+  OUTPUT FOLDERS
+----------------------------------------------------------------
+  data_tables/             all CSV tables + raw program output + this report
+  graphs/01_distributions/ histograms (linear + log-log), ECDFs for every metric
+  graphs/02_correlations/  full correlation heatmap + CC vs each metric scatterplots
+  graphs/03_risk_bands/    boxplots per band, ridgelines, naming/comment by band
+  graphs/04_projects/      per-project CC profiles + small multiples grid
+  graphs/06_cc_vs_cognitive  CC vs cognitive comparisons and disagreement analysis
+  graphs/07_nesting_drivers  nesting depth as a complexity driver
+  graphs/08_loc_vs_complexity LOC-based plots and CC density by method length
+  graphs/09_modelling/     regression, partial correlations, PCA, redundancy
+================================================================

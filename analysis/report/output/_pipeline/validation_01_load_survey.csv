@@ -1,0 +1,22 @@
+check,passed,detail,time
+identifying survey columns removed on load,TRUE,,2026-10-19 14:32
+every pair's rating column exists in the export,TRUE,,2026-10-19 14:32
+every rating text matches the 5-point scale,TRUE,,2026-10-19 14:32
+"participants = 75 (completed, non-preview)",TRUE,75,2026-10-19 14:32
+comparisons = 750,TRUE,750,2026-10-19 14:32
+exactly 10 responses per participant,TRUE,10-10,2026-10-19 14:32
+44 distinct pairs have responses,TRUE,44,2026-10-19 14:32
+pair map covers the 44 pairs once,TRUE,,2026-10-19 14:32
+34 snippets have measurements,TRUE,34,2026-10-19 14:32
+every pair's two snippets have measurements,TRUE,,2026-10-19 14:32
+no missing metric values after the join,TRUE,,2026-10-19 14:32
+each participant saw one pair per task,TRUE,,2026-10-19 14:32
+Q4A seen by every participant,TRUE,,2026-10-19 14:32
+10-V3 absent from the pair map and snippets,TRUE,,2026-10-19 14:32
+Q10C is V1 vs V2,TRUE,,2026-10-19 14:32
+"coding: A lower, participant says A less complex -> agree",TRUE,,2026-10-19 14:32
+"coding: A lower, participant says B less complex -> disagree",TRUE,,2026-10-19 14:32
+coding: metric tie agrees with No difference,TRUE,,2026-10-19 14:32
+coding: metric tie does not agree with a stated preference,TRUE,,2026-10-19 14:32
+"coding: metric separates, participant says No difference -> disagree",TRUE,,2026-10-19 14:32
+"coding on real data: Q3A CC 3 vs 2, 'B slightly less complex' -> agree",TRUE,,2026-10-19 14:32

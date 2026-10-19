@@ -1,0 +1,47 @@
+R version 4.6.0 (2026-04-24 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 26200)
+
+Matrix products: default
+  LAPACK version 3.12.1
+
+locale:
+[1] LC_COLLATE=English_New Zealand.utf8  LC_CTYPE=English_New Zealand.utf8   
+[3] LC_MONETARY=English_New Zealand.utf8 LC_NUMERIC=C                        
+[5] LC_TIME=English_New Zealand.utf8    
+
+time zone: Pacific/Auckland
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggrepel_0.9.8     patchwork_1.3.2   data.table_1.18.4 ggplot2_4.0.3    
+[5] tidyr_1.3.2       dplyr_1.2.1       readr_2.2.0      
+
+loaded via a namespace (and not attached):
+ [1] gld_2.6.8           gtable_0.3.6        lattice_0.22-9     
+ [4] numDeriv_2016.8-1.1 tzdb_0.5.0          vctrs_0.7.3        
+ [7] tools_4.6.0         Rdpack_2.6.6        generics_0.1.4     
+[10] stats4_4.6.0        parallel_4.6.0      tibble_3.3.1       
+[13] proxy_0.4-29        ucminf_1.2.3        pkgconfig_2.0.3    
+[16] Matrix_1.7-5        irr_0.85            RColorBrewer_1.1-3 
+[19] S7_0.2.2            readxl_1.4.5        lifecycle_1.0.5    
+[22] rootSolve_1.8.2.4   compiler_4.6.0      farver_2.1.2       
+[25] textshaping_1.0.5   Exact_3.3           DescTools_0.99.60  
+[28] class_7.3-23        pillar_1.11.1       nloptr_2.2.1       
+[31] crayon_1.5.3        MASS_7.3-65         reformulas_0.4.4   
+[34] boot_1.3-32         nlme_3.1-169        tidyselect_1.2.1   
+[37] mvtnorm_1.4-2       purrr_1.2.2         forcats_1.0.1      
+[40] labeling_0.4.3      splines_4.6.0       ordinal_2026.7-26  
+[43] grid_4.6.0          lmom_3.3            expm_1.0-1         
+[46] cli_3.6.6           magrittr_2.0.5      e1071_1.7-17       
+[49] withr_3.0.2         scales_1.4.0        bit64_4.8.0        
+[52] httr_1.4.8          bit_4.6.0           lme4_2.0-6         
+[55] cellranger_1.1.0    ragg_1.5.2          hms_1.1.4          
+[58] lpSolve_5.6.23      haven_2.5.5         rbibutils_2.4.1    
+[61] viridisLite_0.4.3   rlang_1.2.0         Rcpp_1.1.1-1.1     
+[64] glue_1.8.1          rstudioapi_0.18.0   vroom_1.7.1        
+[67] minqa_1.2.8         R6_2.6.1            fs_2.1.0           
+[70] systemfonts_1.3.2  

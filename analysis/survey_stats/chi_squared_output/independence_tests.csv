@@ -1,0 +1,4 @@
+"test","kind","n","note","statistic","df","p_value","method","cramers_v","effect"
+"Experience x rating direction (3-way)","independence",757,"ok",5.05,4,0.2818,"chisq (Pearson)",0.058,"negligible"
+"Degree x rating direction (3-way)","independence",757,"ok",2.18,2,0.337,"chisq (Pearson)",0.054,"negligible"
+"Experience x rating (5-point)","independence",757,"ok",11.46,8,0.1769,"chisq (Pearson)",0.087,"negligible"

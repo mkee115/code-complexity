@@ -1,7 +1,0 @@
-check,passed,detail,time
-survey pair table has 44 rows and no missing measurements,TRUE,,2026-10-17 23:08
-concordance classifier: same sign,TRUE,,2026-10-17 23:08
-concordance classifier: opposite sign,TRUE,,2026-10-17 23:08
-concordance classifier: one ties,TRUE,,2026-10-17 23:08
-concordance classifier: both tie,TRUE,,2026-10-17 23:08
-survey concordance classes sum to 44 for each metric pair,TRUE,,2026-10-17 23:08

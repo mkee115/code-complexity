@@ -1,0 +1,10 @@
+check,passed,detail,time
+Spearman matrix is symmetric with a unit diagonal,TRUE,,2026-10-19 14:32
+snippet percentiles cover 34 snippets and lie between 0 and 100,TRUE,,2026-10-19 14:33
+broad metric sample has the expected size and no missing values,TRUE,1000000,2026-10-19 14:33
+sample Spearman for the 4 key metrics is within 0.01 of the full corpus,TRUE,max difference 0.0007,2026-10-19 14:33
+pair sample (Corpus: random method pairs): no self-pairs and no repeated unordered pair,TRUE,,2026-10-19 14:33
+pair sample (Corpus: non-trivial methods (CC ≥ 3)): no self-pairs and no repeated unordered pair,TRUE,,2026-10-19 14:33
+concordance classes sum to the number of sampled pairs,TRUE,,2026-10-19 14:33
+"four-metric classes (discordant, partly, fully) partition the pairs",TRUE,,2026-10-19 14:33
+four-metric discordance matches the six pairwise results (any discordant pair),TRUE,,2026-10-19 14:33

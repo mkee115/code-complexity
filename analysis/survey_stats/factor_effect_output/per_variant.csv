@@ -1,0 +1,29 @@
+"ID","group","version","factor","direction","basis","raw_delta_normal","oriented_delta_normal","raw_delta_decisive","oriented_delta_decisive"
+"01-V1",1,"V1","nesting","improved","MaxNest -3",-268.6,-268.6,-192.1,-192.1
+"01-V2",1,"V2","multiple exits","improved","Cognitive -9",-208.7,-208.7,-123.5,-123.5
+"01-V3",1,"V3","volume","improved","LOC -18",-56,-56,-5.6,-5.6
+"01-V4",1,"V4","comment quality","improved","declared",NA,NA,NA,NA
+"01-V5",1,"V5","comment quality","worsened","declared",NA,NA,NA,NA
+"02-V1",2,"V1","cognitive","worsened","Cognitive +3",12.5,-12.5,10.3,-10.3
+"02-V2",2,"V2","extraction","improved","declared",-67.5,-67.5,-42.3,-42.3
+"02-V3",2,"V3","layout","worsened","declared",-8,8,-6.2,6.2
+"03-V1",3,"V1","recursion","improved","declared",26.1,26.1,14.6,14.6
+"03-V2",3,"V2","volume","improved","LOC -3",154.4,154.4,112.1,112.1
+"04-V1",4,"V1","volume","no-metric-change","LOC +0",7.8,NA,17.8,NA
+"04-V2",4,"V2","extraction","improved","declared",NA,NA,NA,NA
+"04-V3",4,"V3","comment quality","improved","declared",NA,NA,NA,NA
+"05-V1",5,"V1","branch+nesting","improved","MaxNest -1",-154.2,-154.2,-112.9,-112.9
+"05-V2",5,"V2","library knowledge","improved","CC -4",-169.8,-169.8,-128.6,-128.6
+"05-V3",5,"V3","naming","improved","declared",27.1,27.1,31,31
+"06-V1",6,"V1","branch count","improved","CC -1",-104.7,-104.7,-74,-74
+"06-V2",6,"V2","naming","improved","declared",-27.3,-27.3,-9.5,-9.5
+"07-V1",7,"V1","branch count","improved","CC -2",-33.3,-33.3,-17.3,-17.3
+"07-V2",7,"V2","control-flow removal","improved","CC -5",-166.7,-166.7,-118.4,-118.4
+"07-V3",7,"V3","comment quality","improved","declared",-116.7,-116.7,-73.6,-73.6
+"08-V1",8,"V1","nesting","improved","MaxNest -1",-110.8,-110.8,-88.6,-88.6
+"08-V2",8,"V2","branch count","improved","CC -1",-32.3,-32.3,-23.9,-23.9
+"09-V1",9,"V1","nesting","improved","Cognitive -3",-94.1,-94.1,-63,-63
+"09-V2",9,"V2","control-flow removal","improved","CC -2",-229,-229,-162.2,-162.2
+"10-V1",10,"V1","branch count","improved","CC -9",-52.9,-52.9,-34.8,-34.8
+"10-V2",10,"V2","extraction","improved","declared",-29.8,-29.8,-12.1,-12.1
+"10-V3",10,"V3","comment quality","improved","declared",-50.2,-50.2,-25.8,-25.8

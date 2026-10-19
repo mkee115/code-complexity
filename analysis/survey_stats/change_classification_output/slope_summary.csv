@@ -1,0 +1,13 @@
+"metric","scope","score","n_pairs","median_slope","mean_slope","q1","q3","min","max"
+"Cyclomatic","all-combo","decisive",22,23.8,22.6,-10.6,54.7,-64.7,97.5
+"Cognitive","all-combo","decisive",29,16.9,8.2,3.4,22.6,-117.9,68.6
+"Max nesting","all-combo","decisive",24,50.1,39.1,23.6,63.2,-186.5,143.9
+"Cyclomatic","orig-only","decisive",11,23.7,24.5,2.7,44.3,-21.2,81.1
+"Cognitive","orig-only","decisive",16,14.9,12.7,3,21.4,-4.9,29.5
+"Max nesting","orig-only","decisive",13,54.1,51.8,34.8,64,1.4,112.9
+"Cyclomatic","all-combo","normal",22,32.8,29.4,-18.6,74.7,-78.5,128.3
+"Cognitive","all-combo","normal",29,23.8,10.6,5.2,31.4,-152.7,59.9
+"Max nesting","all-combo","normal",24,67.1,55.9,31.7,84.9,-212.6,181.2
+"Cyclomatic","orig-only","normal",11,32.3,33.7,4.8,59.8,-33.7,114.5
+"Cognitive","orig-only","normal",16,22.2,18.3,5.2,31,-8.7,36.9
+"Max nesting","orig-only","normal",13,76.3,74.3,52.9,94.1,14,154.2

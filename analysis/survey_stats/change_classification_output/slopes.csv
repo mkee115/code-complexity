@@ -1,0 +1,231 @@
+"scope","score","group","problem","pair","metric","d_metric","d_survey","slope"
+"all-combo","normal",1,"Letter grade","ORIG->V1","Cognitive",-10,-268.627450980392,26.8627450980392
+"all-combo","normal",1,"Letter grade","ORIG->V1","Max nesting",-3,-268.627450980392,89.5424836601307
+"all-combo","normal",1,"Letter grade","ORIG->V2","Cognitive",-9,-208.714596949891,23.1905107722101
+"all-combo","normal",1,"Letter grade","ORIG->V3","Cognitive",-10,-55.9912854030501,5.59912854030501
+"all-combo","normal",1,"Letter grade","ORIG->V3","Max nesting",-4,-55.9912854030501,13.9978213507625
+"all-combo","normal",1,"Letter grade","V1->V2","Cognitive",1,59.9128540305011,59.9128540305011
+"all-combo","normal",1,"Letter grade","V1->V2","Max nesting",3,59.9128540305011,19.9709513435004
+"all-combo","normal",1,"Letter grade","V1->V3","Max nesting",-1,212.636165577342,-212.636165577342
+"all-combo","normal",1,"Letter grade","V2->V3","Cognitive",-1,152.723311546841,-152.723311546841
+"all-combo","normal",1,"Letter grade","V2->V3","Max nesting",-4,152.723311546841,-38.1808278867102
+"all-combo","normal",2,"Password check","ORIG->V1","Cognitive",3,12.4542124542125,4.15140415140417
+"all-combo","normal",2,"Password check","ORIG->V2","Cyclomatic",2,-67.4991674991675,-33.7495837495837
+"all-combo","normal",2,"Password check","ORIG->V2","Max nesting",-1,-67.4991674991675,67.4991674991675
+"all-combo","normal",2,"Password check","V1->V2","Cyclomatic",2,-79.95337995338,-39.97668997669
+"all-combo","normal",2,"Password check","V1->V2","Cognitive",-3,-79.95337995338,26.6511266511267
+"all-combo","normal",2,"Password check","V1->V2","Max nesting",-1,-79.95337995338,79.95337995338
+"all-combo","normal",2,"Password check","V1->V3","Cognitive",-3,-20.4129204129204,6.80430680430681
+"all-combo","normal",2,"Password check","V2->V3","Cyclomatic",-2,59.5404595404595,-29.7702297702298
+"all-combo","normal",2,"Password check","V2->V3","Max nesting",1,59.5404595404595,59.5404595404595
+"all-combo","normal",3,"Sum of digits","ORIG->V1","Cyclomatic",-1,26.0769230769231,-26.0769230769231
+"all-combo","normal",3,"Sum of digits","ORIG->V1","Cognitive",-3,26.0769230769231,-8.69230769230769
+"all-combo","normal",3,"Sum of digits","V1->V2","Cyclomatic",1,128.307692307692,128.307692307692
+"all-combo","normal",3,"Sum of digits","V1->V2","Cognitive",3,128.307692307692,42.7692307692308
+"all-combo","normal",5,"Remove duplicates","ORIG->V1","Cyclomatic",-2,-154.166666666667,77.0833333333333
+"all-combo","normal",5,"Remove duplicates","ORIG->V1","Cognitive",-5,-154.166666666667,30.8333333333333
+"all-combo","normal",5,"Remove duplicates","ORIG->V1","Max nesting",-1,-154.166666666667,154.166666666667
+"all-combo","normal",5,"Remove duplicates","ORIG->V2","Cyclomatic",-4,-169.791666666667,42.4479166666667
+"all-combo","normal",5,"Remove duplicates","ORIG->V2","Cognitive",-8,-169.791666666667,21.2239583333333
+"all-combo","normal",5,"Remove duplicates","ORIG->V2","Max nesting",-3,-169.791666666667,56.5972222222222
+"all-combo","normal",5,"Remove duplicates","V1->V2","Cyclomatic",-2,-15.625,7.8125
+"all-combo","normal",5,"Remove duplicates","V1->V2","Cognitive",-3,-15.625,5.20833333333333
+"all-combo","normal",5,"Remove duplicates","V1->V2","Max nesting",-2,-15.625,7.8125
+"all-combo","normal",5,"Remove duplicates","V1->V3","Cyclomatic",2,181.25,90.625
+"all-combo","normal",5,"Remove duplicates","V1->V3","Cognitive",5,181.25,36.25
+"all-combo","normal",5,"Remove duplicates","V1->V3","Max nesting",1,181.25,181.25
+"all-combo","normal",5,"Remove duplicates","V2->V3","Cyclomatic",4,196.875,49.21875
+"all-combo","normal",5,"Remove duplicates","V2->V3","Cognitive",8,196.875,24.609375
+"all-combo","normal",5,"Remove duplicates","V2->V3","Max nesting",3,196.875,65.625
+"all-combo","normal",6,"Frequency count","ORIG->V1","Cyclomatic",-1,-104.740740740741,104.740740740741
+"all-combo","normal",6,"Frequency count","ORIG->V1","Cognitive",-3,-104.740740740741,34.9135802469136
+"all-combo","normal",6,"Frequency count","ORIG->V1","Max nesting",-1,-104.740740740741,104.740740740741
+"all-combo","normal",6,"Frequency count","V1->V2","Cyclomatic",1,77.4814814814815,77.4814814814815
+"all-combo","normal",6,"Frequency count","V1->V2","Cognitive",3,77.4814814814815,25.8271604938272
+"all-combo","normal",6,"Frequency count","V1->V2","Max nesting",1,77.4814814814815,77.4814814814815
+"all-combo","normal",7,"Merge sorted arrays","ORIG->V1","Cyclomatic",-2,-33.3333333333333,16.6666666666667
+"all-combo","normal",7,"Merge sorted arrays","ORIG->V1","Cognitive",-2,-33.3333333333333,16.6666666666667
+"all-combo","normal",7,"Merge sorted arrays","ORIG->V2","Cyclomatic",-5,-166.666666666667,33.3333333333333
+"all-combo","normal",7,"Merge sorted arrays","ORIG->V2","Cognitive",-7,-166.666666666667,23.8095238095238
+"all-combo","normal",7,"Merge sorted arrays","ORIG->V2","Max nesting",-2,-166.666666666667,83.3333333333333
+"all-combo","normal",7,"Merge sorted arrays","V1->V2","Cyclomatic",-3,-133.333333333333,44.4444444444444
+"all-combo","normal",7,"Merge sorted arrays","V1->V2","Cognitive",-5,-133.333333333333,26.6666666666667
+"all-combo","normal",7,"Merge sorted arrays","V1->V2","Max nesting",-2,-133.333333333333,66.6666666666667
+"all-combo","normal",7,"Merge sorted arrays","V1->V3","Cyclomatic",2,-83.3333333333333,-41.6666666666667
+"all-combo","normal",7,"Merge sorted arrays","V1->V3","Cognitive",2,-83.3333333333333,-41.6666666666667
+"all-combo","normal",8,"Roman numeral","ORIG->V1","Cognitive",-3,-110.769230769231,36.9230769230769
+"all-combo","normal",8,"Roman numeral","ORIG->V1","Max nesting",-1,-110.769230769231,110.769230769231
+"all-combo","normal",8,"Roman numeral","ORIG->V2","Cyclomatic",-1,-32.3076923076923,32.3076923076923
+"all-combo","normal",8,"Roman numeral","ORIG->V2","Cognitive",-4,-32.3076923076923,8.07692307692307
+"all-combo","normal",8,"Roman numeral","ORIG->V2","Max nesting",-1,-32.3076923076923,32.3076923076923
+"all-combo","normal",8,"Roman numeral","V1->V2","Cyclomatic",-1,78.4615384615385,-78.4615384615385
+"all-combo","normal",8,"Roman numeral","V1->V2","Cognitive",-1,78.4615384615385,-78.4615384615385
+"all-combo","normal",9,"Binary search","ORIG->V1","Cognitive",-3,-94.0769230769231,31.3589743589744
+"all-combo","normal",9,"Binary search","ORIG->V1","Max nesting",-1,-94.0769230769231,94.0769230769231
+"all-combo","normal",9,"Binary search","ORIG->V2","Cyclomatic",-2,-229,114.5
+"all-combo","normal",9,"Binary search","ORIG->V2","Cognitive",-7,-229,32.7142857142857
+"all-combo","normal",9,"Binary search","ORIG->V2","Max nesting",-3,-229,76.3333333333333
+"all-combo","normal",9,"Binary search","V1->V2","Cyclomatic",-2,-134.923076923077,67.4615384615385
+"all-combo","normal",9,"Binary search","V1->V2","Cognitive",-4,-134.923076923077,33.7307692307692
+"all-combo","normal",9,"Binary search","V1->V2","Max nesting",-2,-134.923076923077,67.4615384615385
+"all-combo","normal",10,"Balanced brackets","ORIG->V1","Cyclomatic",-9,-52.9230769230769,5.88034188034188
+"all-combo","normal",10,"Balanced brackets","ORIG->V1","Cognitive",-18,-52.9230769230769,2.94017094017094
+"all-combo","normal",10,"Balanced brackets","ORIG->V1","Max nesting",-1,-52.9230769230769,52.9230769230769
+"all-combo","normal",10,"Balanced brackets","ORIG->V2","Cyclomatic",-8,-29.8461538461538,3.73076923076923
+"all-combo","normal",10,"Balanced brackets","ORIG->V2","Cognitive",-20,-29.8461538461538,1.49230769230769
+"all-combo","normal",10,"Balanced brackets","ORIG->V2","Max nesting",-1,-29.8461538461538,29.8461538461538
+"orig-only","normal",1,"Letter grade","ORIG->V1","Cognitive",-10,-268.627450980392,26.8627450980392
+"orig-only","normal",1,"Letter grade","ORIG->V1","Max nesting",-3,-268.627450980392,89.5424836601307
+"orig-only","normal",1,"Letter grade","ORIG->V2","Cognitive",-9,-208.714596949891,23.1905107722101
+"orig-only","normal",1,"Letter grade","ORIG->V3","Cognitive",-10,-55.9912854030501,5.59912854030501
+"orig-only","normal",1,"Letter grade","ORIG->V3","Max nesting",-4,-55.9912854030501,13.9978213507625
+"orig-only","normal",2,"Password check","ORIG->V1","Cognitive",3,12.4542124542125,4.15140415140417
+"orig-only","normal",2,"Password check","ORIG->V2","Cyclomatic",2,-67.4991674991675,-33.7495837495837
+"orig-only","normal",2,"Password check","ORIG->V2","Max nesting",-1,-67.4991674991675,67.4991674991675
+"orig-only","normal",3,"Sum of digits","ORIG->V1","Cyclomatic",-1,26.0769230769231,-26.0769230769231
+"orig-only","normal",3,"Sum of digits","ORIG->V1","Cognitive",-3,26.0769230769231,-8.69230769230769
+"orig-only","normal",5,"Remove duplicates","ORIG->V1","Cyclomatic",-2,-154.166666666667,77.0833333333333
+"orig-only","normal",5,"Remove duplicates","ORIG->V1","Cognitive",-5,-154.166666666667,30.8333333333333
+"orig-only","normal",5,"Remove duplicates","ORIG->V1","Max nesting",-1,-154.166666666667,154.166666666667
+"orig-only","normal",5,"Remove duplicates","ORIG->V2","Cyclomatic",-4,-169.791666666667,42.4479166666667
+"orig-only","normal",5,"Remove duplicates","ORIG->V2","Cognitive",-8,-169.791666666667,21.2239583333333
+"orig-only","normal",5,"Remove duplicates","ORIG->V2","Max nesting",-3,-169.791666666667,56.5972222222222
+"orig-only","normal",6,"Frequency count","ORIG->V1","Cyclomatic",-1,-104.740740740741,104.740740740741
+"orig-only","normal",6,"Frequency count","ORIG->V1","Cognitive",-3,-104.740740740741,34.9135802469136
+"orig-only","normal",6,"Frequency count","ORIG->V1","Max nesting",-1,-104.740740740741,104.740740740741
+"orig-only","normal",7,"Merge sorted arrays","ORIG->V1","Cyclomatic",-2,-33.3333333333333,16.6666666666667
+"orig-only","normal",7,"Merge sorted arrays","ORIG->V1","Cognitive",-2,-33.3333333333333,16.6666666666667
+"orig-only","normal",7,"Merge sorted arrays","ORIG->V2","Cyclomatic",-5,-166.666666666667,33.3333333333333
+"orig-only","normal",7,"Merge sorted arrays","ORIG->V2","Cognitive",-7,-166.666666666667,23.8095238095238
+"orig-only","normal",7,"Merge sorted arrays","ORIG->V2","Max nesting",-2,-166.666666666667,83.3333333333333
+"orig-only","normal",8,"Roman numeral","ORIG->V1","Cognitive",-3,-110.769230769231,36.9230769230769
+"orig-only","normal",8,"Roman numeral","ORIG->V1","Max nesting",-1,-110.769230769231,110.769230769231
+"orig-only","normal",8,"Roman numeral","ORIG->V2","Cyclomatic",-1,-32.3076923076923,32.3076923076923
+"orig-only","normal",8,"Roman numeral","ORIG->V2","Cognitive",-4,-32.3076923076923,8.07692307692307
+"orig-only","normal",8,"Roman numeral","ORIG->V2","Max nesting",-1,-32.3076923076923,32.3076923076923
+"orig-only","normal",9,"Binary search","ORIG->V1","Cognitive",-3,-94.0769230769231,31.3589743589744
+"orig-only","normal",9,"Binary search","ORIG->V1","Max nesting",-1,-94.0769230769231,94.0769230769231
+"orig-only","normal",9,"Binary search","ORIG->V2","Cyclomatic",-2,-229,114.5
+"orig-only","normal",9,"Binary search","ORIG->V2","Cognitive",-7,-229,32.7142857142857
+"orig-only","normal",9,"Binary search","ORIG->V2","Max nesting",-3,-229,76.3333333333333
+"orig-only","normal",10,"Balanced brackets","ORIG->V1","Cyclomatic",-9,-52.9230769230769,5.88034188034188
+"orig-only","normal",10,"Balanced brackets","ORIG->V1","Cognitive",-18,-52.9230769230769,2.94017094017094
+"orig-only","normal",10,"Balanced brackets","ORIG->V1","Max nesting",-1,-52.9230769230769,52.9230769230769
+"orig-only","normal",10,"Balanced brackets","ORIG->V2","Cyclomatic",-8,-29.8461538461538,3.73076923076923
+"orig-only","normal",10,"Balanced brackets","ORIG->V2","Cognitive",-20,-29.8461538461538,1.49230769230769
+"orig-only","normal",10,"Balanced brackets","ORIG->V2","Max nesting",-1,-29.8461538461538,29.8461538461538
+"all-combo","decisive",1,"Letter grade","ORIG->V1","Cognitive",-10,-192.09756097561,19.209756097561
+"all-combo","decisive",1,"Letter grade","ORIG->V1","Max nesting",-3,-192.09756097561,64.0325203252033
+"all-combo","decisive",1,"Letter grade","ORIG->V2","Cognitive",-9,-123.5,13.7222222222222
+"all-combo","decisive",1,"Letter grade","ORIG->V3","Cognitive",-10,-5.56521739130434,0.556521739130434
+"all-combo","decisive",1,"Letter grade","ORIG->V3","Max nesting",-4,-5.56521739130434,1.39130434782609
+"all-combo","decisive",1,"Letter grade","V1->V2","Cognitive",1,68.5975609756098,68.5975609756098
+"all-combo","decisive",1,"Letter grade","V1->V2","Max nesting",3,68.5975609756098,22.8658536585366
+"all-combo","decisive",1,"Letter grade","V1->V3","Max nesting",-1,186.532343584305,-186.532343584305
+"all-combo","decisive",1,"Letter grade","V2->V3","Cognitive",-1,117.934782608696,-117.934782608696
+"all-combo","decisive",1,"Letter grade","V2->V3","Max nesting",-4,117.934782608696,-29.4836956521739
+"all-combo","decisive",2,"Password check","ORIG->V1","Cognitive",3,10.2564102564102,3.41880341880342
+"all-combo","decisive",2,"Password check","ORIG->V2","Cyclomatic",2,-42.3076923076923,-21.1538461538462
+"all-combo","decisive",2,"Password check","ORIG->V2","Max nesting",-1,-42.3076923076923,42.3076923076923
+"all-combo","decisive",2,"Password check","V1->V2","Cyclomatic",2,-52.5641025641026,-26.2820512820513
+"all-combo","decisive",2,"Password check","V1->V2","Cognitive",-3,-52.5641025641026,17.5213675213675
+"all-combo","decisive",2,"Password check","V1->V2","Max nesting",-1,-52.5641025641026,52.5641025641026
+"all-combo","decisive",2,"Password check","V1->V3","Cognitive",-3,-16.4529914529915,5.48433048433048
+"all-combo","decisive",2,"Password check","V2->V3","Cyclomatic",-2,36.1111111111111,-18.0555555555556
+"all-combo","decisive",2,"Password check","V2->V3","Max nesting",1,36.1111111111111,36.1111111111111
+"all-combo","decisive",3,"Sum of digits","ORIG->V1","Cyclomatic",-1,14.6099290780142,-14.6099290780142
+"all-combo","decisive",3,"Sum of digits","ORIG->V1","Cognitive",-3,14.6099290780142,-4.86997635933806
+"all-combo","decisive",3,"Sum of digits","V1->V2","Cyclomatic",1,97.4734042553192,97.4734042553192
+"all-combo","decisive",3,"Sum of digits","V1->V2","Cognitive",3,97.4734042553192,32.4911347517731
+"all-combo","decisive",5,"Remove duplicates","ORIG->V1","Cyclomatic",-2,-112.903225806452,56.4516129032258
+"all-combo","decisive",5,"Remove duplicates","ORIG->V1","Cognitive",-5,-112.903225806452,22.5806451612903
+"all-combo","decisive",5,"Remove duplicates","ORIG->V1","Max nesting",-1,-112.903225806452,112.903225806452
+"all-combo","decisive",5,"Remove duplicates","ORIG->V2","Cyclomatic",-4,-128.571428571429,32.1428571428571
+"all-combo","decisive",5,"Remove duplicates","ORIG->V2","Cognitive",-8,-128.571428571429,16.0714285714286
+"all-combo","decisive",5,"Remove duplicates","ORIG->V2","Max nesting",-3,-128.571428571429,42.8571428571429
+"all-combo","decisive",5,"Remove duplicates","V1->V2","Cyclomatic",-2,-15.668202764977,7.83410138248848
+"all-combo","decisive",5,"Remove duplicates","V1->V2","Cognitive",-3,-15.668202764977,5.22273425499232
+"all-combo","decisive",5,"Remove duplicates","V1->V2","Max nesting",-2,-15.668202764977,7.83410138248848
+"all-combo","decisive",5,"Remove duplicates","V1->V3","Cyclomatic",2,143.937708565072,71.9688542825362
+"all-combo","decisive",5,"Remove duplicates","V1->V3","Cognitive",5,143.937708565072,28.7875417130145
+"all-combo","decisive",5,"Remove duplicates","V1->V3","Max nesting",1,143.937708565072,143.937708565072
+"all-combo","decisive",5,"Remove duplicates","V2->V3","Cyclomatic",4,159.605911330049,39.9014778325123
+"all-combo","decisive",5,"Remove duplicates","V2->V3","Cognitive",8,159.605911330049,19.9507389162562
+"all-combo","decisive",5,"Remove duplicates","V2->V3","Max nesting",3,159.605911330049,53.2019704433498
+"all-combo","decisive",6,"Frequency count","ORIG->V1","Cyclomatic",-1,-74.025974025974,74.025974025974
+"all-combo","decisive",6,"Frequency count","ORIG->V1","Cognitive",-3,-74.025974025974,24.6753246753247
+"all-combo","decisive",6,"Frequency count","ORIG->V1","Max nesting",-1,-74.025974025974,74.025974025974
+"all-combo","decisive",6,"Frequency count","V1->V2","Cyclomatic",1,64.5021645021645,64.5021645021645
+"all-combo","decisive",6,"Frequency count","V1->V2","Cognitive",3,64.5021645021645,21.5007215007215
+"all-combo","decisive",6,"Frequency count","V1->V2","Max nesting",1,64.5021645021645,64.5021645021645
+"all-combo","decisive",7,"Merge sorted arrays","ORIG->V1","Cyclomatic",-2,-17.3015873015873,8.65079365079367
+"all-combo","decisive",7,"Merge sorted arrays","ORIG->V1","Cognitive",-2,-17.3015873015873,8.65079365079367
+"all-combo","decisive",7,"Merge sorted arrays","ORIG->V2","Cyclomatic",-5,-118.444444444444,23.6888888888889
+"all-combo","decisive",7,"Merge sorted arrays","ORIG->V2","Cognitive",-7,-118.444444444444,16.9206349206349
+"all-combo","decisive",7,"Merge sorted arrays","ORIG->V2","Max nesting",-2,-118.444444444444,59.2222222222222
+"all-combo","decisive",7,"Merge sorted arrays","V1->V2","Cyclomatic",-3,-101.142857142857,33.7142857142857
+"all-combo","decisive",7,"Merge sorted arrays","V1->V2","Cognitive",-5,-101.142857142857,20.2285714285714
+"all-combo","decisive",7,"Merge sorted arrays","V1->V2","Max nesting",-2,-101.142857142857,50.5714285714286
+"all-combo","decisive",7,"Merge sorted arrays","V1->V3","Cyclomatic",2,-56.3095238095238,-28.1547619047619
+"all-combo","decisive",7,"Merge sorted arrays","V1->V3","Cognitive",2,-56.3095238095238,-28.1547619047619
+"all-combo","decisive",8,"Roman numeral","ORIG->V1","Cognitive",-3,-88.5714285714286,29.5238095238095
+"all-combo","decisive",8,"Roman numeral","ORIG->V1","Max nesting",-1,-88.5714285714286,88.5714285714286
+"all-combo","decisive",8,"Roman numeral","ORIG->V2","Cyclomatic",-1,-23.8655462184874,23.8655462184874
+"all-combo","decisive",8,"Roman numeral","ORIG->V2","Cognitive",-4,-23.8655462184874,5.96638655462185
+"all-combo","decisive",8,"Roman numeral","ORIG->V2","Max nesting",-1,-23.8655462184874,23.8655462184874
+"all-combo","decisive",8,"Roman numeral","V1->V2","Cyclomatic",-1,64.7058823529412,-64.7058823529412
+"all-combo","decisive",8,"Roman numeral","V1->V2","Cognitive",-1,64.7058823529412,-64.7058823529412
+"all-combo","decisive",9,"Binary search","ORIG->V1","Cognitive",-3,-62.979797979798,20.993265993266
+"all-combo","decisive",9,"Binary search","ORIG->V1","Max nesting",-1,-62.979797979798,62.979797979798
+"all-combo","decisive",9,"Binary search","ORIG->V2","Cyclomatic",-2,-162.222222222222,81.1111111111111
+"all-combo","decisive",9,"Binary search","ORIG->V2","Cognitive",-7,-162.222222222222,23.1746031746032
+"all-combo","decisive",9,"Binary search","ORIG->V2","Max nesting",-3,-162.222222222222,54.0740740740741
+"all-combo","decisive",9,"Binary search","V1->V2","Cyclomatic",-2,-99.2424242424242,49.6212121212121
+"all-combo","decisive",9,"Binary search","V1->V2","Cognitive",-4,-99.2424242424242,24.8106060606061
+"all-combo","decisive",9,"Binary search","V1->V2","Max nesting",-2,-99.2424242424242,49.6212121212121
+"all-combo","decisive",10,"Balanced brackets","ORIG->V1","Cyclomatic",-9,-34.8484848484849,3.87205387205387
+"all-combo","decisive",10,"Balanced brackets","ORIG->V1","Cognitive",-18,-34.8484848484849,1.93602693602694
+"all-combo","decisive",10,"Balanced brackets","ORIG->V1","Max nesting",-1,-34.8484848484849,34.8484848484849
+"all-combo","decisive",10,"Balanced brackets","ORIG->V2","Cyclomatic",-8,-12.1212121212121,1.51515151515152
+"all-combo","decisive",10,"Balanced brackets","ORIG->V2","Cognitive",-20,-12.1212121212121,0.606060606060606
+"all-combo","decisive",10,"Balanced brackets","ORIG->V2","Max nesting",-1,-12.1212121212121,12.1212121212121
+"orig-only","decisive",1,"Letter grade","ORIG->V1","Cognitive",-10,-192.09756097561,19.209756097561
+"orig-only","decisive",1,"Letter grade","ORIG->V1","Max nesting",-3,-192.09756097561,64.0325203252033
+"orig-only","decisive",1,"Letter grade","ORIG->V2","Cognitive",-9,-123.5,13.7222222222222
+"orig-only","decisive",1,"Letter grade","ORIG->V3","Cognitive",-10,-5.56521739130434,0.556521739130434
+"orig-only","decisive",1,"Letter grade","ORIG->V3","Max nesting",-4,-5.56521739130434,1.39130434782609
+"orig-only","decisive",2,"Password check","ORIG->V1","Cognitive",3,10.2564102564102,3.41880341880342
+"orig-only","decisive",2,"Password check","ORIG->V2","Cyclomatic",2,-42.3076923076923,-21.1538461538462
+"orig-only","decisive",2,"Password check","ORIG->V2","Max nesting",-1,-42.3076923076923,42.3076923076923
+"orig-only","decisive",3,"Sum of digits","ORIG->V1","Cyclomatic",-1,14.6099290780142,-14.6099290780142
+"orig-only","decisive",3,"Sum of digits","ORIG->V1","Cognitive",-3,14.6099290780142,-4.86997635933806
+"orig-only","decisive",5,"Remove duplicates","ORIG->V1","Cyclomatic",-2,-112.903225806452,56.4516129032258
+"orig-only","decisive",5,"Remove duplicates","ORIG->V1","Cognitive",-5,-112.903225806452,22.5806451612903
+"orig-only","decisive",5,"Remove duplicates","ORIG->V1","Max nesting",-1,-112.903225806452,112.903225806452
+"orig-only","decisive",5,"Remove duplicates","ORIG->V2","Cyclomatic",-4,-128.571428571429,32.1428571428571
+"orig-only","decisive",5,"Remove duplicates","ORIG->V2","Cognitive",-8,-128.571428571429,16.0714285714286
+"orig-only","decisive",5,"Remove duplicates","ORIG->V2","Max nesting",-3,-128.571428571429,42.8571428571429
+"orig-only","decisive",6,"Frequency count","ORIG->V1","Cyclomatic",-1,-74.025974025974,74.025974025974
+"orig-only","decisive",6,"Frequency count","ORIG->V1","Cognitive",-3,-74.025974025974,24.6753246753247
+"orig-only","decisive",6,"Frequency count","ORIG->V1","Max nesting",-1,-74.025974025974,74.025974025974
+"orig-only","decisive",7,"Merge sorted arrays","ORIG->V1","Cyclomatic",-2,-17.3015873015873,8.65079365079367
+"orig-only","decisive",7,"Merge sorted arrays","ORIG->V1","Cognitive",-2,-17.3015873015873,8.65079365079367
+"orig-only","decisive",7,"Merge sorted arrays","ORIG->V2","Cyclomatic",-5,-118.444444444444,23.6888888888889
+"orig-only","decisive",7,"Merge sorted arrays","ORIG->V2","Cognitive",-7,-118.444444444444,16.9206349206349
+"orig-only","decisive",7,"Merge sorted arrays","ORIG->V2","Max nesting",-2,-118.444444444444,59.2222222222222
+"orig-only","decisive",8,"Roman numeral","ORIG->V1","Cognitive",-3,-88.5714285714286,29.5238095238095
+"orig-only","decisive",8,"Roman numeral","ORIG->V1","Max nesting",-1,-88.5714285714286,88.5714285714286
+"orig-only","decisive",8,"Roman numeral","ORIG->V2","Cyclomatic",-1,-23.8655462184874,23.8655462184874
+"orig-only","decisive",8,"Roman numeral","ORIG->V2","Cognitive",-4,-23.8655462184874,5.96638655462185
+"orig-only","decisive",8,"Roman numeral","ORIG->V2","Max nesting",-1,-23.8655462184874,23.8655462184874
+"orig-only","decisive",9,"Binary search","ORIG->V1","Cognitive",-3,-62.979797979798,20.993265993266
+"orig-only","decisive",9,"Binary search","ORIG->V1","Max nesting",-1,-62.979797979798,62.979797979798
+"orig-only","decisive",9,"Binary search","ORIG->V2","Cyclomatic",-2,-162.222222222222,81.1111111111111
+"orig-only","decisive",9,"Binary search","ORIG->V2","Cognitive",-7,-162.222222222222,23.1746031746032
+"orig-only","decisive",9,"Binary search","ORIG->V2","Max nesting",-3,-162.222222222222,54.0740740740741
+"orig-only","decisive",10,"Balanced brackets","ORIG->V1","Cyclomatic",-9,-34.8484848484849,3.87205387205387
+"orig-only","decisive",10,"Balanced brackets","ORIG->V1","Cognitive",-18,-34.8484848484849,1.93602693602694
+"orig-only","decisive",10,"Balanced brackets","ORIG->V1","Max nesting",-1,-34.8484848484849,34.8484848484849
+"orig-only","decisive",10,"Balanced brackets","ORIG->V2","Cyclomatic",-8,-12.1212121212121,1.51515151515152
+"orig-only","decisive",10,"Balanced brackets","ORIG->V2","Cognitive",-20,-12.1212121212121,0.606060606060606
+"orig-only","decisive",10,"Balanced brackets","ORIG->V2","Max nesting",-1,-12.1212121212121,12.1212121212121

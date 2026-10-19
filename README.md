@@ -1,157 +1,97 @@
 # code-complexity
 
-Part 4 Project — **Measuring code complexity**.
+Part 4 Project (SOFTENG 700): **Measuring code complexity**.
 
-This repository contains a toolchain that mines Java repositories from GitHub,
-computes a suite of per-method complexity and readability metrics with
-[JavaParser](https://javaparser.org/), and analyses the resulting dataset in R.
+This repository mines Java repositories from GitHub, measures per-method complexity and readability metrics with [JavaParser](https://javaparser.org/), runs a survey asking programmers which of two code versions is easier to understand, and analyses both in R (and some Python).
 
 ## Repository layout
 
 ```
-Cyclomatic Complexity Calculator/
-├── javaparser-complexity-calculator/   # Maven project — the metric extractor
-│   └── src/main/java/com/complexity/
-│       ├── ComplexityCalculator.java        # entry point / orchestration + config
-│       ├── GitHubRepositorySearcher.java    # GitHub search + chunked harvesting
-│       ├── CyclomaticComplexityVisitor.java # cyclomatic complexity (CC)
-│       ├── CognitiveComplexityVisitor.java  # cognitive complexity
-│       ├── MethodLocCalculator.java         # NBNC + physical lines of code
-│       ├── MethodNestingCalculator.java     # average / max nesting depth
-│       └── IdentifierMetricsCalculator.java # naming + comment metrics
-├── analysis/                            # R analysis of the generated CSVs
-│   ├── cc_analysis.R                         # per-method metric analysis
-│   └── repos_analysis.R                      # repository-level analysis
-└── cc_calculator.py                     # legacy regex prototype (superseded)
+code-complexity/
+├── tool/                    Maven project: the metric extractor and GitHub harvester
+│   ├── config.properties        run mode, search filters, output location
+│   └── src/main, src/test       calculators (CC, cognitive, LOC, nesting, Halstead, ...) and unit tests
+├── data/
+│   └── corpus/                  GitHub harvest, October 2026: cc_data.csv, repos.csv, skipped.csv, run_log.txt
+├── survey/
+│   ├── instrument/              Qualtrics definition (.qsf) and the practice question
+│   ├── snippets/                the 34 code snippets, their catalogue and measured metrics
+│   ├── images/                  screenshots and side-by-side pair images shown to participants
+│   ├── responses/               raw Qualtrics export and which pair each question showed
+│   ├── variant_selection/       candidate pool before variants were chosen, ranking spreadsheet
+│   └── image_drafts/            earlier image sets, kept for the record
+├── analysis/
+│   ├── report/                  the pipeline that produces every figure, table and number in the report
+│   │   ├── scripts/                 numbered R scripts + run_all.R
+│   │   └── output/                  generated figures, tables, report_numbers.csv
+│   ├── survey_stats/            earlier R survey analysis (chi-squared, change classification, ...)
+│   ├── survey_graphs/           Python survey graphs and isolation analyses
+│   ├── exploratory/             first corpus analysis (cc_analysis.R, repos_analysis.R) and its output
+│   └── poster/                  poster script and figures
+├── scripts/                 PowerShell helpers: run_survey.ps1, check_corpus_progress.ps1
+└── docs/
+    └── METRIC_DEFINITIONS.md    how every metric is calculated, and why
 ```
+
+Each of `data/`, `survey/` and `analysis/report/` has its own README with the detail.
 
 ## Requirements
 
-- **JDK 17+** and **Maven** (the metric extractor)
-- **R 4.x** with `tidyverse`, `scales`, `moments`, `GGally`, `ggridges`, `broom`
-- A **GitHub personal access token** (only for `GITHUB_SEARCH` / `GITHUB_REPO`
-  modes), stored in a plain-text file named `.token` in the working directory.
+- **JDK 17+** and **Maven** (the extractor)
+- **R 4.x** (the report pipeline lists its packages in `analysis/report/README.md`; versions used are in `analysis/report/output/sessionInfo.txt`)
+- **Python 3** with pandas, numpy, matplotlib, scipy (only for `analysis/survey_graphs/`)
+- A **GitHub personal access token** in `tool/.token` (only for the `GITHUB_SEARCH` and `GITHUB_REPO` modes; never commit it)
 
-## Running the extractor
+## Reproducing the work
 
-Configuration lives in [`config.properties`](Cyclomatic%20Complexity%20Calculator/javaparser-complexity-calculator/config.properties)
-(no recompilation needed). Set `run.mode` to one of:
-
-| Mode            | What it does                                                        | Relevant keys                       |
-|-----------------|--------------------------------------------------------------------|-------------------------------------|
-| `LOCAL_PATH`    | Scan a local `.java` file or directory tree                        | `local.input`                       |
-| `GITHUB_REPO`   | Clone and analyse a single repo                                    | `single.repo.url`                   |
-| `GITHUB_SEARCH` | Search GitHub by filters, clone matches, and analyse them in bulk  | `search.*`, `threads`, `token.file` |
-
-Then build and run from `javaparser-complexity-calculator/`:
+**1. Harvest the corpus** (hours; resumable). Configure `tool/config.properties`, then from `tool/`:
 
 ```bash
 mvn compile
-mvn exec:java                                   # uses ./config.properties
+mvn exec:java                                          # uses ./config.properties
 mvn exec:java -Dexec.args="path/to/other.properties"   # alternate config
 ```
 
-`GITHUB_SEARCH` runs are **parallelised** (`threads`) and **resumable**: with
-`output.append=true`, repos already present in `repos.csv` are skipped, so an
-interrupted harvest can be restarted without redoing work.
+Output goes to `data/corpus/`. Modes: `LOCAL_PATH` (a file or folder), `GITHUB_REPO` (one repo), `GITHUB_SEARCH` (search by filters, clone and analyse in parallel). With `output.append=true` a restarted harvest skips repos already in `repos.csv`. Check progress with `.\scripts\check_corpus_progress.ps1`.
 
-### Output
+`data/corpus/cc_data.csv` is 2 GB and is **not in git**; it is supplied with the compendium.
 
-Results are written to `../analysis/data_tables/` (next to the R scripts) as CSV:
+**2. Measure the survey snippets** (from the repo root):
 
-- **`cc_data.csv`** — one row per method:
-  `project, class_name, method_name, cc, cognitive_complexity, loc, loc_physical,
-  avg_nesting, max_nesting, avg_id_words, abbreviated_ratio, single_letter_ids,
-  longest_id, total_words, comment_count, comment_words, halstead_volume,
-  halstead_difficulty, halstead_effort, maintainability_index, mi_normalized,
-  param_count, return_count, fan_out, max_line_length, avg_line_length`
-- **`repos.csv`** — one row per harvested repository (stars, forks, size, commit
-  count, Java file count, timestamps)
-- **`skipped.csv`** — methods/files/repos that could not be processed, with reasons
-
-## Running the analysis
-
-From `analysis/` (with the CSVs present):
-
-```r
-source("cc_analysis.R")     # per-method metrics
-source("repos_analysis.R")  # repo-level metrics
+```powershell
+.\scripts\run_survey.ps1      # writes survey/snippets/snippet_metrics.csv
 ```
 
-Generated **plots** go to `analysis/graphs/` (grouped into numbered sub-folders)
-and generated **CSV tables** (plus the raw program output read back in) go to
-`analysis/data_tables/`. Both are ignored by git.
+**3. Run the report analysis** (about 3 minutes; empties and regenerates `analysis/report/output/`):
+
+```bash
+Rscript analysis/report/scripts/run_all.R
+```
+
+**4. Unit tests:**
+
+```bash
+cd tool && mvn test
+```
 
 ## Metrics
 
-| Metric                  | Source class                  | Notes                                                    |
-|-------------------------|-------------------------------|----------------------------------------------------------|
-| Cyclomatic complexity   | `CyclomaticComplexityVisitor` | +1 per branch / loop / case label / `&&` / `\|\|` / `?:`  |
-| Cognitive complexity    | `CognitiveComplexityVisitor`  | nesting-weighted, SonarSource-style                      |
-| LOC (NBNC) + physical   | `MethodLocCalculator`         | non-blank-non-comment line count vs raw line span        |
-| Nesting depth           | `MethodNestingCalculator`     | average and maximum structural nesting                   |
-| Identifier / comments   | `IdentifierMetricsCalculator` | word counts, abbreviation ratio, single-letter ids, etc. |
-| Halstead measures       | `HalsteadCalculator`          | volume, difficulty, effort from operator/operand counts  |
-| Maintainability Index   | `MaintainabilityIndexCalculator` | raw + 0-100 normalised composite of volume, CC, LOC   |
-| Structure               | `MethodStructureCalculator`   | parameter count, return-statement count, fan-out         |
-| Line length             | `LineLengthCalculator`        | maximum and average source line width                    |
+See [docs/METRIC_DEFINITIONS.md](docs/METRIC_DEFINITIONS.md) for the definition of each metric and the reasoning behind it. The columns of `cc_data.csv` are described in [data/README.md](data/README.md).
 
-## Metric definitions
+| Metric                  | Source class                     |
+|-------------------------|----------------------------------|
+| Cyclomatic complexity   | `CyclomaticComplexityVisitor`    |
+| Cognitive complexity    | `CognitiveComplexityVisitor`     |
+| LOC (non-blank, non-comment) and physical | `MethodLocCalculator` |
+| Nesting depth           | `MethodNestingCalculator`        |
+| Identifier / comments   | `IdentifierMetricsCalculator`    |
+| Halstead measures       | `HalsteadCalculator`             |
+| Maintainability Index   | `MaintainabilityIndexCalculator` |
+| Structure (params, returns, fan-out) | `MethodStructureCalculator` |
+| Line length             | `LineLengthCalculator`           |
 
-### First-degree metrics (measured directly by the Java extractor)
+## Notes
 
-These are read straight off each method's source/AST — no other metric feeds into them.
-
-| Column | Meaning |
-|--------|---------|
-| `cc` | **Cyclomatic complexity** — number of linearly independent paths through the method. Starts at 1 and adds 1 for every branch point (`if`, `for`, `while`, `case`, `catch`, `&&`, `\|\|`, ternary). |
-| `cognitive_complexity` | **Cognitive complexity** (SonarSource style) — like CC but weighted by how hard the control flow is to *follow*: each level of nesting adds an increasing penalty, and linear sequences are not penalised. |
-| `loc` | **Lines of code (NBNC)** — non-blank, non-comment source lines in the method body. |
-| `loc_physical` | **Physical LOC** — total line span of the method including blanks and comments. |
-| `avg_nesting` | Average structural nesting depth across the method's statements. |
-| `max_nesting` | Deepest level of nested blocks (loops/conditionals) reached. |
-| `avg_id_words` | Average number of words per identifier (split on camelCase / `snake_case`). |
-| `abbreviated_ratio` | Fraction of identifiers that look abbreviated (no clear word boundaries / very short). |
-| `single_letter_ids` | Count of single-letter identifiers (`i`, `x`, …). |
-| `longest_id` | Character length of the longest identifier. |
-| `total_words` | Total identifier words in the method. |
-| `comment_count` | Number of comment blocks attached to the method. |
-| `comment_words` | Total words contained in those comments. |
-| `halstead_volume` | **Halstead volume** = program length × log₂(vocabulary), from distinct/total operator and operand token counts — a size measure weighted by vocabulary. |
-| `halstead_difficulty` | **Halstead difficulty** = (n₁/2) × (N₂/n₂) — how error-prone the method is to write/read. |
-| `halstead_effort` | **Halstead effort** = difficulty × volume — estimated mental effort to (re)create the method. |
-| `param_count` | Number of declared parameters. |
-| `return_count` | Number of `return` statements. |
-| `fan_out` | Number of *distinct* methods called from this method (outgoing coupling). |
-| `max_line_length` | Longest source line (characters) within the method. |
-| `avg_line_length` | Average source line length within the method. |
-
-> Halstead volume/difficulty/effort are themselves derived from the underlying
-> operator/operand counts, but those counts are computed in the same pass from
-> the token stream, so the three Halstead measures are treated as first-degree
-> outputs here.
-
-### Derived (higher-degree) metrics — computed *from* the first-degree metrics
-
-| Column / name | Where | Formula & meaning |
-|---------------|-------|-------------------|
-| `maintainability_index` | Java (`MaintainabilityIndexCalculator`) | `171 − 5.2·ln(halstead_volume) − 0.23·cc − 16.2·ln(loc)` — the classic composite maintainability score (higher = more maintainable). |
-| `mi_normalized` | Java | `maintainability_index` rescaled to a 0–100 range. |
-| `cc_per_loc` | R analysis | `cc / loc` — branching density per line. |
-| `cog_ratio` | R analysis | `cognitive_complexity / cc` — how much the cognitive metric penalises beyond raw branching. |
-| `cog_excess` | R analysis | `cognitive_complexity − cc` — absolute extra penalty. |
-| `naming_score` | R analysis | `avg_id_words × (1 − abbreviated_ratio)` — proxy for descriptive naming quality. |
-| `comment_density` | R analysis | `comment_words / loc` — documentation per line. |
-| `word_density` | R analysis | `total_words / loc` — identifier words per line. |
-| `blank_ratio` | R analysis | `(loc_physical − loc) / loc_physical` — share of blank/comment lines. |
-
-## Tests
-
-```bash
-cd "Cyclomatic Complexity Calculator/javaparser-complexity-calculator"
-mvn test
-```
-
-> **Note:** `cc_calculator.py` is an early regex-based prototype kept for
-> reference only. The JavaParser-based extractor supersedes it and is the
-> supported tool.
+- `analysis/survey_stats/`, `analysis/survey_graphs/`, `analysis/exploratory/` and `analysis/poster/` are earlier or supporting analyses. The report numbers come from `analysis/report/`.
+- Some of those scripts still need their input files supplied: `survey_graphs/` expects `qualtrics_raw.csv` and `png_metrics_match*.csv` beside it, and the poster script reads `analysis/survey_stats/700_survey.csv` and `variant_metrics.csv`.
+- The survey's live images were loaded from GitHub `main` at `survey_methods/combinedImages/`; that folder is now `survey/image_drafts/combinedImages/`.
