@@ -35,30 +35,21 @@ Raw corpus data from the GitHub harvest. Nothing here has been processed. How ev
 
 **Selection criteria** (the same as the June harvest): Java, at least 10 stars, at least 10 forks, pushed to on or after 2026-01-01, created on or before 2026-01-01, `pom.xml` at the repo root (Maven). Test folders (`src/test`, `src/it`) were excluded. Both methods and constructors are recorded (see `kind`). Metric definitions: `metric_definitions.md`.
 
-The June 2026 harvest (1,894 repositories, 7,295,624 methods, measured with the earlier calculator) is no longer kept here; the original is in `analysis/data_tables/`.
+The June 2026 harvest (1,894 repositories, 7,295,624 methods, measured with the earlier calculator) was superseded by the October harvest and is not included. Only its repository list and summary tables remain, in `analysis/exploratory/data_tables/`.
 
 For the report analysis, see [analysis/README.md](../analysis/README.md) (scripts, outputs, the main-corpus filter and the counts at each step).
-
-The June 2026 harvest (1,894 repositories, 7,295,624 methods, measured with the earlier calculator) was superseded by the October harvest and is not kept in this repository.
 
 ## Survey (`data/survey/`)
 
 The Qualtrics survey: its definition and the responses.
 
-| File | Contents |
-|---|---|
-| `700_survey.qsf` | Qualtrics survey definition (questions, blocks, randomizers, image URLs) |
-| `survey_responses_raw.csv` | Qualtrics export |
-| `comparison_pairs.csv` | Which pair of snippets each comparison question showed |
-
-The code snippets and images participants saw are in [`snippets/`](../snippets/).
-
 | File | Description |
 |---|---|
-| `survey_responses_raw.csv` | Qualtrics export, unmodified (copy of `analysis/survey_stats/700_survey.csv`). |
+| `survey_responses_raw.csv` | Qualtrics export, unmodified (contains IP addresses and locations: see the note below). |
 | `comparison_pairs.csv` | Which two snippets each comparison question showed (44 rows). Checked against `700_survey.qsf` on 15 Oct: every item, image and A/B side matches. |
 | `700_survey.qsf` | Qualtrics survey definition (JSON): questions, blocks, randomizers, image URLs. |
-| `700_survey.docx` | Qualtrics Word export of the same survey, with images. |
+
+The code snippets and images participants saw are in [`snippets/`](../snippets/).
 
 **Survey design (confirmed from the .qsf):**
 - **Order:** intro → demographics (degree; Java experience) → 3 Java screening questions → practice example → **10 task randomizers, Q1 to Q10 in fixed order**, each showing **1 pair chosen at random with even presentation** → a final optional comment (`Qend`). So every completer saw exactly 10 comparisons, one per task. Q4 had only one pair, so every participant saw Q4A.
@@ -73,7 +64,7 @@ The code snippets and images participants saw are in [`snippets/`](../snippets/)
 **Reading `survey_responses_raw.csv`:**
 - Qualtrics writes **3 header rows**: column names, question text, then an ImportId JSON row. Respondents start on row 4. In R: `read_csv(...)[-(1:2), ]`.
 - 109 respondent rows: 2 have `Status == "Survey Preview"` (drop these), leaving 107 real submissions. 75 of those have `Progress == 100` / `Finished == True`, which is the inclusion rule for the report (75 participants, 750 comparisons).
-- **It contains IP addresses and latitude/longitude.** Drop `IPAddress`, `LocationLatitude` and `LocationLongitude` before sharing anything derived from it.
+- **Not anonymised:** the file contains each respondent's `IPAddress`, `LocationLatitude` and `LocationLongitude` and a Qualtrics `ResponseId` per respondent. The report pipeline drops the IP, location and recipient columns on load, and its export script scans every output file for them, so they do not appear in `analysis/report/output/`.
 - Columns:
   - `Demographic Q1`: degree. `Demographic Q2`: Java experience.
   - `Java Q1` to `Java Q3`: screening questions. The correct answers are `C`, `2` and `24`.
@@ -101,22 +92,15 @@ The code shown to survey participants and everything about how it was chosen.
 
 | Path | Contents |
 |---|---|
-| `snippets/survey_code.java` | Source of the 34 snippets, labelled by survey ID |
-| `snippets/snippet_catalogue.csv`, `snippet_metrics.csv` | What each snippet is and its measured metrics |
-| `snippets/images/screenshots/`, `snippets/images/pair_images/` | The 34 snippet images and 44 side-by-side pair images, named by survey ID |
-| `snippets/images/example_question/` | The practice question shown before the real comparisons |
-| `snippets/variant_selection/` | The larger candidate pool before the final variants were chosen, and the ranking spreadsheet |
-
-Survey definition and responses: the survey section above. Snippet metrics are regenerated with `tool/scripts/run_survey.ps1`.
-
-| File / folder | Description |
-|---|---|
-| `snippet_metrics.csv` | **Snippet metrics**: one row per shown snippet (34 rows), measured by the corrected calculator, which is the same code as the corpus (`run_survey.ps1` → `SurveyAnalyser`). Main method only; helper methods are excluded. Re-measured 15 Oct 2026. |
 | `snippets/survey_code.java` | Source code of the 34 snippets, labelled with survey IDs, with a banner per snippet giving its task, its measurements and the single factor it changes. The summary table at the top lists every method measured, helpers included. Matches the pair images participants saw (checked 15 Oct). |
-| `snippets/snippet_catalogue.csv` | One row per snippet: `id`, `group`, `task`, `variant`, `main_method`, `function`, `isolating` (the factor the variant changes), and `original_file_id` (its ID in the repo-root `survey_code.java`, which uses older numbering). |
+| `snippets/snippet_metrics.csv` | **Snippet metrics**: one row per shown snippet (34 rows), measured by the same calculator code as the corpus (`tool/scripts/run_survey.ps1` runs `SurveyAnalyser`). Main method only; helper methods are excluded. Re-measured 15 Oct 2026. |
+| `snippets/snippet_catalogue.csv` | One row per snippet: `id`, `group`, `task`, `variant`, `main_method`, `function`, `isolating` (the factor the variant changes), and `original_file_id` (its ID under the older numbering used before the survey IDs). |
 | `snippets/images/screenshots/` | Each snippet's image as participants saw it, named by survey ID: the 17 Aug versions the pair images were built from. |
 | `snippets/images/pair_images/` | The side-by-side A \| B image for each of the 44 comparisons, named `<A>_<B>.png` by survey ID. |
 | `snippets/images/example_question/` | The practice question shown before the real comparisons. |
+| `snippets/variant_selection/` | The larger candidate pool (`survey_code_all_variants_pre_selection.java`) before the final variants were chosen. |
+
+Survey definition and responses: see the survey section above.
 
 **snippet_metrics.csv columns:** `group`, `variant`, `id` (survey ID), `method`, `cc`, `cognitive`, `loc`, `max_nesting`, `avg_nesting`, `fan_out`, `params`, `hal_vol`, `hal_eff`, `avg_id_words`, `comment_count` (in-body comments plus the method's header comment), `has_javadoc`, `recursive`.
 
@@ -126,4 +110,4 @@ Survey definition and responses: the survey section above. Snippet metrics are r
 - **comment_count:** the Javadoc variants now count their header comment.
 - **CC and LOC:** unchanged.
 
-Snippet metrics are regenerated with `scripts/run_survey.ps1` from `snippets/survey_code.java`.
+Snippet metrics are regenerated with `tool/scripts/run_survey.ps1` from `snippets/survey_code.java`.

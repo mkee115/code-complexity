@@ -124,7 +124,7 @@ Generated code (parser and lexer output, mainly) is not code people read, and it
 
 These flagged 1,447,851 of the 6,961,274 methods and constructors harvested (20.8%).
 
-**2. Filter rules in the R analysis (`scripts/02_load_corpus.R`).** Added after the top-scoring methods turned out to include generator output the harvest had not flagged. They use only columns already in the corpus and are applied to every row, not to particular methods:
+**2. Filter rules in the R analysis (`scripts/01_load_data.R`, corpus section).** Added after the top-scoring methods turned out to include generator output the harvest had not flagged. They use only columns already in the corpus and are applied to every row, not to particular methods:
 - classes named `DFA<number>` and methods named `specialStateTransition` (ANTLR 3 lookahead code);
 - methods whose name starts with `jj_` (JavaCC lookahead code);
 - files under `src-gen/` or `generated-sources/`;

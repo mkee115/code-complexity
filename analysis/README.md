@@ -4,11 +4,11 @@
 |---|---|
 | `report/` | The R pipeline that produces every figure, table and number in the report. **This is the one to run and cite.** |
 | `survey_stats/` | Earlier R survey analysis (one script per analysis: chi-squared, change classification, factor effects, complexity scores, metrics vs survey) with its Excel/CSV output |
-| `survey_graphs/` | Python survey graphs and isolation analyses (35 charts) |
+| `survey_graphs/` | Earlier Python survey analysis (35 charts). **Its counts differ from the report** (740 comparisons, 35 variants); see the note in its section below |
 | `exploratory/` | First look at the corpus (`cc_analysis.R`, `repos_analysis.R`) and its graphs and tables, from the June harvest |
 | `poster/` | `poster_graphs.R` and the poster figures |
 
-The scripts in `survey_stats/`, `exploratory/` and `poster/` are standalone: each has its own config block at the top, and the survey ones expect `700_survey.csv` (the raw Qualtrics export, kept out of git because it holds IP addresses) next to them.
+The scripts in `survey_stats/`, `exploratory/` and `poster/` are standalone: each has its own config block at the top, and the survey ones expect a local `700_survey.csv` next to them. That file has the same contents as `data/survey/survey_responses_raw.csv` (the raw Qualtrics export, which includes respondents' IP addresses and locations, see `data/README.md`); the duplicate is git-ignored.
 
 # Report pipeline (`report/`)
 
@@ -26,13 +26,13 @@ or from a terminal in `analysis/report/` (or the repo root, `Rscript analysis/re
 
 Needs R 4.x with `readr`, `dplyr`, `tidyr`, `ggplot2`, `data.table`, `patchwork`, `ggrepel`, `lme4`, `DescTools`, `irr`, `purrr`, `scales`. The exact versions used are written to `output/sessionInfo.txt`.
 
-**The corpus must be complete before the corpus results are final.** `01_load_data.R` reads `data/corpus/run_log.txt` (repo root); if the harvest has not finished (no `EXIT 0`), the corpus results are marked PROVISIONAL in the figures, the validation log and `report_numbers.csv`. Re-run after the harvest finishes.
+**Harvest check.** `01_load_data.R` reads `data/corpus/run_log.txt` and confirms the harvest finished (the last line is `EXIT 0`). The October 2026 harvest did, so nothing is marked provisional. If you re-harvest and the run is cut short, the corpus results are labelled PROVISIONAL in the figures, the validation log and `report_numbers.csv` until it completes.
 
 ## Scripts
 
 | Script | What it does |
 |---|---|
-| `run_all.R` | Runs the four numbered scripts in order (empties `output/` first) |
+| `run_all.R` | Runs `01` to `04` in order (empties `output/` first); `00_setup.R` is loaded at the start of each |
 | `00_setup.R` | Loads the shared helpers in `lib/`: `config.R` (paths, seed, metric order and colours, report sections), `plot_output.R` (theme, figure/table writers), `checks_numbers.R` (validation log, report-number register), `stats.R` (bootstrap, Wilson CI, concordance, pair sampling) |
 | `01_load_data.R` | Survey: reads the Qualtrics export, drops identifying columns, applies the inclusion rule, joins pairs and measurements, validates. Corpus: loads only the columns needed, validates, applies and counts the filters, describes it |
 | `02_analysis.R` | RQ1 on the corpus (Spearman, partial correlation, PCA, pairwise concordance, resolution) and on the survey snippets; RQ2 (agreement, kappa, decomposition, metric comparisons, tie status and side, gap vs strength, pair-level, all-tie pairs, position diagnostics, the six 3x3 metric-comparison grids); RQ3 (win rates, original vs refactor, reduction vs preference, kinds of change, exceptions); sensitivity (screening, decisive-only, tie-free, experience, corpus filter) |
@@ -84,6 +84,11 @@ To promote or demote an output, change `suggested_use` (figures) in `scripts/fig
 - Self-reported experience groups at the ends ("none": 5 participants, "large": 3) are too small for inference.
 
 # Survey graphs (`survey_graphs/`)
+
+> **Earlier analysis: its numbers differ from the report.** This section describes an earlier Python analysis. It uses **740 comparisons** (74 respondents), **35 screenshot variants** and produces 35 charts. The report uses **750 comparisons** (75 participants) and **34 snippets**. The differences:
+> - **740 vs 750:** its Qualtrics copy (`qualtrics_raw.csv`) drops one response row whose free-text answer broke the CSV field count, so one respondent (10 comparisons) is missing.
+> - **35 vs 34:** it included `10-V3`, a screenshot that was made but never shown in the live survey.
+> - Nothing in `analysis/report/` is built from this folder. Use the report figures and `report_numbers.csv`.
 
 Run `python survey_analysis.py` from `analysis/survey_graphs/` (needs pandas, numpy, matplotlib, scipy). Regenerates everything in `output/` (35 charts) and
 `tables/` (long-format data + summary CSVs) from the two source files below.

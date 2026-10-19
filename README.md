@@ -22,7 +22,7 @@ code-complexity/
 │   └── variant_selection/       candidate pool before the variants were chosen, ranking spreadsheet
 └── analysis/
     ├── report/                  the pipeline that produces every figure, table and number in the report
-    │   ├── scripts/                 numbered R scripts + run_all.R
+    │   ├── scripts/                 00_setup.R, 01_load_data, 02_analysis, 03_figures, 04_tables_and_export + run_all.R
     │   └── output/                  generated figures, tables, report_numbers.csv
     ├── survey_stats/            earlier R survey analysis (chi-squared, change classification, ...)
     ├── survey_graphs/           Python survey graphs and isolation analyses
