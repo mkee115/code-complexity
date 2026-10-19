@@ -26,3 +26,5 @@ target/
 Cyclomatic Complexity Calculator/report_analysis/.Rproj.user/
 Cyclomatic Complexity Calculator/report_analysis/report_analysis.Rproj
 Cyclomatic Complexity Calculator/report_analysis/data/corpus/cc_data.csv
+__pycache__/
+*.pyc
