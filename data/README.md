@@ -67,7 +67,7 @@ The code snippets and images participants saw are in [`snippets/`](../snippets/)
 - **Fixed sides:** Method A was always the earlier version (ORIG, then V1, …); sides were not counterbalanced.
 - **Wording:** the question asks "Which of these is easier to understand?", but the answer options say "… less complex".
 - **Screening answers** (worked out from the code shown): Java Q1 = `C`, Q2 = `2`, Q3 = `24`.
-- **Images were loaded live from GitHub `main`** (`survey_methods/combinedImages/ (now `snippets/images/pair_images/`)<file-ID pair>.png?raw=true`), so participants saw the 17 Aug versions of those files. Q10A points at the misnamed `10-ORIG-10_V1.png`, which is that file's real name, so it loaded correctly. **Don't rename or delete those files on `main`.** If the survey is ever reopened, it would show broken or changed images.
+- **Images were loaded live from GitHub `main`** at `survey_methods/combinedImages/<file-ID pair>.png?raw=true`, so participants saw the 17 Aug versions of those files. That folder no longer exists on `main`; the same images are in `snippets/images/pair_images/`. The live survey would show broken images if reopened.
 - **Intro text shown to participants:** "You will be shown pairs of Java methods and asked to judge which is easier to understand, and by how much. There are no right or wrong answers. We are interested in your genuine first impression. You will not be able to go back to a previous question."
 
 **Reading `survey_responses_raw.csv`:**
