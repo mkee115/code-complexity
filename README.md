@@ -92,6 +92,8 @@ The survey asked 75 participants to compare pairs of Java snippets (10 compariso
 
 ## Metrics
 
+**The four key metrics** the report is built around are **cyclomatic complexity (CC), cognitive complexity (CogC), lines of code (LOC) and maximum nesting depth (MaxNest)**: the `cc`, `cognitive_complexity`, `loc` and `max_nesting` columns of `cc_data.csv`. The other measures (Halstead, naming, comments, line length, fan-out and so on) are collected for supporting analysis.
+
 See [tool/docs/metric_definitions.md](tool/docs/metric_definitions.md) for the definition of each metric and the reasoning behind it. The columns of `cc_data.csv` are described in [data/README.md](data/README.md).
 
 | Metric                  | Source class                     |
