@@ -1,6 +1,6 @@
 # data/
 
-Raw corpus data from the GitHub harvest. Nothing here has been processed. How every metric is calculated: [../docs/METRIC_DEFINITIONS.md](../docs/METRIC_DEFINITIONS.md). The analysis that uses it: [../analysis/report/README.md](../analysis/report/README.md).
+Raw corpus data from the GitHub harvest. Nothing here has been processed. How every metric is calculated: [../tool/docs/METRIC_DEFINITIONS.md](../tool/docs/METRIC_DEFINITIONS.md). The analysis that uses it: [../analysis/report/README.md](../analysis/report/README.md).
 
 **`corpus/cc_data.csv` (2 GB) is not in git** (it is listed in `.gitignore`); it is supplied in the compendium zip. Regenerate it with the `tool/` harvester (see the root README).
 

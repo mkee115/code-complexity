@@ -1,6 +1,6 @@
 # Report analysis pipeline
 
-R pipeline for the final report. It analyses the October 2026 corpus and the survey and produces every figure, table and number the report uses. The data are described in `data/README.md` (corpus) and `survey/README.md` (survey) at the repo root; the metric definitions are in `docs/METRIC_DEFINITIONS.md`.
+R pipeline for the final report. It analyses the October 2026 corpus and the survey and produces every figure, table and number the report uses. The data are described in `data/README.md` (corpus) and `data/survey/README.md` (survey) and `snippets/README.md` (snippets) at the repo root; the metric definitions are in `tool/docs/METRIC_DEFINITIONS.md`.
 
 ## Running it
 

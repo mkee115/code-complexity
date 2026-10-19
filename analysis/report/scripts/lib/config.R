@@ -13,13 +13,13 @@ suppressPackageStartupMessages({
 })
 
 # The pipeline runs from analysis/report/; survey data and the corpus live at the repo root
-stopifnot(dir.exists("../../survey/snippets"), dir.exists("../../data/corpus"))
+stopifnot(dir.exists("../../snippets"), dir.exists("../../data/corpus"))
 
 PATHS <- list(
-  survey_raw  = "../../survey/responses/survey_responses_raw.csv",
-  pairs       = "../../survey/responses/comparison_pairs.csv",
-  snippets    = "../../survey/snippets/snippet_metrics.csv",
-  catalogue   = "../../survey/snippets/snippet_catalogue.csv",
+  survey_raw  = "../../data/survey/survey_responses_raw.csv",
+  pairs       = "../../data/survey/comparison_pairs.csv",
+  snippets    = "../../snippets/snippet_metrics.csv",
+  catalogue   = "../../snippets/snippet_catalogue.csv",
   corpus_dir  = "../../data/corpus",
   out         = "output",
   work        = "output/_pipeline"       # intermediate files passed between scripts, and the validation log

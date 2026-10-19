@@ -8,7 +8,7 @@ library(data.table)
 base <- "."
 
 config <- list(
-  survey_csv = file.path(base, "../../survey/responses/survey_responses_raw.csv"),
+  survey_csv = file.path(base, "../../data/survey/survey_responses_raw.csv"),
   variant_metrics_csv = file.path(base, "../survey_stats/variant_metrics.csv"),
   corpus_csv = file.path(base, "../../data/corpus/cc_data.csv"),
   out_dir = file.path(base, "figures"),
