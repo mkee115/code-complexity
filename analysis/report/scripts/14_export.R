@@ -34,23 +34,12 @@ validate("every figure has a suggested takeaway", !anyNA(index$takeaway), paste(
          stop_on_fail = FALSE)
 write_csv(index, "output/figure_index.csv")
 
-# One folder with a copy of every main and supporting figure, for viewing them together. Files are prefixed with
-# their report section number so they sort in report order (the originals stay where they are).
-view_dir <- file.path(PATHS$out, "figures_main_and_supporting")
-unlink(view_dir, recursive = TRUE); dir.create(view_dir, recursive = TRUE)
-to_copy <- index |> filter(suggested_use %in% c("main", "supporting")) |>
-  mutate(src = file.path(PATHS$out, folder, importance, figure), dest = file.path(view_dir, paste0(substr(folder, 1, 1), "_", figure)))
-validate("main and supporting figures: every source file exists", all(file.exists(to_copy$src)), paste(to_copy$figure[!file.exists(to_copy$src)], collapse = ", "))
-file.copy(to_copy$src, to_copy$dest)
-# ... and the version without title and subtitle, next to each one (suffix _no_title). A figure that never had a
-# title or subtitle gives an identical file, so only the figures where the two versions differ get a second copy.
-nt <- to_copy |> mutate(src_nt = file.path(PATHS$out, "figures_no_titles", folder, figure),
-                        dest_nt = sub("[.]png$", "_no_title.png", dest))
-validate("main and supporting figures: every title-free version exists", all(file.exists(nt$src_nt)),
-         paste(nt$figure[!file.exists(nt$src_nt)], collapse = ", "))
-differs <- unname(tools::md5sum(nt$src)) != unname(tools::md5sum(nt$src_nt))
-file.copy(nt$src_nt[differs], nt$dest_nt[differs])
-cat(sprintf("Copied %d main and supporting figures to %s, plus %d title-free versions\n", nrow(to_copy), view_dir, sum(differs)))
+# Every main and supporting figure exists in its section folder and has a title-free version in figures_no_titles/
+chk <- index |> filter(suggested_use %in% c("main", "supporting")) |>
+  mutate(src = file.path(PATHS$out, folder, importance, figure), src_nt = file.path(PATHS$out, "figures_no_titles", folder, figure))
+validate("main and supporting figures: every source file exists", all(file.exists(chk$src)), paste(chk$figure[!file.exists(chk$src)], collapse = ", "))
+validate("main and supporting figures: every title-free version exists", all(file.exists(chk$src_nt)),
+         paste(chk$figure[!file.exists(chk$src_nt)], collapse = ", "))
 
 # ---- Session info -------------------------------------------------------------------------------------
 writeLines(capture.output(sessionInfo()), "output/sessionInfo.txt")

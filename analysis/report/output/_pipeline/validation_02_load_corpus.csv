@@ -1,17 +1,17 @@
 check,passed,detail,time
-corpus files exist,TRUE,,2026-10-19 14:32
-October harvest finished (EXIT 0): corpus results are final,TRUE,complete,2026-10-19 14:32
-corpus has the expected columns,TRUE,,2026-10-19 14:32
-excluded metrics are never loaded (maintainability index),TRUE,,2026-10-19 14:32
-no missing key metric values,TRUE,0 rows with a missing key metric,2026-10-19 14:32
-"metric ranges are valid (CC >= 1, others >= 0)",TRUE,,2026-10-19 14:32
-kind is method or constructor,TRUE,,2026-10-19 14:32
-flag columns are 0/1,TRUE,,2026-10-19 14:32
-bodyless methods have CC 1 (sanity check on has_body),TRUE,,2026-10-19 14:32
-every corpus project is in repos.csv,TRUE,0 projects with methods but no repository row,2026-10-19 14:32
-repos.csv has no duplicate repositories,TRUE,,2026-10-19 14:32
-repo identifying/contributor columns present,TRUE,,2026-10-19 14:32
-repositories contributing methods <= repositories harvested,TRUE,,2026-10-19 14:32
-no repository processed twice (share of rows on a shared file/line is small in every repo),TRUE,693 rows share a file/line overall (0.0100%); highest repository share 13.1%,2026-10-19 14:32
-added generated-code rules remove methods and none are left in the main corpus,TRUE,,2026-10-19 14:32
-main corpus is non-empty and the filter steps nest,TRUE,6961274 > 6331495 > 5812249 > 5662672 > 4370540 > 4315785,2026-10-19 14:32
+corpus files exist,TRUE,,2026-10-19 14:47
+October harvest finished (EXIT 0): corpus results are final,TRUE,complete,2026-10-19 14:47
+corpus has the expected columns,TRUE,,2026-10-19 14:47
+excluded metrics are never loaded (maintainability index),TRUE,,2026-10-19 14:47
+no missing key metric values,TRUE,0 rows with a missing key metric,2026-10-19 14:47
+"metric ranges are valid (CC >= 1, others >= 0)",TRUE,,2026-10-19 14:47
+kind is method or constructor,TRUE,,2026-10-19 14:47
+flag columns are 0/1,TRUE,,2026-10-19 14:47
+bodyless methods have CC 1 (sanity check on has_body),TRUE,,2026-10-19 14:47
+every corpus project is in repos.csv,TRUE,0 projects with methods but no repository row,2026-10-19 14:47
+repos.csv has no duplicate repositories,TRUE,,2026-10-19 14:47
+repo identifying/contributor columns present,TRUE,,2026-10-19 14:47
+repositories contributing methods <= repositories harvested,TRUE,,2026-10-19 14:47
+no repository processed twice (share of rows on a shared file/line is small in every repo),TRUE,693 rows share a file/line overall (0.0100%); highest repository share 13.1%,2026-10-19 14:47
+added generated-code rules remove methods and none are left in the main corpus,TRUE,,2026-10-19 14:48
+main corpus is non-empty and the filter steps nest,TRUE,6961274 > 6331495 > 5812249 > 5662672 > 4370540 > 4315785,2026-10-19 14:48
