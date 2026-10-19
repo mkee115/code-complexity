@@ -71,6 +71,25 @@ Rscript analysis/report/scripts/run_all.R
 cd tool && mvn test
 ```
 
+## Survey
+
+The survey asked 75 participants to compare pairs of Java snippets (10 comparisons each, 750 responses in total). Everything about it is in two places: [`snippets/`](snippets/) (what participants saw) and [`data/survey/`](data/survey/) (what they answered). Detail is in [data/README.md](data/README.md).
+
+| What | Where |
+|---|---|
+| Survey code (the 34 snippets, labelled `01-ORIG`, `01-V1`, ...) | `snippets/survey_code.java` |
+| Larger candidate pool from before the final variants were chosen | `snippets/variant_selection/survey_code_all_variants_pre_selection.java` |
+| Snippet and pair images shown to participants (this is what `survey_methods/` became) | `snippets/images/screenshots/`, `snippets/images/pair_images/` |
+| Variant rankings spreadsheet (`survey_variant_rankings.xlsx`) | Removed from the working tree; it is in the git history before the restructure |
+| Measured metrics per snippet | `snippets/snippet_metrics.csv` |
+| Script that measures the snippets | `tool/scripts/run_survey.ps1` |
+
+**Scoring the survey code.** `tool/scripts/run_survey.ps1` builds the tool and runs `SurveyAnalyser` on `snippets/survey_code.java`. It splits the file at each snippet's banner comment (the `ID:` line), measures every method with the same calculators used for the corpus, prints a table, and writes one row per snippet (its main, first method only) to `snippets/snippet_metrics.csv`. To score new or edited snippets, keep the banner format, then run:
+
+```powershell
+./tool/scripts/run_survey.ps1
+```
+
 ## Metrics
 
 See [tool/docs/metric_definitions.md](tool/docs/metric_definitions.md) for the definition of each metric and the reasoning behind it. The columns of `cc_data.csv` are described in [data/README.md](data/README.md).
