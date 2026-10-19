@@ -1,0 +1,16 @@
+figure,folder,importance,research_question,purpose
+fig02_rq1_correlations.png,2_rq1_do_metrics_agree,important,RQ1,"How strongly the metrics' rankings agree, in the corpus and in the survey snippets"
+fig02b_rq1_correlations_above_lowest.png,2_rq1_do_metrics_agree,optional,RQ1,The metric correlations once the trivial lowest-value methods are removed
+fig03a_rq1_concordance_survey.png,2_rq1_do_metrics_agree,important,RQ1,Direct test of the supervisor's definition on the survey pairs
+fig03b_rq1_concordance_corpus_random.png,2_rq1_do_metrics_agree,optional,RQ1,"Same test on 1,000,000 random pairs of corpus methods"
+fig03c_rq1_concordance_corpus_nontrivial.png,2_rq1_do_metrics_agree,important,RQ1,Same test restricted to non-trivial methods (CC >= 3)
+fig04a_rq1_ties_survey_pairs.png,2_rq1_do_metrics_agree,important,RQ1/RQ2,Resolution: how often each metric cannot tell the two survey methods apart
+fig04b_rq1_ties_corpus.png,2_rq1_do_metrics_agree,optional,RQ1/RQ2,Resolution in the corpus
+fig04c_rq1_ties_corpus_above_lowest.png,2_rq1_do_metrics_agree,optional,RQ1/RQ2,Resolution in the corpus once the trivial lowest-value methods are removed
+diag_rq1_ties_survey_responses.png,2_rq1_do_metrics_agree,optional,RQ1/RQ2,Response-level tie share (differs from the pair-level share)
+fig05_rq1_pca_variance.png,2_rq1_do_metrics_agree,optional,RQ1,Supporting evidence: how much variation one shared component captures (not proof the metrics are equivalent)
+diag_rq1_pca_loadings.png,2_rq1_do_metrics_agree,optional,RQ1,PCA loadings
+diag_rq1_pca_scores.png,2_rq1_do_metrics_agree,optional,RQ1,PCA score plots
+diag_rq1_corpus_correlations_broad.png,2_rq1_do_metrics_agree,optional,RQ1,Broader metric correlation matrix
+diag_rq1_survey_correlations_broad.png,2_rq1_do_metrics_agree,optional,RQ1,Broader metric correlation matrix for the survey snippets
+diag_rq1_pca_broad_scree.png,2_rq1_do_metrics_agree,optional,RQ1,Scree for the broader metric sets

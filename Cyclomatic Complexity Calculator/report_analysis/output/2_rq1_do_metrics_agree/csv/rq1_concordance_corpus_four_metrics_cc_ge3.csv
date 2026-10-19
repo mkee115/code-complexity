@@ -1,0 +1,6 @@
+class,n,total,prop
+Discordant: at least one metric combination orders the pair in opposite directions,307744,1000000,0.307744
+"Partly agreeing: no combination discordant, but a metric ties while another orders the pair",313730,1000000,0.31373
+"Fully agreeing: all four order the pair the same way, or all four tie",378526,1000000,0.378526
+   of which all four tie,2965,1000000,0.002965
+"Discordant among CC, CogC and MaxNest only (ignoring LOC)",164339,1000000,0.164339

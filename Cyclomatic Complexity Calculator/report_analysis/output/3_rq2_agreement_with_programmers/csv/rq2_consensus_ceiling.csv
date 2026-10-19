@@ -1,0 +1,3 @@
+ceiling,agreement,low,high
+In-sample consensus (optimistic),0.6973333333333334,0.672,0.748
+Leave-one-out consensus,0.6693333333333333,0.6231,0.7346666666666667

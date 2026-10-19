@@ -1,21 +1,21 @@
 package com.complexity;
 
 import com.github.javaparser.JavaToken;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class MethodLocCalculator
 {
-    public static int computePhysicalLOC(MethodDeclaration method)
+    public static int computePhysicalLOC(CallableDeclaration<?> method)
     {
         return method.getRange()
                 .map(r -> r.end.line - r.begin.line + 1)
                 .orElse(0);
     }
 
-    public static int computeLOC(MethodDeclaration method)
+    public static int computeLOC(CallableDeclaration<?> method)
     {
         return method.getTokenRange().map(tokenRange ->
         {

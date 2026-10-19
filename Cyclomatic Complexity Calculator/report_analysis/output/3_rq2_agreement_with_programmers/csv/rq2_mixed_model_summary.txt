@@ -1,0 +1,34 @@
+Generalized linear mixed model fit by maximum likelihood (Laplace
+  Approximation) [glmerMod]
+ Family: binomial  ( logit )
+Formula: agree ~ metric_label + (1 | pid) + (1 | item)
+   Data: scored
+Control: lme4::glmerControl(optimizer = "bobyqa")
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   3268.3    3304.4   -1628.2    3256.3      2994 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.4562 -0.6792  0.1517  0.6347  4.3237 
+
+Random effects:
+ Groups Name        Variance Std.Dev.
+ pid    (Intercept) 0.5921   0.7695  
+ item   (Intercept) 3.4798   1.8654  
+Number of obs: 3000, groups:  pid, 75; item, 44
+
+Fixed effects:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)          -0.5437     0.3125  -1.740   0.0819 .  
+metric_labelCogC      0.8616     0.1271   6.777 1.22e-11 ***
+metric_labelLOC       0.6674     0.1261   5.293 1.20e-07 ***
+metric_labelMaxNest   0.3175     0.1251   2.537   0.0112 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+            (Intr) mtr_CC mt_LOC
+mtrc_lblCgC -0.204              
+mtrc_lblLOC -0.203  0.504       
+mtrc_lblMxN -0.202  0.500  0.503

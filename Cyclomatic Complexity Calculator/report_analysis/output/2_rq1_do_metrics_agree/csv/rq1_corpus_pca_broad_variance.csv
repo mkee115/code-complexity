@@ -1,0 +1,22 @@
+dataset,component,variance,cumulative
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC1,0.5148865950222092,0.5148865950222092
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC2,0.11827798975489895,0.6331645847771081
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC3,0.07643489444972158,0.7095994792268298
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC4,0.06999675759912762,0.7795962368259574
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC5,0.04392551617333626,0.8235217529992936
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC6,0.04308076461419125,0.8666025176134848
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC7,0.03721317791932433,0.9038156955328093
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC8,0.022416164976065422,0.9262318605088746
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC9,0.018753020855212636,0.9449848813640873
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC10,0.013707294133566398,0.9586921754976537
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC11,0.011699263967444811,0.9703914394650985
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC12,0.007620265698076108,0.9780117051631746
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC13,0.007358785866302874,0.9853704910294775
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC14,0.005738849172385467,0.9911093402018629
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC15,0.004098410779857344,0.9952077509817203
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC16,0.0018050830838988816,0.9970128340656191
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC17,0.001291170315919656,0.9983040043815388
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC18,9.528066578696874e-4,0.9992568110394086
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC19,4.511526263251875e-4,0.9997079636657337
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC20,2.891878602475235e-4,0.9999971515259812
+"Corpus, broader metrics (1M sample, log1p, standardised)",PC21,2.84847401868417e-6,0.9999999999999999

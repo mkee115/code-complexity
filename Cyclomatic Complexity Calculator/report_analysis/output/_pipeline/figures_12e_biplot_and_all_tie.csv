@@ -1,0 +1,3 @@
+figure,folder,importance,research_question,purpose
+diag_rq1_pca_biplot.png,2_rq1_do_metrics_agree,optional,RQ1,"PCA biplot: corpus density (30,000-method sample), loadings of the four metrics, and the 34 survey snippets (originals orange, variants blue); dashed ellipse holds 90% of corpus methods; only snippets outside it are labelled"
+diag_rq2_all_tie_forest.png,3_rq2_agreement_with_programmers,optional,RQ2,"The seven pairs where CC, CogC, LOC and MaxNest all tie: share of decisive responses preferring the later version, with Wilson 95% CIs per pair and the pooled participant-bootstrap estimate in red; dashed line = 50%"

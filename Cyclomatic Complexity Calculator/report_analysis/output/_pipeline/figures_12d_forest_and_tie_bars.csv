@@ -1,0 +1,3 @@
+figure,folder,importance,research_question,purpose
+fig08_a_forest_cc_ties.png,3_rq2_agreement_with_programmers,important,RQ2,"Pairs where CC ties and CogC, MaxNest or LOC separates: share of decisive responses choosing the method that metric rates lower (Wilson 95% CIs per pair; pooled participant-bootstrap estimate in red)"
+fig10_rq2_tie_rate_by_strength.png,3_rq2_agreement_with_programmers,important,RQ2,"How often each metric ties on the pair, by the participant's answer (no difference / slightly / much); exported 1568 px wide"

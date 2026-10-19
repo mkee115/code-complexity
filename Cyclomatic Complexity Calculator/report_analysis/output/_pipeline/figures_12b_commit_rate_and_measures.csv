@@ -1,0 +1,3 @@
+figure,folder,importance,research_question,purpose
+diag_rq2_commit_vs_direction.png,3_rq2_agreement_with_programmers,optional,RQ2,"Commit rate against direction accuracy for CC, CogC, LOC and MaxNest (95% participant-bootstrap intervals; dashed line = 50%)"
+diag_rq2_measures_tie_rate_vs_agreement.png,3_rq2_agreement_with_programmers,optional,RQ2,Agreement against tie rate for the 13 measures in fig06b; the four key metrics are coloured

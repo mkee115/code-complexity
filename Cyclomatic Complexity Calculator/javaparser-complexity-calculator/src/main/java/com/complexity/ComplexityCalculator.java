@@ -4,12 +4,22 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.JavaToken;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
 import org.eclipse.jgit.api.Git;
 
 import java.io.BufferedReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.regex.Pattern;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,11 +51,14 @@ public class ComplexityCalculator
             + "longest_id,total_words,comment_count,comment_words,"
             + "halstead_volume,halstead_difficulty,halstead_effort,"
             + "maintainability_index,mi_normalized,param_count,return_count,fan_out,"
-            + "max_line_length,avg_line_length";
+            + "max_line_length,avg_line_length,"
+            + "kind,file_path,start_line,has_body,nested_in_method,is_generated,"
+            + "recursive,has_javadoc,body_hash";
 
     static final String REPOS_HEADER =
             "full_name,url,scraped_at,language,stars,forks,size_kb,commit_count,"
-            + "java_file_count,created_at,pushed_at";
+            + "java_file_count,created_at,pushed_at,"
+            + "contributors,default_branch,head_sha,open_issues,license,archived,is_fork,topics";
 
     static final String SKIPPED_HEADER = "type,repo,file,method,reason";
 
@@ -212,7 +225,19 @@ public class ComplexityCalculator
                 System.out.printf("Processing chunk %d/%d (%s to %s)...%n",
                         i + 1, chunks.size(), chunk.startDate, chunk.endDate);
 
-                List<GitHubRepositorySearcher.Repo> repos = searcher.search(chunkQuery);
+                List<GitHubRepositorySearcher.Repo> repos;
+                try
+                {
+                    repos = searcher.search(chunkQuery);
+                }
+                catch (IOException e)
+                {
+                    // Still failing after the searcher's retries: log it and move
+                    // on, so one bad chunk does not lose the rest of the harvest.
+                    System.err.println("  Chunk failed, skipping: " + classifyError(e));
+                    logSkip(skipOut, "chunk", chunkQuery, "", "", classifyError(e));
+                    continue;
+                }
                 System.out.println("  Retrieved " + repos.size() + " repos in chunk");
 
                 List<Future<?>> futures = new ArrayList<>();
@@ -258,6 +283,7 @@ public class ComplexityCalculator
                     chunkIndex + 1, chunkTotal, mavenProcessed.get(), cfg.targetRepos, repo.cloneUrl);
 
             cloneDir = cloneRepo(repo.cloneUrl);
+            repo.headSha = headSha(cloneDir);
             int[] result = processRepo(cloneDir, repo.fullName, ccOut, skipOut);
 
             reposOut.writeLine(repoRow(repo, scrapedAt, result[0]));
@@ -312,7 +338,7 @@ public class ComplexityCalculator
         {
             try
             {
-                methodsWritten += processFile(f, repoName, ccOut, skipOut);
+                methodsWritten += processFile(f, target, repoName, ccOut, skipOut);
             }
             catch (StackOverflowError | Exception e)
             {
@@ -325,7 +351,7 @@ public class ComplexityCalculator
         return new int[]{javaFiles.size(), methodsWritten};
     }
 
-    private static int processFile(File file, String projectName,
+    private static int processFile(File file, File root, String projectName,
                                    CsvWriter out, CsvWriter skipOut) throws Exception
     {
         int count = 0;
@@ -345,9 +371,14 @@ public class ComplexityCalculator
         if (!parsed.isSuccessful())
             logSkip(skipOut, "file_partial", projectName, file.getName(), "", firstProblem(parsed));
 
-        // findAll captures methods in classes, interfaces, enums, records and
-        // anonymous classes — not just the methods of top-level classes.
-        for (MethodDeclaration method : cu.findAll(MethodDeclaration.class))
+        String relPath = root.isDirectory()
+                ? root.toPath().relativize(file.toPath()).toString().replace('\\', '/')
+                : file.getName();
+        boolean generatedFile = isGeneratedFile(file, relPath);
+
+        // findAll captures methods and constructors in classes, interfaces,
+        // enums, records and anonymous classes, not just top-level classes.
+        for (CallableDeclaration<?> method : cu.findAll(CallableDeclaration.class))
         {
             String className = method.findAncestor(TypeDeclaration.class)
                     .map(t -> t.getNameAsString())
@@ -355,7 +386,8 @@ public class ComplexityCalculator
             String methodName = method.getNameAsString();
             try
             {
-                out.writeLine(methodRow(projectName, className, methodName, method));
+                out.writeLine(methodRow(projectName, className, methodName, method,
+                        relPath, generatedFile || hasGeneratedAnnotation(method)));
                 count++;
             }
             catch (StackOverflowError | Exception e)
@@ -374,7 +406,7 @@ public class ComplexityCalculator
     }
 
     private static String methodRow(String projectName, String className, String methodName,
-                                    MethodDeclaration method)
+                                    CallableDeclaration<?> method, String relPath, boolean generated)
     {
         int cc = CyclomaticComplexityVisitor.compute(method);
         int cognitiveComplexity = CognitiveComplexityVisitor.compute(method);
@@ -392,9 +424,15 @@ public class ComplexityCalculator
         MethodStructureCalculator.Metrics struct = MethodStructureCalculator.compute(method);
         LineLengthCalculator.Metrics lines = LineLengthCalculator.compute(method);
 
+        String kind = method instanceof ConstructorDeclaration ? "constructor" : "method";
+        boolean hasBody = !(method instanceof MethodDeclaration m) || m.getBody().isPresent();
+        boolean nestedInMethod = method.findAncestor(CallableDeclaration.class).isPresent();
+        int startLine = method.getBegin().map(p -> p.line).orElse(-1);
+
         return String.format(Locale.ROOT,
                 "\"%s\",\"%s\",\"%s\",%d,%d,%d,%d,%.2f,%d,%.2f,%.3f,%d,%d,%d,%d,%d,"
-                + "%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%.2f",
+                + "%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%.2f,"
+                + "%s,\"%s\",%d,%d,%d,%d,%d,%d,%s",
                 escape(projectName), escape(className), escape(methodName),
                 cc, cognitiveComplexity, loc, locPhysical, avgNesting, maxNesting,
                 idMetrics.avgIdentifierWords(), idMetrics.abbreviatedRatio(),
@@ -403,7 +441,99 @@ public class ComplexityCalculator
                 hal.volume(), hal.difficulty(), hal.effort(),
                 mi.raw(), mi.normalized(),
                 struct.paramCount(), struct.returnCount(), struct.fanOut(),
-                lines.maxLineLength(), lines.avgLineLength());
+                lines.maxLineLength(), lines.avgLineLength(),
+                kind, escape(relPath), startLine, hasBody ? 1 : 0, nestedInMethod ? 1 : 0,
+                generated ? 1 : 0, CognitiveComplexityVisitor.isRecursive(method) ? 1 : 0,
+                idMetrics.hasJavadoc() ? 1 : 0, bodyHash(method));
+    }
+
+    // Markers that tools write into generated sources (parser generators, protobuf,
+    // annotation processors, IDE form builders, ...). The ANTLR and JavaCC headers are
+    // listed explicitly: ANTLR 3 writes "$ANTLR 3.x" (or "$ANTLR null" from some builds), ANTLR 4
+    // writes "Generated from X.g4 by ANTLR 4.x", JavaCC writes "Generated By:JavaCC" (also
+    // matched by "generated by").
+    private static final Pattern GENERATED_MARKER = Pattern.compile(
+            "(?i)(auto-?generated|generated by|do not edit|@generated|code generator"
+                    + "|\\$ANTLR\\b|generated from [^\\n]{0,200} by antlr|generated by:?\\s*javacc)");
+
+    /**
+     * A file counts as generated when a directory on its path has "generated"
+     * in its name or is src-gen, or its opening text (licence/header comments)
+     * carries a generator marker.
+     */
+    private static boolean isGeneratedFile(File file, String relPath)
+    {
+        if (relPath.toLowerCase(Locale.ROOT).matches("(.*/)?([^/]*generated[^/]*|src-gen)/.*"))
+            return true;
+        try (var in = Files.newInputStream(file.toPath()))
+        {
+            byte[] head = in.readNBytes(4096);
+            return GENERATED_MARKER.matcher(new String(head, StandardCharsets.UTF_8)).find();
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+    }
+
+    /** True when the method or any enclosing type is annotated @Generated. */
+    private static boolean hasGeneratedAnnotation(CallableDeclaration<?> method)
+    {
+        Optional<Node> node = Optional.of(method);
+        while (node.isPresent())
+        {
+            if (node.get() instanceof NodeWithAnnotations<?> annotated
+                    && annotated.getAnnotations().stream()
+                            .anyMatch(a -> a.getNameAsString().endsWith("Generated")))
+                return true;
+            node = node.get().getParentNode();
+        }
+        return false;
+    }
+
+    /**
+     * Fingerprint of the method's code: SHA-1 over its tokens with comments and
+     * whitespace removed, so identical methods copied between repositories (or
+     * vendored libraries) can be found and de-duplicated in the analysis.
+     */
+    private static String bodyHash(CallableDeclaration<?> method)
+    {
+        try
+        {
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            method.getTokenRange().ifPresent(range ->
+            {
+                for (JavaToken token : range)
+                {
+                    JavaToken.Category cat = token.getCategory();
+                    if (cat == JavaToken.Category.COMMENT
+                            || cat == JavaToken.Category.WHITESPACE_NO_EOL
+                            || cat == JavaToken.Category.EOL)
+                        continue;
+                    sha.update(token.getText().getBytes(StandardCharsets.UTF_8));
+                    sha.update((byte) 0);
+                }
+            });
+            return HexFormat.of().formatHex(sha.digest()).substring(0, 16);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            return "";
+        }
+    }
+
+    /** Commit the shallow clone checked out, so the snapshot can be reproduced. */
+    private static String headSha(File cloneDir)
+    {
+        try (Git git = Git.open(cloneDir))
+        {
+            var head = git.getRepository().resolve("HEAD");
+            return head != null ? head.getName() : "";
+        }
+        catch (IOException e)
+        {
+            return "";
+        }
     }
 
     private static List<File> findJavaFiles(File dir)
@@ -530,9 +660,11 @@ public class ComplexityCalculator
     private static String repoRow(GitHubRepositorySearcher.Repo r, String scrapedAt, int javaFileCount)
     {
         return String.format(Locale.ROOT,
-                "\"%s\",\"%s\",%s,\"%s\",%d,%d,%d,%d,%d,%s,%s",
+                "\"%s\",\"%s\",%s,\"%s\",%d,%d,%d,%d,%d,%s,%s,%d,\"%s\",%s,%d,\"%s\",%d,%d,\"%s\"",
                 escape(r.fullName), escape(r.htmlUrl), scrapedAt, escape(r.language),
-                r.stars, r.forks, r.sizeKb, r.commitCount, javaFileCount, r.createdAt, r.pushedAt);
+                r.stars, r.forks, r.sizeKb, r.commitCount, javaFileCount, r.createdAt, r.pushedAt,
+                r.contributors, escape(r.defaultBranch), r.headSha, r.openIssues, escape(r.license),
+                r.archived ? 1 : 0, r.fork ? 1 : 0, escape(r.topics));
     }
 
     private static String classifyError(Throwable e)

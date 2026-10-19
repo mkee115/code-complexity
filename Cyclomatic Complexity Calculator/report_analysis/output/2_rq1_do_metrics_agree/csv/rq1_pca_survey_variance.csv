@@ -1,0 +1,20 @@
+dataset,component,variance,cumulative
+"Survey snippets, key metrics (log1p, standardised)",PC1,0.8018691035473795,0.8018691035473795
+"Survey snippets, key metrics (log1p, standardised)",PC2,0.12696023206750118,0.9288293356148807
+"Survey snippets, key metrics (log1p, standardised)",PC3,0.04553105872336521,0.9743603943382458
+"Survey snippets, key metrics (log1p, standardised)",PC4,0.025639605661754113,1
+"Survey snippets, key metrics (raw, standardised)",PC1,0.7710568125744556,0.7710568125744556
+"Survey snippets, key metrics (raw, standardised)",PC2,0.13292799670607616,0.9039848092805317
+"Survey snippets, key metrics (raw, standardised)",PC3,0.07268389475361575,0.9766687040341475
+"Survey snippets, key metrics (raw, standardised)",PC4,0.02333129596585258,1
+"Survey snippets, broader metrics (log1p, standardised)",PC1,0.5104150744112114,0.5104150744112114
+"Survey snippets, broader metrics (log1p, standardised)",PC2,0.17644729370565138,0.6868623681168627
+"Survey snippets, broader metrics (log1p, standardised)",PC3,0.09944289346194446,0.7863052615788072
+"Survey snippets, broader metrics (log1p, standardised)",PC4,0.08583804963088579,0.872143311209693
+"Survey snippets, broader metrics (log1p, standardised)",PC5,0.0610404001026946,0.9331837113123875
+"Survey snippets, broader metrics (log1p, standardised)",PC6,0.03588533495618663,0.9690690462685743
+"Survey snippets, broader metrics (log1p, standardised)",PC7,0.012191073997769385,0.9812601202663436
+"Survey snippets, broader metrics (log1p, standardised)",PC8,0.008707207664499199,0.9899673279308427
+"Survey snippets, broader metrics (log1p, standardised)",PC9,0.005987312093187301,0.9959546400240301
+"Survey snippets, broader metrics (log1p, standardised)",PC10,0.0027351610962522647,0.9986898011202824
+"Survey snippets, broader metrics (log1p, standardised)",PC11,0.0013101988797175731,0.9999999999999999

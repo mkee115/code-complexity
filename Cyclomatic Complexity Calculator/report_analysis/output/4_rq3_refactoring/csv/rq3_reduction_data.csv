@@ -1,0 +1,97 @@
+item,method_b_id,n,net_preference,prefer_refactor,prefer_original,metric,reduction,metric_label,change
+Q10A,10-V1,25,0.36,14,7,cc,9,CC,Measurement reduced
+Q10A,10-V1,25,0.36,14,7,cognitive,18,CogC,Measurement reduced
+Q10A,10-V1,25,0.36,14,7,loc,9,LOC,Measurement reduced
+Q10A,10-V1,25,0.36,14,7,max_nesting,1,MaxNest,Measurement reduced
+Q10B,10-V2,25,0.16,13,8,cc,9,CC,Measurement reduced
+Q10B,10-V2,25,0.16,13,8,cognitive,20,CogC,Measurement reduced
+Q10B,10-V2,25,0.16,13,8,loc,12,LOC,Measurement reduced
+Q10B,10-V2,25,0.16,13,8,max_nesting,1,MaxNest,Measurement reduced
+Q1A,01-V1,7,1,5,2,cc,0,CC,Unchanged
+Q1A,01-V1,7,1,5,2,cognitive,9,CogC,Measurement reduced
+Q1A,01-V1,7,1,5,2,loc,6,LOC,Measurement reduced
+Q1A,01-V1,7,1,5,2,max_nesting,3,MaxNest,Measurement reduced
+Q1B,01-V2,6,1.8333333333333333,6,0,cc,0,CC,Unchanged
+Q1B,01-V2,6,1.8333333333333333,6,0,cognitive,4,CogC,Measurement reduced
+Q1B,01-V2,6,1.8333333333333333,6,0,loc,17,LOC,Measurement reduced
+Q1B,01-V2,6,1.8333333333333333,6,0,max_nesting,4,MaxNest,Measurement reduced
+Q1C,01-V3,12,1.1666666666666667,12,0,cc,0,CC,Unchanged
+Q1C,01-V3,12,1.1666666666666667,12,0,cognitive,0,CogC,Unchanged
+Q1C,01-V3,12,1.1666666666666667,12,0,loc,0,LOC,Unchanged
+Q1C,01-V3,12,1.1666666666666667,12,0,max_nesting,0,MaxNest,Unchanged
+Q2A,02-V1,13,-1.0769230769230769,2,11,cc,0,CC,Unchanged
+Q2A,02-V1,13,-1.0769230769230769,2,11,cognitive,-3,CogC,Measurement increased
+Q2A,02-V1,13,-1.0769230769230769,2,11,loc,-10,LOC,Measurement increased
+Q2A,02-V1,13,-1.0769230769230769,2,11,max_nesting,0,MaxNest,Unchanged
+Q2B,02-V2,13,0.6923076923076923,10,3,cc,2,CC,Measurement reduced
+Q2B,02-V2,13,0.6923076923076923,10,3,cognitive,1,CogC,Measurement reduced
+Q2B,02-V2,13,0.6923076923076923,10,3,loc,5,LOC,Measurement reduced
+Q2B,02-V2,13,0.6923076923076923,10,3,max_nesting,1,MaxNest,Measurement reduced
+Q2C,02-V3,13,0.7692307692307693,10,2,cc,0,CC,Unchanged
+Q2C,02-V3,13,0.7692307692307693,10,2,cognitive,0,CogC,Unchanged
+Q2C,02-V3,13,0.7692307692307693,10,2,loc,0,LOC,Unchanged
+Q2C,02-V3,13,0.7692307692307693,10,2,max_nesting,0,MaxNest,Unchanged
+Q3A,03-V1,24,-0.2916666666666667,8,14,cc,1,CC,Measurement reduced
+Q3A,03-V1,24,-0.2916666666666667,8,14,cognitive,2,CogC,Measurement reduced
+Q3A,03-V1,24,-0.2916666666666667,8,14,loc,0,LOC,Unchanged
+Q3A,03-V1,24,-0.2916666666666667,8,14,max_nesting,0,MaxNest,Unchanged
+Q3B,03-V2,26,-0.9230769230769231,3,20,cc,0,CC,Unchanged
+Q3B,03-V2,26,-0.9230769230769231,3,20,cognitive,0,CogC,Unchanged
+Q3B,03-V2,26,-0.9230769230769231,3,20,loc,3,LOC,Measurement reduced
+Q3B,03-V2,26,-0.9230769230769231,3,20,max_nesting,0,MaxNest,Unchanged
+Q4A,04-V1,75,0.013333333333333334,40,31,cc,2,CC,Measurement reduced
+Q4A,04-V1,75,0.013333333333333334,40,31,cognitive,5,CogC,Measurement reduced
+Q4A,04-V1,75,0.013333333333333334,40,31,loc,4,LOC,Measurement reduced
+Q4A,04-V1,75,0.013333333333333334,40,31,max_nesting,2,MaxNest,Measurement reduced
+Q5A,05-V1,8,1.25,7,0,cc,2,CC,Measurement reduced
+Q5A,05-V1,8,1.25,7,0,cognitive,5,CogC,Measurement reduced
+Q5A,05-V1,8,1.25,7,0,loc,6,LOC,Measurement reduced
+Q5A,05-V1,8,1.25,7,0,max_nesting,1,MaxNest,Measurement reduced
+Q5B,05-V2,8,0.5,4,2,cc,4,CC,Measurement reduced
+Q5B,05-V2,8,0.5,4,2,cognitive,8,CogC,Measurement reduced
+Q5B,05-V2,8,0.5,4,2,loc,12,LOC,Measurement reduced
+Q5B,05-V2,8,0.5,4,2,max_nesting,3,MaxNest,Measurement reduced
+Q5C,05-V3,8,-0.125,4,4,cc,0,CC,Unchanged
+Q5C,05-V3,8,-0.125,4,4,cognitive,0,CogC,Unchanged
+Q5C,05-V3,8,-0.125,4,4,loc,0,LOC,Unchanged
+Q5C,05-V3,8,-0.125,4,4,max_nesting,0,MaxNest,Unchanged
+Q5D,05-V4,6,1.1666666666666667,5,1,cc,0,CC,Unchanged
+Q5D,05-V4,6,1.1666666666666667,5,1,cognitive,0,CogC,Unchanged
+Q5D,05-V4,6,1.1666666666666667,5,1,loc,0,LOC,Unchanged
+Q5D,05-V4,6,1.1666666666666667,5,1,max_nesting,0,MaxNest,Unchanged
+Q6A,06-V1,24,0.4583333333333333,15,6,cc,1,CC,Measurement reduced
+Q6A,06-V1,24,0.4583333333333333,15,6,cognitive,3,CogC,Measurement reduced
+Q6A,06-V1,24,0.4583333333333333,15,6,loc,5,LOC,Measurement reduced
+Q6A,06-V1,24,0.4583333333333333,15,6,max_nesting,1,MaxNest,Measurement reduced
+Q6B,06-V2,24,0.4583333333333333,15,4,cc,0,CC,Unchanged
+Q6B,06-V2,24,0.4583333333333333,15,4,cognitive,0,CogC,Unchanged
+Q6B,06-V2,24,0.4583333333333333,15,4,loc,0,LOC,Unchanged
+Q6B,06-V2,24,0.4583333333333333,15,4,max_nesting,0,MaxNest,Unchanged
+Q7A,07-V1,13,0.3076923076923077,7,4,cc,2,CC,Measurement reduced
+Q7A,07-V1,13,0.3076923076923077,7,4,cognitive,2,CogC,Measurement reduced
+Q7A,07-V1,13,0.3076923076923077,7,4,loc,11,LOC,Measurement reduced
+Q7A,07-V1,13,0.3076923076923077,7,4,max_nesting,0,MaxNest,Unchanged
+Q7B,07-V2,13,0.6923076923076923,9,3,cc,5,CC,Measurement reduced
+Q7B,07-V2,13,0.6923076923076923,9,3,cognitive,7,CogC,Measurement reduced
+Q7B,07-V2,13,0.6923076923076923,9,3,loc,20,LOC,Measurement reduced
+Q7B,07-V2,13,0.6923076923076923,9,3,max_nesting,2,MaxNest,Measurement reduced
+Q7C,07-V3,12,1,11,1,cc,0,CC,Unchanged
+Q7C,07-V3,12,1,11,1,cognitive,0,CogC,Unchanged
+Q7C,07-V3,12,1,11,1,loc,0,LOC,Unchanged
+Q7C,07-V3,12,1,11,1,max_nesting,0,MaxNest,Unchanged
+Q8A,08-V1,24,0.8333333333333334,18,1,cc,0,CC,Unchanged
+Q8A,08-V1,24,0.8333333333333334,18,1,cognitive,3,CogC,Measurement reduced
+Q8A,08-V1,24,0.8333333333333334,18,1,loc,4,LOC,Measurement reduced
+Q8A,08-V1,24,0.8333333333333334,18,1,max_nesting,1,MaxNest,Measurement reduced
+Q8B,08-V2,26,0.15384615384615385,10,6,cc,1,CC,Measurement reduced
+Q8B,08-V2,26,0.15384615384615385,10,6,cognitive,4,CogC,Measurement reduced
+Q8B,08-V2,26,0.15384615384615385,10,6,loc,2,LOC,Measurement reduced
+Q8B,08-V2,26,0.15384615384615385,10,6,max_nesting,1,MaxNest,Measurement reduced
+Q9A,09-V1,26,0.8076923076923077,19,0,cc,0,CC,Unchanged
+Q9A,09-V1,26,0.8076923076923077,19,0,cognitive,3,CogC,Measurement reduced
+Q9A,09-V1,26,0.8076923076923077,19,0,loc,2,LOC,Measurement reduced
+Q9A,09-V1,26,0.8076923076923077,19,0,max_nesting,1,MaxNest,Measurement reduced
+Q9B,09-V2,25,1.32,23,2,cc,2,CC,Measurement reduced
+Q9B,09-V2,25,1.32,23,2,cognitive,7,CogC,Measurement reduced
+Q9B,09-V2,25,1.32,23,2,loc,13,LOC,Measurement reduced
+Q9B,09-V2,25,1.32,23,2,max_nesting,3,MaxNest,Measurement reduced

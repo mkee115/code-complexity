@@ -1,0 +1,35 @@
+id,group,task,variant,main_method,function,isolating,original_file_id
+01-ORIG,1,Letter grade,ORIG,grade,Turns a numeric score into a letter grade.,baseline,01-ORIG
+01-V1,1,Letter grade,V1,grade,Turns a numeric score into a letter grade.,"multiple exits, by flattening to an else-if chain but keeping one exit",01-V2
+01-V2,1,Letter grade,V2,grade,Turns a numeric score into a letter grade.,"volume, by collapsing to a chained ternary at constant CC",01-V3
+01-V3,1,Letter grade,V3,grade,Turns a numeric score into a letter grade.,"comment quality, accurate summary. Code token for token identical to 01-ORIG with a correct header comment stating the bands",01-V4
+02-ORIG,2,Password check,ORIG,check,"Checks a password for length, mixed case and a digit.",baseline,02-ORIG
+02-V1,2,Password check,V1,check,"Checks a password for length, mixed case and a digit.","cognitive complexity against CC, held equal at 6 while cognitive moves 2 to 5",02-V1
+02-V2,2,Password check,V2,check,"Checks a password for length, mixed case and a digit.",extraction into named helpers,02-V2
+02-V3,2,Password check,V3,check,"Checks a password for length, mixed case and a digit.","comment quality, Javadoc header. Code token for token identical to 02-ORIG",02-V3
+03-ORIG,3,Sum of digits,ORIG,sd,Sums the decimal digits of an integer.,baseline,03-ORIG
+03-V1,3,Sum of digits,V1,sd,Sums the decimal digits of an integer.,"recursion, with LOC identical on both sides so size cannot explain a preference",03-V1
+03-V2,3,Sum of digits,V2,sd,Sums the decimal digits of an integer.,"volume, with recursion and both control flow metrics held constant",03-V2
+04-ORIG,4,Max in 2D array,ORIG,max,Finds the largest value in a 2D array.,baseline,04-ORIG
+04-V1,4,Max in 2D array,V1,max,Finds the largest value in a 2D array.,"extraction, where summed CC exceeds the original but no method is as deep",04-V2
+05-ORIG,5,Remove duplicates,ORIG,dedupe,"Removes duplicates from a list, keeping first appearance order.",baseline,05-ORIG
+05-V1,5,Remove duplicates,V1,dedupe,"Removes duplicates from a list, keeping first appearance order.","branch count and nesting together, algorithm unchanged",05-V1
+05-V2,5,Remove duplicates,V2,dedupe,"Removes duplicates from a list, keeping first appearance order.","library knowledge, at the floor of every structural metric",05-V2
+05-V3,5,Remove duplicates,V3,removeDuplicates,"Removes duplicates from a list, keeping first appearance order.","naming, on a structurally hard method",05-V3
+05-V4,5,Remove duplicates,V4,dedupe,"Removes duplicates from a list, keeping first appearance order.",comments. Code token for token identical to 05-ORIG with a Javadoc header and one inline comment,05-V4
+06-ORIG,6,Frequency count,ORIG,tally,Counts how many times each string appears in a list.,baseline,06-ORIG
+06-V1,6,Frequency count,V1,tally,Counts how many times each string appears in a list.,"branch count, by replacing the presence test with a default lookup",06-V1
+06-V2,6,Frequency count,V2,countByValue,Counts how many times each string appears in a list.,"naming, structure identical to 06-ORIG",06-V2
+07-ORIG,7,Merge sorted arrays,ORIG,merge,Merges two sorted arrays into one sorted array.,baseline,07-ORIG
+07-V1,7,Merge sorted arrays,V1,merge,Merges two sorted arrays into one sorted array.,"branch count, by replacing the two tail loops with bulk copies",07-V1
+07-V2,7,Merge sorted arrays,V2,merge,Merges two sorted arrays into one sorted array.,"control flow removal, at the cost of doing asymptotically more work",07-V2
+07-V3,7,Merge sorted arrays,V3,merge,Merges two sorted arrays into one sorted array.,"comment quality, helpful inline on a long method. Code token for token identical to 07-ORIG. This is the largest method in the set, so it tests whether comments pay off more when there is more to hold in your head",07-V3
+08-ORIG,8,Roman numeral,ORIG,roman,Converts a Roman numeral to an integer.,baseline,08-ORIG
+08-V1,8,Roman numeral,V1,roman,Converts a Roman numeral to an integer.,"nesting, by merging the bounds check into the comparison with &&",08-V1
+08-V2,8,Roman numeral,V2,roman,Converts a Roman numeral to an integer.,"branch count, by scanning right to left against a running maximum",08-V2
+09-ORIG,9,Binary search,ORIG,bSearch,"Binary searches a sorted array, returning an index or -1.",baseline,09-ORIG
+09-V1,9,Binary search,V1,bSearch,"Binary searches a sorted array, returning an index or -1.","nesting, by folding the inner if into an else-if at constant CC",09-V1
+09-V2,9,Binary search,V2,bSearch,"Binary searches a sorted array, returning an index or -1.","control flow removal, traded for knowing what the library returns on a miss",09-V2
+10-ORIG,10,Balanced brackets,ORIG,balanced,Checks whether brackets in a string are balanced and correctly nested.,"baseline. The hardest item in the set and the only one above McCabe's threshold of 10, so it doubles as a probe for RQ3",10-ORIG
+10-V1,10,Balanced brackets,V1,balanced,Checks whether brackets in a string are balanced and correctly nested.,"branch count, by replacing nine character comparisons with position lookups",10-V1
+10-V2,10,Balanced brackets,V2,balanced,Checks whether brackets in a string are balanced and correctly nested.,"extraction, with the pair test moved behind a name and guarded by short circuiting",10-V2

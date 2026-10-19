@@ -1,0 +1,7 @@
+step,n,removed,pct_of_all,repositories
+All methods and constructors harvested,6961274,NA,1,1832
+Methods only (constructors excluded),6331495,629779,0.9095310714676652,1832
+... with a body (abstract/interface excluded),5812249,519246,0.8349404146424921,1832
+... not nested in another method,5662672,149577,0.8134533994783139,1832
+... not flagged generated at harvest,4370540,1292132,0.627836226529799,1831
+... not matching the added generated-code rules (main corpus),4315785,54755,0.6199705686056891,1831

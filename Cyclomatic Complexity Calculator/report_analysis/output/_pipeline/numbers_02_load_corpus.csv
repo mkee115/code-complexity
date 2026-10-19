@@ -1,0 +1,60 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+"added generated-code rule: DFA<number> classes / specialStateTransition, methods removed from the main corpus",666,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,1076 rows match in all; 1062 of them not already flagged generated at harvest
+"added generated-code rule: DFA<number> classes / specialStateTransition, methods removed only by this rule",441,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,not matched by any other added rule
+"added generated-code rule: jj_ methods (JavaCC), methods removed from the main corpus",1524,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,6679 rows match in all; 1524 of them not already flagged generated at harvest
+"added generated-code rule: jj_ methods (JavaCC), methods removed only by this rule",1524,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,not matched by any other added rule
+"added generated-code rule: src-gen/ or generated-sources/ paths, methods removed from the main corpus",46384,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,107278 rows match in all; 64705 of them not already flagged generated at harvest
+"added generated-code rule: src-gen/ or generated-sources/ paths, methods removed only by this rule",46159,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,not matched by any other added rule
+"added generated-code rule: File-level propagation (file holds a DFA / specialStateTransition / jj_ method), methods removed from the main corpus",18350,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,26158 rows match in all; 18956 of them not already flagged generated at harvest
+"added generated-code rule: File-level propagation (file holds a DFA / specialStateTransition / jj_ method), methods removed only by this rule",6406,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,not matched by any other added rule
+"added generated-code rule: Any added rule, methods removed from the main corpus",54755,NA,NA,NA,4370540,NA,NA,RQ1: corpus,NA,123007 rows match in all; 73474 of them not already flagged generated at harvest
+corpus share: Constructors,0.09046892853233474,NA,NA,629779,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+corpus share: Methods without a body,0.07459065682517309,NA,NA,519246,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+corpus share: Nested in another method,0.02155252041508494,NA,NA,150033,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+corpus share: Generated code,0.20798649787380874,NA,NA,1447851,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+"corpus share: Generated code (added rules, not flagged at harvest)",0.010554677204201415,NA,NA,73474,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+corpus share: Duplicate code (identical to an earlier method),0.23542472254360336,NA,NA,1638856,6961274,NA,NA,RQ1: corpus,all harvested rows,NA
+corpus filter step: All methods and constructors harvested,6961274,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1832 repositories
+corpus filter step: Methods only (constructors excluded),6331495,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1832 repositories
+corpus filter step: ... with a body (abstract/interface excluded),5812249,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1832 repositories
+corpus filter step: ... not nested in another method,5662672,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1832 repositories
+corpus filter step: ... not flagged generated at harvest,4370540,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1831 repositories
+corpus filter step: ... not matching the added generated-code rules (main corpus),4315785,NA,NA,NA,6961274,NA,NA,RQ1: corpus,NA,1831 repositories
+corpus provisional (1 = harvest not finished),0,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+repositories harvested,1843,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+repositories contributing methods,1832,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+methods and constructors measured,6961274,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+main corpus methods,4315785,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+repository stars (median),66,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+repository contributors (median),9,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+files parsed with errors,6971,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+files not parsed,412,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,NA
+Java files in the harvested repositories (outside Maven test directories),861843,NA,NA,NA,NA,NA,NA,RQ1: corpus,NA,sum of java_file_count in repos.csv; excludes the repositories that failed to clone
+files not parsed: share of all Java files,4.780453052354083e-4,NA,NA,412,861843,NA,NA,RQ1: corpus,NA,"the file column of skipped.csv holds only the file name, so distinct names undercount (384 of 412)"
+files parsed with errors (methods kept): share of all Java files,0.008088480152417551,NA,NA,6971,861843,NA,NA,RQ1: corpus,NA,rows in skipped.csv of type file_partial
+estimated methods lost in unparsed files: mean methods per parsed file,3329.395956263473,NA,NA,412,NA,NA,NA,RQ1: corpus,NA,412 unparsed files x 8.08 rows per parsed file; 0.048% of the rows harvested
+estimated methods lost in unparsed files: same-repository mean,3383.4826876273382,NA,NA,412,NA,NA,NA,RQ1: corpus,NA,each unparsed file given its repository's rows per file; 0.049% of the rows harvested
+"CC: median, main corpus",1,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CC: 95th percentile, main corpus",7,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CC: 99.9th percentile, main corpus",46,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CC: share of methods at 0, main corpus",0,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CC: distinct values, main corpus",313,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CogC: median, main corpus",0,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CogC: 95th percentile, main corpus",9,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CogC: 99.9th percentile, main corpus",87,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CogC: share of methods at 0, main corpus",0.636737696618344,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"CogC: distinct values, main corpus",483,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"LOC: median, main corpus",5,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"LOC: 95th percentile, main corpus",32,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"LOC: 99.9th percentile, main corpus",179,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"LOC: share of methods at 0, main corpus",0,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"LOC: distinct values, main corpus",765,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"MaxNest: median, main corpus",0,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"MaxNest: 95th percentile, main corpus",2,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"MaxNest: 99.9th percentile, main corpus",6,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"MaxNest: share of methods at 0, main corpus",0.6726882826646833,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+"MaxNest: distinct values, main corpus",18,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+methods with CC > 10 (share of main corpus),0.024713928057120547,NA,NA,106660,4315785,NA,NA,RQ1: corpus,NA,NA
+methods with CC = 1 (share of main corpus),0.6413489087153322,NA,NA,2767924,4315785,NA,NA,RQ1: corpus,NA,NA
+added generated-code rules: how many of the 50 highest CC methods they removed,20,NA,NA,50,NA,NA,NA,RQ1: corpus,NA,"top 50 of the pre-rule main corpus (methods, with a body, not nested, not flagged generated at harvest)"
+added generated-code rules: how many of the 50 highest CogC methods they removed,11,NA,NA,50,NA,NA,NA,RQ1: corpus,NA,"top 50 of the pre-rule main corpus (methods, with a body, not nested, not flagged generated at harvest)"

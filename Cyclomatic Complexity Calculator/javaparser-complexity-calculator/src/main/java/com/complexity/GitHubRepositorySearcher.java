@@ -37,7 +37,12 @@ public class GitHubRepositorySearcher
     private static final long SEARCH_MIN_REQUEST_INTERVAL_MS = 2200;   // ~27/min, under the 30/min cap
     private static final long MAX_WAIT_MS = 3_600_000;   // never sleep more than an hour
 
-    private final HttpClient http = HttpClient.newHttpClient();
+    // HTTP/1.1: GitHub occasionally resets HTTP/2 streams (RST_STREAM) mid-run,
+    // which surfaces as an IOException; plain HTTP/1.1 connections avoid that.
+    private final HttpClient http = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .connectTimeout(java.time.Duration.ofSeconds(30))
+            .build();
     private final ObjectMapper json = new ObjectMapper();
     private final String token;
     private long lastRequestTimeMs = 0;
@@ -203,11 +208,21 @@ public class GitHubRepositorySearcher
                 Repo repo = buildRepo(item);
 
                 // Apply the cheap pom.xml existence check first; only spend a
-                // commit-count API call on repos that actually qualify.
-                if (!hasPomXml(repo.fullName))
-                    continue;
+                // commit-count API call on repos that actually qualify. A repo
+                // whose requests keep failing after retries is skipped, not fatal.
+                try
+                {
+                    if (!hasPomXml(repo.fullName))
+                        continue;
 
-                repo.commitCount = fetchCommitCount(repo.fullName);
+                    repo.commitCount = fetchCommitCount(repo.fullName);
+                    repo.contributors = fetchContributorCount(repo.fullName);
+                }
+                catch (IOException e)
+                {
+                    System.err.println("  Skipping " + repo.fullName + " (API error: " + e.getMessage() + ")");
+                    continue;
+                }
                 if (commitFilter.isActive() && !commitFilter.matches(repo.commitCount))
                     continue;
 
@@ -232,6 +247,15 @@ public class GitHubRepositorySearcher
         r.createdAt = item.get("created_at").asText();
         r.pushedAt = item.get("pushed_at").asText();
         r.language = item.hasNonNull("language") ? item.get("language").asText() : "";
+        // Extra metadata that is already in the search result, so costs no calls
+        r.defaultBranch = item.hasNonNull("default_branch") ? item.get("default_branch").asText() : "";
+        r.openIssues = item.path("open_issues_count").asInt(-1);
+        r.license = item.path("license").hasNonNull("spdx_id") ? item.get("license").get("spdx_id").asText() : "";
+        r.archived = item.path("archived").asBoolean(false);
+        r.fork = item.path("fork").asBoolean(false);
+        List<String> topics = new ArrayList<>();
+        item.path("topics").forEach(t -> topics.add(t.asText()));
+        r.topics = String.join(";", topics);
         return r;
     }
 
@@ -248,6 +272,26 @@ public class GitHubRepositorySearcher
             return arr.size();
         }
 
+        Matcher m = Pattern.compile("[?&]page=(\\d+)>;\\s*rel=\"last\"").matcher(link.get());
+        if (m.find()) return Integer.parseInt(m.group(1));
+        return -1;
+    }
+
+    /**
+     * Number of contributors (including commit authors without a GitHub account,
+     * so it counts people rather than accounts), read from the last-page
+     * number of a one-per-page listing (one API call). GitHub refuses to list
+     * contributors for some very large repositories; those return -1.
+     */
+    private int fetchContributorCount(String fullName) throws IOException, InterruptedException
+    {
+        String url = API + "/repos/" + fullName + "/contributors?per_page=1&anon=true";
+        HttpResponse<String> response = send(url);
+        if (response.statusCode() == 204) return 0;
+        if (response.statusCode() != 200) return -1;
+        Optional<String> link = response.headers().firstValue("Link");
+        if (link.isEmpty())
+            return json.readTree(response.body()).size();
         Matcher m = Pattern.compile("[?&]page=(\\d+)>;\\s*rel=\"last\"").matcher(link.get());
         if (m.find()) return Integer.parseInt(m.group(1));
         return -1;
@@ -282,7 +326,24 @@ public class GitHubRepositorySearcher
         for (int attempt = 1; ; attempt++)
         {
             throttle(url);
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response;
+            try
+            {
+                response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            }
+            catch (IOException e)
+            {
+                // Transient network failure (reset, timeout, DNS blip): back off
+                // and retry rather than letting one dropped request end the run.
+                lastRequestTimeMs = System.currentTimeMillis();
+                if (attempt > MAX_RETRIES)
+                    throw e;
+                long waitMs = Math.min(120_000L, (long) Math.pow(2, attempt) * 2000L);
+                System.err.printf("%nNetwork error (%s). Retrying in %.0fs [retry %d/%d]...%n",
+                        e.getMessage(), waitMs / 1000.0, attempt, MAX_RETRIES);
+                Thread.sleep(waitMs);
+                continue;
+            }
             lastRequestTimeMs = System.currentTimeMillis();
 
             if (!isRateLimited(response))
@@ -422,6 +483,14 @@ public class GitHubRepositorySearcher
         public String pushedAt;
         public String language;
         public int commitCount;
+        public int contributors;
+        public String defaultBranch;
+        public int openIssues;
+        public String license;
+        public boolean archived;
+        public boolean fork;
+        public String topics;
+        public String headSha = "";
     }
 
     private static class CommitFilter

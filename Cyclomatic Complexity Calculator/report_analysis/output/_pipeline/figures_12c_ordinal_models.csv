@@ -1,0 +1,3 @@
+figure,folder,importance,research_question,purpose
+diag_rq2_ordinal_coefficients.png,3_rq2_agreement_with_programmers,optional,RQ2,"Coefficients of CC, CogC, LOC and MaxNest in the cumulative-link mixed model of the 1-5 ratings (all four entered together)"
+diag_rq2_bradley_terry.png,3_rq2_agreement_with_programmers,optional,RQ2,Latent perceived complexity of each snippet from the within-task ordinal Bradley-Terry model (95% Wald intervals)

@@ -1,0 +1,55 @@
+col,row,pairs,n,chose_A,no_difference,chose_B,shared_agree,only_m1,only_m2,metric_1,metric_2,type,same_prediction,neither
+B lower,B lower,17,360,111,40,209,209,0,0,CC,CogC,Same direction,TRUE,NA
+B lower,Equal,0,0,0,0,0,0,0,0,CC,CogC,One metric ties,FALSE,0
+B lower,B higher,0,0,0,0,0,0,0,0,CC,CogC,Opposite directions,FALSE,0
+Equal,B lower,6,101,21,15,65,0,15,65,CC,CogC,One metric ties,FALSE,21
+Equal,Equal,8,109,34,11,64,11,0,0,CC,CogC,Both tie,TRUE,NA
+Equal,B higher,4,63,58,0,5,0,0,58,CC,CogC,One metric ties,FALSE,5
+B higher,B lower,0,0,0,0,0,0,0,0,CC,CogC,Opposite directions,FALSE,0
+B higher,Equal,0,0,0,0,0,0,0,0,CC,CogC,One metric ties,FALSE,0
+B higher,B higher,9,117,85,9,23,85,0,0,CC,CogC,Same direction,TRUE,NA
+B lower,B lower,15,311,83,31,197,197,0,0,CC,LOC,Same direction,TRUE,NA
+B lower,Equal,1,24,14,2,8,0,8,2,CC,LOC,One metric ties,FALSE,14
+B lower,B higher,1,25,14,7,4,0,4,14,CC,LOC,Opposite directions,FALSE,7
+Equal,B lower,8,143,55,18,70,0,18,70,CC,LOC,One metric ties,FALSE,55
+Equal,Equal,7,83,14,8,61,8,0,0,CC,LOC,Both tie,TRUE,NA
+Equal,B higher,3,47,44,0,3,0,0,44,CC,LOC,One metric ties,FALSE,3
+B higher,B lower,1,25,20,1,4,0,20,4,CC,LOC,Opposite directions,FALSE,1
+B higher,Equal,0,0,0,0,0,0,0,0,CC,LOC,One metric ties,FALSE,0
+B higher,B higher,8,92,65,8,19,65,0,0,CC,LOC,Same direction,TRUE,NA
+B lower,B lower,14,298,79,29,190,190,0,0,CC,MaxNest,Same direction,TRUE,NA
+B lower,Equal,3,62,32,11,19,0,19,11,CC,MaxNest,One metric ties,FALSE,32
+B lower,B higher,0,0,0,0,0,0,0,0,CC,MaxNest,Opposite directions,FALSE,0
+Equal,B lower,5,79,17,12,50,0,12,50,CC,MaxNest,One metric ties,FALSE,17
+Equal,Equal,11,160,63,14,83,14,0,0,CC,MaxNest,Both tie,TRUE,NA
+Equal,B higher,2,34,33,0,1,0,0,33,CC,MaxNest,One metric ties,FALSE,1
+B higher,B lower,0,0,0,0,0,0,0,0,CC,MaxNest,Opposite directions,FALSE,0
+B higher,Equal,2,36,25,2,9,0,25,2,CC,MaxNest,One metric ties,FALSE,9
+B higher,B higher,7,81,60,7,14,60,0,0,CC,MaxNest,Same direction,TRUE,NA
+B lower,B lower,21,412,104,46,262,262,0,0,CogC,LOC,Same direction,TRUE,NA
+B lower,Equal,1,24,14,2,8,0,8,2,CogC,LOC,One metric ties,FALSE,14
+B lower,B higher,1,25,14,7,4,0,4,14,CogC,LOC,Opposite directions,FALSE,7
+Equal,B lower,1,26,20,3,3,0,3,3,CogC,LOC,One metric ties,FALSE,20
+Equal,Equal,7,83,14,8,61,8,0,0,CogC,LOC,Both tie,TRUE,NA
+Equal,B higher,0,0,0,0,0,0,0,0,CogC,LOC,One metric ties,FALSE,0
+B higher,B lower,2,41,34,1,6,0,34,6,CogC,LOC,Opposite directions,FALSE,1
+B higher,Equal,0,0,0,0,0,0,0,0,CogC,LOC,One metric ties,FALSE,0
+B higher,B higher,11,139,109,8,22,109,0,0,CogC,LOC,Same direction,TRUE,NA
+B lower,B lower,18,361,82,41,238,238,0,0,CogC,MaxNest,Same direction,TRUE,NA
+B lower,Equal,5,100,50,14,36,0,36,14,CogC,MaxNest,One metric ties,FALSE,50
+B lower,B higher,0,0,0,0,0,0,0,0,CogC,MaxNest,Opposite directions,FALSE,0
+Equal,B lower,0,0,0,0,0,0,0,0,CogC,MaxNest,One metric ties,FALSE,0
+Equal,Equal,8,109,34,11,64,11,0,0,CogC,MaxNest,Both tie,TRUE,NA
+Equal,B higher,0,0,0,0,0,0,0,0,CogC,MaxNest,One metric ties,FALSE,0
+B higher,B lower,1,16,14,0,2,0,14,2,CogC,MaxNest,Opposite directions,FALSE,0
+B higher,Equal,3,49,36,2,11,0,36,2,CogC,MaxNest,One metric ties,FALSE,11
+B higher,B higher,9,115,93,7,15,93,0,0,CogC,MaxNest,Same direction,TRUE,NA
+B lower,B lower,19,377,96,41,240,240,0,0,LOC,MaxNest,Same direction,TRUE,NA
+B lower,Equal,5,102,62,9,31,0,31,9,LOC,MaxNest,One metric ties,FALSE,62
+B lower,B higher,0,0,0,0,0,0,0,0,LOC,MaxNest,Opposite directions,FALSE,0
+Equal,B lower,0,0,0,0,0,0,0,0,LOC,MaxNest,One metric ties,FALSE,0
+Equal,Equal,8,107,28,10,69,10,0,0,LOC,MaxNest,Both tie,TRUE,NA
+Equal,B higher,0,0,0,0,0,0,0,0,LOC,MaxNest,One metric ties,FALSE,0
+B higher,B lower,0,0,0,0,0,0,0,0,LOC,MaxNest,Opposite directions,FALSE,0
+B higher,Equal,3,49,30,8,11,0,30,8,LOC,MaxNest,One metric ties,FALSE,11
+B higher,B higher,9,115,93,7,15,93,0,0,LOC,MaxNest,Same direction,TRUE,NA

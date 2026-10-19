@@ -1,0 +1,16 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+"CC ties, CogC separates: pooled share of decisive responses choosing the method CogC rates lower",0.825503355704698,0.7702702702702703,0.8785714285714286,123,149,participant cluster bootstrap 95% CI,NA,RQ2: CC ties,NA,10 pairs; 9 of them above 50%
+"CC ties, MaxNest separates: pooled share of decisive responses choosing the method MaxNest rates lower",0.8217821782178217,0.7448925314806775,0.89,83,101,participant cluster bootstrap 95% CI,NA,RQ2: CC ties,NA,7 pairs; 6 of them above 50%
+"CC ties, LOC separates: pooled share of decisive responses choosing the method LOC rates lower",0.6627906976744186,0.5999732620320858,0.725609756097561,114,172,participant cluster bootstrap 95% CI,NA,RQ2: CC ties,NA,11 pairs; 8 of them above 50%
+CC: tie rate when the participant answered No difference,0.3466666666666667,0.25756493506493516,0.44776119402985076,26,75,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+CC: tie rate when the participant answered Slightly,0.36159600997506236,0.3187327446011876,0.4065656565656566,145,401,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+CC: tie rate when the participant answered Much,0.3722627737226277,0.3265976087404659,0.4200925133181126,102,274,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+CogC: tie rate when the participant answered No difference,0.14666666666666667,0.06730567226890759,0.25,11,75,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+CogC: tie rate when the participant answered Slightly,0.16957605985037408,0.1377551020408163,0.2037472295647042,68,401,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+CogC: tie rate when the participant answered Much,0.10948905109489052,0.07450980392156863,0.14685314685314685,30,274,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+LOC: tie rate when the participant answered No difference,0.13333333333333333,0.060240963855421686,0.22388059701492538,10,75,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+LOC: tie rate when the participant answered Slightly,0.1770573566084788,0.1380933779761905,0.21695949001123563,71,401,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+LOC: tie rate when the participant answered Much,0.0948905109489051,0.05859375,0.13333333333333333,26,274,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+MaxNest: tie rate when the participant answered No difference,0.36,0.25,0.48,27,75,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+MaxNest: tie rate when the participant answered Slightly,0.3940149625935162,0.3436752634857203,0.44390842028311284,158,401,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA
+MaxNest: tie rate when the participant answered Much,0.2664233576642336,0.2222222222222222,0.30970149253731344,73,274,participant cluster bootstrap 95% CI,NA,RQ2: tie rate by strength,NA,NA

@@ -1,0 +1,70 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+"CogC vs CC: Only CC agrees, responses",15,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CC agrees, on pairs where CC ties",15,NA,NA,NA,15,NA,NA,RQ2: only-one-agrees,NA,3 distinct pairs
+"CogC vs CC: Only CC agrees, participant chose a side",0,NA,NA,NA,15,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CC agrees, CC separates and participant said no difference",0,NA,NA,NA,15,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CC agrees, CC separates and participant chose a side",0,NA,NA,NA,15,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CogC agrees, responses",123,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CogC agrees, on pairs where CC ties",123,NA,NA,NA,123,NA,NA,RQ2: only-one-agrees,NA,10 distinct pairs
+"CogC vs CC: Only CogC agrees, participant chose a side",123,NA,NA,NA,123,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CogC agrees, CC separates and participant said no difference",0,NA,NA,NA,123,NA,NA,RQ2: only-one-agrees,NA,NA
+"CogC vs CC: Only CogC agrees, CC separates and participant chose a side",0,NA,NA,NA,123,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only CC agrees, responses",50,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only CC agrees, on pairs where CC ties",18,NA,NA,NA,50,NA,NA,RQ2: only-one-agrees,NA,4 distinct pairs
+"LOC vs CC: Only CC agrees, participant chose a side",32,NA,NA,NA,50,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only CC agrees, CC separates and participant said no difference",0,NA,NA,NA,50,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only CC agrees, CC separates and participant chose a side",32,NA,NA,NA,50,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only LOC agrees, responses",134,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only LOC agrees, on pairs where CC ties",114,NA,NA,NA,134,NA,NA,RQ2: only-one-agrees,NA,11 distinct pairs
+"LOC vs CC: Only LOC agrees, participant chose a side",132,NA,NA,NA,134,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only LOC agrees, CC separates and participant said no difference",2,NA,NA,NA,134,NA,NA,RQ2: only-one-agrees,NA,NA
+"LOC vs CC: Only LOC agrees, CC separates and participant chose a side",18,NA,NA,NA,134,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only CC agrees, responses",56,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only CC agrees, on pairs where CC ties",12,NA,NA,NA,56,NA,NA,RQ2: only-one-agrees,NA,2 distinct pairs
+"MaxNest vs CC: Only CC agrees, participant chose a side",44,NA,NA,NA,56,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only CC agrees, CC separates and participant said no difference",0,NA,NA,NA,56,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only CC agrees, CC separates and participant chose a side",44,NA,NA,NA,56,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only MaxNest agrees, responses",96,NA,NA,NA,NA,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only MaxNest agrees, on pairs where CC ties",83,NA,NA,NA,96,NA,NA,RQ2: only-one-agrees,NA,7 distinct pairs
+"MaxNest vs CC: Only MaxNest agrees, participant chose a side",83,NA,NA,NA,96,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only MaxNest agrees, CC separates and participant said no difference",13,NA,NA,NA,96,NA,NA,RQ2: only-one-agrees,NA,NA
+"MaxNest vs CC: Only MaxNest agrees, CC separates and participant chose a side",0,NA,NA,NA,96,NA,NA,RQ2: only-one-agrees,NA,NA
+CC: tie rate over all 750 responses,0.364,0.3373333333333333,0.3893333333333333,273,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+CC: commit rate (share of decisive responses where it separates the pair),0.6340740740740741,0.6047548291233283,0.6631109595635429,428,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"CC: direction accuracy (right way round, when it separates and the participant chose a side)",0.6869158878504673,0.6410820744342189,0.7284768211920529,294,428,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+CogC: tie rate over all 750 responses,0.14533333333333334,0.124,0.168,109,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+CogC: commit rate (share of decisive responses where it separates the pair),0.8548148148148148,0.8308151342937145,0.87701317715959,577,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"CogC: direction accuracy (right way round, when it separates and the participant chose a side)",0.7227036395147314,0.6863084922010398,0.756477810317639,417,577,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+LOC: tie rate over all 750 responses,0.14266666666666666,0.12,0.16533333333333333,107,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+LOC: commit rate (share of decisive responses where it separates the pair),0.8562962962962963,0.8313778653108679,0.8808841036414565,578,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"LOC: direction accuracy (right way round, when it separates and the participant chose a side)",0.6816608996539792,0.6442461460400842,0.7181663837011885,394,578,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+MaxNest: tie rate over all 750 responses,0.344,0.31866666666666665,0.36933333333333335,258,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+MaxNest: commit rate (share of decisive responses where it separates the pair),0.6577777777777778,0.6295716750583911,0.6864541988099357,444,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"MaxNest: direction accuracy (right way round, when it separates and the participant chose a side)",0.75,0.7070206655780169,0.791757173987501,333,444,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Average nesting: tie rate over all 750 responses,0.144,0.12133333333333333,0.16666666666666666,108,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Average nesting: commit rate (share of decisive responses where it separates the pair),0.8622222222222222,0.8396935437206506,0.8843350854514836,582,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Average nesting: direction accuracy (right way round, when it separates and the participant chose a side)",0.6941580756013745,0.6557630771533339,0.7305800428527701,404,582,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Halstead volume: tie rate over all 750 responses,0.11066666666666666,0.09066666666666667,0.13066666666666665,83,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Halstead volume: commit rate (share of decisive responses where it separates the pair),0.8888888888888888,0.8673780487804879,0.9095024359437027,600,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Halstead volume: direction accuracy (right way round, when it separates and the participant chose a side)",0.6633333333333333,0.6256496911522909,0.6995073891625616,398,600,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Halstead effort: tie rate over all 750 responses,0.11066666666666666,0.09066666666666667,0.13066666666666665,83,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Halstead effort: commit rate (share of decisive responses where it separates the pair),0.8888888888888888,0.8673780487804879,0.9095024359437027,600,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Halstead effort: direction accuracy (right way round, when it separates and the participant chose a side)",0.7083333333333334,0.67269516921863,0.7419925475528418,425,600,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Fan-out: tie rate over all 750 responses,0.464,0.44266666666666665,0.48533333333333334,348,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Fan-out: commit rate (share of decisive responses where it separates the pair),0.5481481481481482,0.5233232315482583,0.5725114108109282,370,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Fan-out: direction accuracy (right way round, when it separates and the participant chose a side)",0.4702702702702703,0.4266294938576418,0.5142857142857142,174,370,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Parameter count: tie rate over all 750 responses,1,1,1,750,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Parameter count: commit rate (share of decisive responses where it separates the pair),0,0,0,0,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Parameter count: direction accuracy (right way round, when it separates and the participant chose a side)",NA,NA,NA,0,0,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Words per identifier: tie rate over all 750 responses,0.36,0.3466666666666667,0.37466666666666665,270,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Words per identifier: commit rate (share of decisive responses where it separates the pair),0.6266666666666667,0.6074615908094766,0.644927536231884,423,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Words per identifier: direction accuracy (right way round, when it separates and the participant chose a side)",0.34515366430260047,0.2958049622236732,0.3957358458106263,146,423,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Comment count: tie rate over all 750 responses,0.8026666666666666,0.78,0.824,602,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Comment count: commit rate (share of decisive responses where it separates the pair),0.21185185185185185,0.18759231905465287,0.23680246706385835,143,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Comment count: direction accuracy (right way round, when it separates and the participant chose a side)",0.5804195804195804,0.503448275862069,0.656934306569343,83,143,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Has Javadoc: tie rate over all 750 responses,0.8506666666666667,0.832,0.868,638,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Has Javadoc: commit rate (share of decisive responses where it separates the pair),0.16,0.13925925925925925,0.18112661662975418,108,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Has Javadoc: direction accuracy (right way round, when it separates and the participant chose a side)",0.6203703703703703,0.53,0.7083333333333334,67,108,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Recursive: tie rate over all 750 responses,0.9346666666666666,0.924,0.9453333333333334,701,750,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+Recursive: commit rate (share of decisive responses where it separates the pair),0.06814814814814815,0.05588214225518288,0.08,46,675,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA
+"Recursive: direction accuracy (right way round, when it separates and the participant chose a side)",0.6086956521739131,0.46511627906976744,0.7446808510638298,28,46,participant cluster bootstrap 95% CI,NA,RQ2: commit rate,NA,NA

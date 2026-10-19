@@ -1,0 +1,13 @@
+metric_label,outcome,n,total,prop
+CC,Metric agrees,294,675,0.43555555555555553
+CC,Metric points the other way,134,675,0.1985185185185185
+CC,Metric ties,247,675,0.36592592592592593
+CogC,Metric agrees,417,675,0.6177777777777778
+CogC,Metric points the other way,160,675,0.23703703703703705
+CogC,Metric ties,98,675,0.1451851851851852
+LOC,Metric agrees,394,675,0.5837037037037037
+LOC,Metric points the other way,184,675,0.2725925925925926
+LOC,Metric ties,97,675,0.1437037037037037
+MaxNest,Metric agrees,333,675,0.49333333333333335
+MaxNest,Metric points the other way,111,675,0.16444444444444445
+MaxNest,Metric ties,231,675,0.3422222222222222

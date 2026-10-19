@@ -1,0 +1,16 @@
+figure,folder,importance,research_question,purpose
+fig06_rq2_agreement.png,3_rq2_agreement_with_programmers,important,RQ2,"Headline RQ2 result: which metrics agree most with participants, and how far above chance"
+fig06b_rq2_agreement_all_measures.png,3_rq2_agreement_with_programmers,optional,RQ2,"Optional: agreement with participants for every measurement recorded for the survey snippets, including Halstead"
+diag_rq2_kappa.png,3_rq2_agreement_with_programmers,optional,RQ2,Chance-corrected agreement (kappa)
+fig07a_rq2_what_each_metric_said.png,3_rq2_agreement_with_programmers,important,RQ2,Shows how much of each metric's disagreement is tying versus pointing the other way
+fig07b_rq2_direction_accuracy.png,3_rq2_agreement_with_programmers,important,RQ2,Direction accuracy of each metric when it does separate the pair
+diag_rq2_decomposition_five_categories.png,3_rq2_agreement_with_programmers,optional,RQ2,Full five-way decomposition of agreement
+fig08_b_grid_cc_vs_loc.png,3_rq2_agreement_with_programmers,optional,RQ2,"3x3 grid for CC vs LOC: where the two metrics agree or differ, and which side participants took"
+fig08_c_grid_cc_vs_maxnest.png,3_rq2_agreement_with_programmers,optional,RQ2,"3x3 grid for CC vs MaxNest: where the two metrics agree or differ, and which side participants took"
+fig08_d_grid_cogc_vs_loc.png,3_rq2_agreement_with_programmers,optional,RQ2,"3x3 grid for CogC vs LOC: where the two metrics agree or differ, and which side participants took"
+fig08_e_grid_cogc_vs_maxnest.png,3_rq2_agreement_with_programmers,optional,RQ2,"3x3 grid for CogC vs MaxNest: where the two metrics agree or differ, and which side participants took"
+fig08_f_grid_loc_vs_maxnest.png,3_rq2_agreement_with_programmers,optional,RQ2,"3x3 grid for LOC vs MaxNest: where the two metrics agree or differ, and which side participants took"
+fig09_rq2_agreement_by_tie_status_and_side.png,3_rq2_agreement_with_programmers,important,RQ2,Agreement split by whether the metric ties and where the lower measurement was shown
+fig11_rq2_pair_level.png,3_rq2_agreement_with_programmers,optional,RQ2,Pair-level view (each pair counted once) of whether measurement differences track perceived differences
+fig12_sensitivity_agreement.png,3_rq2_agreement_with_programmers,optional,RQ2,Shows the ranking of metrics under alternative inclusion rules
+fig13_sensitivity_experience.png,3_rq2_agreement_with_programmers,optional,RQ2,Checks whether agreement differs by self-reported experience

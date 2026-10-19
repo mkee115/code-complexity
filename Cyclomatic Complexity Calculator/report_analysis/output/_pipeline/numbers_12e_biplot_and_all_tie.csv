@@ -1,0 +1,5 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+PCA biplot: survey snippets outside the corpus 90% ellipse in PC1-PC2,11,NA,NA,NA,34,NA,NA,RQ1: biplot,NA,"01-ORIG, 01-V2, 01-V3, 04-ORIG, 05-ORIG, 05-V3, 05-V4, 08-ORIG, 10-ORIG, 10-V1, 10-V2"
+PCA biplot: PC1 share of variance,0.887258182927967,NA,NA,4315785,NA,NA,NA,RQ1: biplot,NA,"log(1+x), standardised, main corpus"
+PCA biplot: PC2 share of variance,0.07331028817546728,NA,NA,4315785,NA,NA,NA,RQ1: biplot,NA,NA
+all-tie pairs: pooled share of decisive responses preferring the later version (participant bootstrap interval),0.8133333333333334,0.7222222222222222,0.9,61,75,participant cluster bootstrap 95% CI,NA,RQ2: all-tie pairs,NA,4 of the 7 pairs have a Wilson interval above 50%

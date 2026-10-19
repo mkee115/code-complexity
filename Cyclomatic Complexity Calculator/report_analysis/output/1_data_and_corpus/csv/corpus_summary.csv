@@ -1,0 +1,14 @@
+Item,Value
+Repositories harvested,"1,843"
+Repositories contributing methods,"1,832"
+Methods and constructors measured,"6,961,274"
+Main corpus (after filters),"4,315,785"
+Stars: median (IQR),66 (28–194)
+Forks: median (IQR),26 (15–60)
+Commits: median (IQR),298 (97–812)
+Contributors: median (IQR),9 (3–19)
+Java files per repository: median (IQR),122 (38–360)
+Repositories created,Jul 2020 to Jan 2026
+Files parsed with errors (methods kept),"6,971"
+Files that could not be parsed,412
+Repositories that failed,8

@@ -1,0 +1,4 @@
+Subset,Pairs,Chose A (left),Chose B (right),No difference,Share choosing B,B minus A (points)
+All 44 pairs,44,309,366,75,54.2% (50.4–58.0),+8.4 (+0.8 to +16.1)
+Pairs without the original (V vs V),20,177,96,21,35.2% (29.9–40.4),-29.7 (-40.1 to -19.2)
+Original (A) vs refactor (B) pairs,24,132,270,54,67.2% (62.1–72.1),+34.3 (+24.2 to +44.1)

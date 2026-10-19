@@ -1,0 +1,2 @@
+figure,folder,importance,research_question,purpose
+diag_rq2_leave_one_task_out.png,3_rq2_agreement_with_programmers,optional,RQ2,"Leave-one-task-out agreement for the four metrics; each dot is labelled with the task that was dropped, the diamond is the full-data value"

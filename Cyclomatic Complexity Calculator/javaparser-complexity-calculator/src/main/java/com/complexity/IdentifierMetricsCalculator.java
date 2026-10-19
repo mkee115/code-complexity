@@ -1,7 +1,9 @@
 package com.complexity;
 
 import com.github.javaparser.JavaToken;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +29,14 @@ public class IdentifierMetricsCalculator
         int longestIdentifier,
         int totalWordCount,
         int commentCount,
-        int commentWordCount
+        int commentWordCount,
+        boolean hasJavadoc
     ) {}
 
-    public static Metrics compute(MethodDeclaration method)
+    public static Metrics compute(CallableDeclaration<?> method)
     {
         if (method.getTokenRange().isEmpty())
-            return new Metrics(0, 0, 0, 0, 0, 0, 0);
+            return new Metrics(0, 0, 0, 0, 0, 0, 0, false);
 
         List<Integer> idWordCounts = new ArrayList<>();
         int abbreviatedCount = 0;
@@ -77,13 +80,26 @@ public class IdentifierMetricsCalculator
             }
         }
 
+        // The method's own header comment (Javadoc, or a comment directly above
+        // the signature) documents the method, so it counts as one of its
+        // comments even though it sits before the method's first token.
+        boolean hasJavadoc = false;
+        if (method.getComment().isPresent())
+        {
+            Comment header = method.getComment().get();
+            hasJavadoc = header instanceof JavadocComment;
+            commentCount++;
+            for (String w : stripComment(header.getContent()).split("\\s+"))
+                if (!w.isEmpty()) commentWordCount++;
+        }
+
         double avgWords = idWordCounts.isEmpty() ? 0
             : idWordCounts.stream().mapToInt(i -> i).average().orElse(0);
         double abbrevRatio = idWordCounts.isEmpty() ? 0
             : (double) abbreviatedCount / idWordCounts.size();
 
         return new Metrics(avgWords, abbrevRatio, singleLetterCount, longestIdentifier,
-            totalWordCount, commentCount, commentWordCount);
+            totalWordCount, commentCount, commentWordCount, hasJavadoc);
     }
 
     private static List<String> splitWords(String identifier)

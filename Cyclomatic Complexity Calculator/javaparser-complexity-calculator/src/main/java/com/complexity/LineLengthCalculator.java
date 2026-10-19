@@ -1,7 +1,7 @@
 package com.complexity;
 
 import com.github.javaparser.JavaToken;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class LineLengthCalculator
 {
     public record Metrics(int maxLineLength, double avgLineLength) {}
 
-    public static Metrics compute(MethodDeclaration method)
+    public static Metrics compute(CallableDeclaration<?> method)
     {
         if (method.getTokenRange().isEmpty())
             return new Metrics(0, 0.0);

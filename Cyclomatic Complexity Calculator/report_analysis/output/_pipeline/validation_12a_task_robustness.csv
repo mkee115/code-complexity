@@ -1,0 +1,4 @@
+check,passed,detail,time
+"task robustness: 750 responses, 10 tasks, 44 pairs",TRUE,,2026-10-17 23:09
+leave-one-task-out: the full-data agreement matches the main analysis,TRUE,,2026-10-17 23:09
+task bootstrap: the resampled agreement is centred on the observed agreement,TRUE,largest gap 0.0008,2026-10-17 23:09

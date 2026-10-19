@@ -1,7 +1,7 @@
 package com.complexity;
 
 import com.github.javaparser.JavaToken;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +35,7 @@ public class HalsteadCalculator
         double effort
     ) {}
 
-    public static Metrics compute(MethodDeclaration method)
+    public static Metrics compute(CallableDeclaration<?> method)
     {
         if (method.getTokenRange().isEmpty())
             return new Metrics(0, 0, 0, 0, 0, 0, 0);

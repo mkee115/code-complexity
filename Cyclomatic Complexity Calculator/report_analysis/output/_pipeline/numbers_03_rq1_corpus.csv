@@ -1,0 +1,124 @@
+name,value,ci_low,ci_high,n,denominator,test,p,section,subset,note
+corpus Spearman: CC – CogC,0.985466792084377,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+corpus Spearman: CC – LOC,0.7202792691115526,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+corpus Spearman: CC – MaxNest,0.9372766062858999,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+corpus Spearman: CogC – LOC,0.7154586328673184,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+corpus Spearman: CogC – MaxNest,0.9379307034550385,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+corpus Spearman: LOC – MaxNest,0.7272152558392707,NA,NA,4315785,NA,Spearman rho (effect size; p-values uninformative at this n),NA,RQ1: corpus,main corpus,
+"corpus, CC >= 3: probability two methods tie: CC ties",0.17478946912499038,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: CogC ties",0.10627046449392485,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: LOC ties",0.029420775429129176,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: MaxNest ties",0.33172355867666403,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: Both CC and CogC tie",0.05705212261821795,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: Only CC ties (CogC separates)",0.11773734650677242,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+"corpus, CC >= 3: probability two methods tie: Only CogC ties (CC separates)",0.0492183418757069,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+CC: median corpus percentile of the 34 survey snippets,86.91362058119206,32.06744543576661,98.79671948440435,34,NA,NA,NA,RQ1: corpus,main corpus,mid-rank percentile of each snippet's measurement among main-corpus methods; interval = range over the snippets
+CC: survey snippets above the corpus 90th percentile,0.4411764705882353,NA,NA,15,34,NA,NA,RQ1: corpus,main corpus,NA
+CogC: median corpus percentile of the 34 survey snippets,90.40051809809803,31.836884830917203,99.1164643280423,34,NA,NA,NA,RQ1: corpus,main corpus,mid-rank percentile of each snippet's measurement among main-corpus methods; interval = range over the snippets
+CogC: survey snippets above the corpus 90th percentile,0.5588235294117647,NA,NA,19,34,NA,NA,RQ1: corpus,main corpus,NA
+LOC: median corpus percentile of the 34 survey snippets,80.09688851506736,14.6264005273664,93.33472357867689,34,NA,NA,NA,RQ1: corpus,main corpus,mid-rank percentile of each snippet's measurement among main-corpus methods; interval = range over the snippets
+LOC: survey snippets above the corpus 90th percentile,0.08823529411764706,NA,NA,3,34,NA,NA,RQ1: corpus,main corpus,NA
+MaxNest: median corpus percentile of the 34 survey snippets,92.143966856551,33.63441413323416,99.02127886352078,34,NA,NA,NA,RQ1: corpus,main corpus,mid-rank percentile of each snippet's measurement among main-corpus methods; interval = range over the snippets
+MaxNest: survey snippets above the corpus 90th percentile,0.5882352941176471,NA,NA,20,34,NA,NA,RQ1: corpus,main corpus,NA
+"corpus, CC >= 3: ratio of 'only CC ties' to 'only CogC ties'",2.39214370130752,NA,NA,976514,NA,exact over all pairs of distinct methods,NA,RQ1: corpus,"main corpus, CC >= 3",
+corpus Spearman without the lowest values: CC – CogC,0.9184362699577754,NA,NA,1543197,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+corpus Spearman without the lowest values: CC – LOC,0.7256396858320389,NA,NA,1545464,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+corpus Spearman without the lowest values: CogC – LOC,0.742301118824736,NA,NA,1565284,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+corpus Spearman without the lowest values: CC – MaxNest,0.6441677158768837,NA,NA,1412433,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+corpus Spearman without the lowest values: CogC – MaxNest,0.761990474482256,NA,NA,1407922,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+corpus Spearman without the lowest values: LOC – MaxNest,0.5373164890561143,NA,NA,1412225,NA,Spearman rho on methods above the lowest value of both metrics,NA,RQ1: corpus,"main corpus, both metrics above their lowest value",
+within-repository median Spearman: CC – CogC,0.9867182782286401,0.9762017631156744,0.9925961500668365,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+within-repository median Spearman: CC – LOC,0.7525689188307485,0.6742883516891593,0.8036087746858207,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+within-repository median Spearman: CogC – LOC,0.7468790154630373,0.6666060293348942,0.8011997766220786,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+within-repository median Spearman: CC – MaxNest,0.9363813567945085,0.9080214745149447,0.9552364509944355,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+within-repository median Spearman: CogC – MaxNest,0.9375512573878307,0.9102705893762444,0.9552631900791605,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+within-repository median Spearman: LOC – MaxNest,0.7533381179986763,0.6828142809472252,0.8010248594676984,1294,NA,median across repositories with >= 200 methods; interval = IQR,NA,RQ1: corpus,NA,NA
+corpus Spearman CC – LOC,0.7202792691115526,NA,NA,4315785,NA,Spearman rho,NA,RQ1: corpus,NA,NA
+corpus partial Spearman CC – LOC (controlling for CogC and MaxNest),0.0813346315616925,NA,NA,4315785,NA,partial Spearman from the rank correlation matrix,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: CC – CogC (other two held constant),0.8772271490139757,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: CC – LOC (other two held constant),0.0813346315616925,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: CC – MaxNest (other two held constant),0.19751283278852402,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: CogC – LOC (other two held constant),-0.004255768872339089,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: CogC – MaxNest (other two held constant),0.2365844610512137,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+corpus partial Spearman: LOC – MaxNest (other two held constant),0.2104052496054063,NA,NA,4315785,NA,partial Spearman,NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics: PC1 share of variance",0.8872581829346414,NA,NA,4315785,NA,"PCA on log(1+x), standardised",NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics (rank check): PC1 share of variance",0.8812148864656596,NA,NA,4315785,NA,PCA on ranks,NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics: PC2 share of variance",0.07331028817216552,NA,NA,4315785,NA,"PCA on log(1+x), standardised",NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics (rank check): PC2 share of variance",0.09582407440329556,NA,NA,4315785,NA,PCA on ranks,NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics: PC3 share of variance",0.032544097969703305,NA,NA,4315785,NA,"PCA on log(1+x), standardised",NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics (rank check): PC3 share of variance",0.01933575855692433,NA,NA,4315785,NA,PCA on ranks,NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics: PC4 share of variance",0.006887430923489773,NA,NA,4315785,NA,"PCA on log(1+x), standardised",NA,RQ1: corpus,NA,NA
+"corpus PCA, key metrics (rank check): PC4 share of variance",0.0036252805741205313,NA,NA,4315785,NA,PCA on ranks,NA,RQ1: corpus,NA,NA
+"corpus PCA, broader metrics: PC1 share of variance",0.5148865950222092,NA,NA,1000000,NA,"PCA on log(1+x), standardised; 1M random sample",NA,RQ1: corpus,NA,NA
+"corpus PCA, broader metrics: PC2 share of variance",0.11827798975489895,NA,NA,1000000,NA,"PCA on log(1+x), standardised; 1M random sample",NA,RQ1: corpus,NA,NA
+"corpus PCA, broader metrics: PC3 share of variance",0.07643489444972158,NA,NA,1000000,NA,"PCA on log(1+x), standardised; 1M random sample",NA,RQ1: corpus,NA,NA
+non-trivial methods (CC >= 3): share of main corpus,0.22626567356807625,NA,NA,976514,4315785,NA,NA,RQ1: corpus,NA,NA
+"corpus, CC >= 3 pairs, all four metrics: Discordant: at least one metric combination orders the pair in opposite directions",0.307744,NA,NA,307744,1000000,NA,NA,RQ1: corpus,"1,000,000 random pairs, both CC >= 3",NA
+"corpus, CC >= 3 pairs, all four metrics: Partly agreeing: no combination discordant, but a metric ties while another orders the pair",0.31373,NA,NA,313730,1000000,NA,NA,RQ1: corpus,"1,000,000 random pairs, both CC >= 3",NA
+"corpus, CC >= 3 pairs, all four metrics: Fully agreeing: all four order the pair the same way, or all four tie",0.378526,NA,NA,378526,1000000,NA,NA,RQ1: corpus,"1,000,000 random pairs, both CC >= 3",NA
+"corpus, CC >= 3 pairs, all four metrics: of which all four tie",0.002965,NA,NA,2965,1000000,NA,NA,RQ1: corpus,"1,000,000 random pairs, both CC >= 3",subset of fully agreeing
+"corpus, CC >= 3 pairs, all four metrics: Discordant among CC, CogC and MaxNest only (ignoring LOC)",0.164339,NA,NA,164339,1000000,NA,NA,RQ1: corpus,"1,000,000 random pairs, both CC >= 3",overlaps the first three classes; not part of the partition
+corpus concordance (Corpus: random method pairs): CC – CogC: Concordant,0.550124,0.5491487639909244,0.5510988509119911,550124,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): CC – CogC: One ties, other separates",0.025305,0.024999006644495222,0.025614640384084657,25305,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – CogC: Both tie,0.420086,0.41911892459020234,0.4210536893801196,420086,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – CogC: Discordant,0.004485,0.0043559255240104774,0.004617881462300216,4485,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – LOC: Concordant,0.491909,0.490929179286423,0.4928888828758249,491909,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): CC – LOC: One ties, other separates",0.350409,0.3494744813039412,0.35134466798697683,350409,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – LOC: Both tie,0.104433,0.1038351197804733,0.10503391931653477,104433,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – LOC: Discordant,0.053249,0.052810643726561746,0.05369078861139229,53249,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – MaxNest: Concordant,0.47779,0.47681107249935967,0.4787690981375858,477790,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): CC – MaxNest: One ties, other separates",0.086402,0.08585292247137141,0.08695425515579253,86402,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – MaxNest: Both tie,0.427222,0.42625273619643655,0.42819182294879565,427222,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CC – MaxNest: Discordant,0.008586,0.008407047994434102,0.008768727484352378,8586,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – LOC: Concordant,0.494989,0.4940090883553661,0.4959689501435864,494989,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): CogC – LOC: One ties, other separates",0.345848,0.34491634877026234,0.34678083556230843,345848,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – LOC: Both tie,0.102326,0.10173350771406738,0.10292154757078599,102326,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – LOC: Discordant,0.056837,0.05638490784837375,0.05729249692337767,56837,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – MaxNest: Concordant,0.482009,0.4810297235967,0.48298841462614045,482009,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): CogC – MaxNest: One ties, other separates",0.094517,0.09394517574718245,0.09509193953334433,94517,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – MaxNest: Both tie,0.418777,0.41781034850251286,0.4197442755247097,418777,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): CogC – MaxNest: Discordant,0.004697,0.004564879793597957,0.004832925563940452,4697,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): LOC – MaxNest: Concordant,0.451467,0.45049183382707864,0.45244253904653103,451467,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: random method pairs): LOC – MaxNest: One ties, other separates",0.398141,0.397181961661356,0.3991008209099459,398141,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): LOC – MaxNest: Both tie,0.113864,0.11324290800349697,0.1144880586361932,113864,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: random method pairs): LOC – MaxNest: Discordant,0.036528,0.03616208784021121,0.0368974729633152,36528,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – CogC: Concordant,0.699853,0.6989539396527716,0.7007505248989873,699853,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – CogC: One ties, other separates",0.166836,0.16610654794984908,0.16756801171189123,166836,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – CogC: Both tie,0.056912,0.056459626313829316,0.0573677778817055,56912,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – CogC: Discordant,0.076399,0.07587998977971984,0.076921264699374,76399,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – LOC: Concordant,0.650819,0.6498840853437309,0.6517527559307648,650819,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – LOC: One ties, other separates",0.184795,0.18403548821819374,0.18555693346655863,184795,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – LOC: Both tie,0.009499,0.00931076108745367,0.00969100737685595,9499,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – LOC: Discordant,0.154887,0.15417921690608422,0.1555974345584863,154887,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – MaxNest: Concordant,0.438553,0.4375806843491705,0.4395257877412564,438553,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – MaxNest: One ties, other separates",0.349715,0.34878091154102664,0.3506502430818157,349715,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – MaxNest: Both tie,0.078279,0.07775415236941395,0.07880708766585025,78279,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CC – MaxNest: Discordant,0.133453,0.13278789532524296,0.13412092081435165,133453,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – LOC: Concordant,0.692889,0.6919841372669412,0.6937923807884506,692889,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – LOC: One ties, other separates",0.123899,0.12325470232785529,0.1245461872140525,123899,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – LOC: Both tie,0.005953,0.005804114617232636,0.006105681090598286,5953,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – LOC: Discordant,0.177259,0.1765117539833459,0.17800872559965142,177259,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – MaxNest: Concordant,0.560123,0.5591498995157594,0.5610956385659577,560123,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – MaxNest: One ties, other separates",0.309363,0.3084577775747741,0.31026968706797,309363,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – MaxNest: Both tie,0.064461,0.06398135815206472,0.06494398804534761,64461,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): CogC – MaxNest: Discordant,0.066053,0.06556785955948552,0.06654147440676891,66053,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): LOC – MaxNest: Concordant,0.479861,0.4788818924917906,0.48084026223389353,479861,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+"corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): LOC – MaxNest: One ties, other separates",0.335732,0.3348070479774234,0.3366582140752436,335732,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): LOC – MaxNest: Both tie,0.012843,0.012624178046547273,0.013065564726184448,12843,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+corpus concordance (Corpus: non-trivial methods (CC ≥ 3)): LOC – MaxNest: Discordant,0.171564,0.17082635352476608,0.1723041698122791,171564,1000000,"Wilson 95% CI: reflects random pair sampling only, not how representative the corpus is",NA,RQ1: corpus,NA,
+CC: probability two random methods tie,0.437126,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, main corpus",NA
+CC: probability two non-trivial methods tie,0.174324,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, non-trivial methods",NA
+CC: probability two methods tie when both are above the lowest value (1),0.20581797613387626,NA,NA,1547861,NA,NA,NA,RQ1: corpus,"main corpus methods above the metric's lowest value; exact, not sampled",NA
+CC: share of methods at the most common value (1),0.6413489087153322,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+CogC: probability two random methods tie,0.428351,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, main corpus",NA
+CogC: probability two non-trivial methods tie,0.106336,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, non-trivial methods",NA
+CogC: probability two methods tie when both are above the lowest value (0),0.1771835580778069,NA,NA,1567762,NA,NA,NA,RQ1: corpus,"main corpus methods above the metric's lowest value; exact, not sampled",NA
+CogC: share of methods at the most common value (0),0.636737696618344,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+LOC: probability two random methods tie,0.122149,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, main corpus",NA
+LOC: probability two non-trivial methods tie,0.029469,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, non-trivial methods",NA
+LOC: probability two methods tie when both are above the lowest value (1),0.12605277354225278,NA,NA,4242383,NA,NA,NA,RQ1: corpus,"main corpus methods above the metric's lowest value; exact, not sampled",NA
+LOC: share of methods at the most common value (3),0.24703871949135556,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA
+MaxNest: probability two random methods tie,0.50372,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, main corpus",NA
+MaxNest: probability two non-trivial methods tie,0.331949,NA,NA,1000000,NA,NA,NA,RQ1: corpus,"random pairs, non-trivial methods",NA
+MaxNest: probability two methods tie when both are above the lowest value (0),0.47621851396424003,NA,NA,1412607,NA,NA,NA,RQ1: corpus,"main corpus methods above the metric's lowest value; exact, not sampled",NA
+MaxNest: share of methods at the most common value (0),0.6726882826646833,NA,NA,4315785,NA,NA,NA,RQ1: corpus,NA,NA

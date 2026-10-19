@@ -1,0 +1,7 @@
+Comparison,Difference in agreement,Only first agrees,Only second agrees,Holm p
+CogC minus CC,+14.4 points (+11.9 to +16.9),15,123,< .001
+LOC minus CC,+11.2 points (+7.9 to +14.5),50,134,< .001
+MaxNest minus CC,+5.3 points (+2.5 to +8.0),56,96,.003
+LOC minus CogC,-3.2 points (-5.3 to -0.9),49,25,.007
+MaxNest minus CogC,-9.1 points (-11.6 to -6.5),86,18,< .001
+MaxNest minus LOC,-5.9 points (-8.1 to -3.6),61,17,< .001

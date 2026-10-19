@@ -1,6 +1,6 @@
 package com.complexity;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
@@ -15,7 +15,7 @@ public class MethodStructureCalculator
 {
     public record Metrics(int paramCount, int returnCount, int fanOut) {}
 
-    public static Metrics compute(MethodDeclaration method)
+    public static Metrics compute(CallableDeclaration<?> method)
     {
         int paramCount = method.getParameters().size();
         int returnCount = method.findAll(ReturnStmt.class).size();

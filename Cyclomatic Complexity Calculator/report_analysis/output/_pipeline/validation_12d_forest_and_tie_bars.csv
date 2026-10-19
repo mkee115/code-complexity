@@ -1,0 +1,3 @@
+check,passed,detail,time
+"forest: every pair where CC ties and the metric separates is shown, with decisive responses",TRUE,31 rows,2026-10-17 23:11
+tie rate by strength: the strength groups partition the 750 responses for every metric,TRUE,,2026-10-17 23:11

@@ -1,0 +1,5 @@
+dataset,component,variance,cumulative
+"Corpus, key metrics (log1p, standardised)",PC1,0.8872581829346414,0.8872581829346414
+"Corpus, key metrics (log1p, standardised)",PC2,0.07331028817216552,0.960568471106807
+"Corpus, key metrics (log1p, standardised)",PC3,0.032544097969703305,0.9931125690765102
+"Corpus, key metrics (log1p, standardised)",PC4,0.006887430923489773,1
