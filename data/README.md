@@ -45,7 +45,7 @@ The Qualtrics survey: its definition and the responses.
 
 | File | Description |
 |---|---|
-| `survey_responses_raw.csv` | Qualtrics export, unmodified (contains IP addresses and locations: see the note below). |
+| `survey_responses_raw.csv` | Qualtrics export, unmodified. |
 | `comparison_pairs.csv` | Which two snippets each comparison question showed (44 rows). Checked against `700_survey.qsf` on 15 Oct: every item, image and A/B side matches. |
 | `700_survey.qsf` | Qualtrics survey definition (JSON): questions, blocks, randomizers, image URLs. |
 
@@ -64,7 +64,6 @@ The code snippets and images participants saw are in [`snippets/`](../snippets/)
 **Reading `survey_responses_raw.csv`:**
 - Qualtrics writes **3 header rows**: column names, question text, then an ImportId JSON row. Respondents start on row 4. In R: `read_csv(...)[-(1:2), ]`.
 - 109 respondent rows: 2 have `Status == "Survey Preview"` (drop these), leaving 107 real submissions. 75 of those have `Progress == 100` / `Finished == True`, which is the inclusion rule for the report (75 participants, 750 comparisons).
-- **Not anonymised:** the file contains each respondent's `IPAddress`, `LocationLatitude` and `LocationLongitude` and a Qualtrics `ResponseId` per respondent. The report pipeline drops the IP, location and recipient columns on load, and its export script scans every output file for them, so they do not appear in `analysis/report/output/`.
 - Columns:
   - `Demographic Q1`: degree. `Demographic Q2`: Java experience.
   - `Java Q1` to `Java Q3`: screening questions. The correct answers are `C`, `2` and `24`.

@@ -4,11 +4,11 @@
 |---|---|
 | `report/` | The R pipeline that produces every figure, table and number in the report. **This is the one to run and cite.** |
 | `survey_stats/` | Earlier R survey analysis (one script per analysis: chi-squared, change classification, factor effects, complexity scores, metrics vs survey) with its Excel/CSV output |
-| `survey_graphs/` | Earlier Python survey analysis (35 charts). **Its counts differ from the report** (740 comparisons, 35 variants); see the note in its section below |
+| `survey_graphs/` | Earlier Python survey analysis (35 charts). Not used by the report |
 | `exploratory/` | First look at the corpus (`cc_analysis.R`, `repos_analysis.R`) and its graphs and tables, from the June harvest |
 | `poster/` | `poster_graphs.R` and the poster figures |
 
-The scripts in `survey_stats/`, `exploratory/` and `poster/` are standalone: each has its own config block at the top, and the survey ones expect a local `700_survey.csv` next to them. That file has the same contents as `data/survey/survey_responses_raw.csv` (the raw Qualtrics export, which includes respondents' IP addresses and locations, see `data/README.md`); the duplicate is git-ignored.
+The scripts in `survey_stats/`, `exploratory/` and `poster/` are standalone: each has its own config block at the top, and the survey ones expect a local `700_survey.csv` next to them. That file is a copy of `data/survey/survey_responses_raw.csv` (the raw Qualtrics export) and is git-ignored.
 
 # Report pipeline (`report/`)
 
@@ -34,10 +34,10 @@ Needs R 4.x with `readr`, `dplyr`, `tidyr`, `ggplot2`, `data.table`, `patchwork`
 |---|---|
 | `run_all.R` | Runs `01` to `04` in order (empties `output/` first); `00_setup.R` is loaded at the start of each |
 | `00_setup.R` | Loads the shared helpers in `lib/`: `config.R` (paths, seed, metric order and colours, report sections), `plot_output.R` (theme, figure/table writers), `checks_numbers.R` (validation log, report-number register), `stats.R` (bootstrap, Wilson CI, concordance, pair sampling) |
-| `01_load_data.R` | Survey: reads the Qualtrics export, drops identifying columns, applies the inclusion rule, joins pairs and measurements, validates. Corpus: loads only the columns needed, validates, applies and counts the filters, describes it |
+| `01_load_data.R` | Survey: reads the Qualtrics export, applies the inclusion rule, joins pairs and measurements, validates. Corpus: loads only the columns needed, validates, applies and counts the filters, describes it |
 | `02_analysis.R` | RQ1 on the corpus (Spearman, partial correlation, PCA, pairwise concordance, resolution) and on the survey snippets; RQ2 (agreement, kappa, decomposition, metric comparisons, tie status and side, gap vs strength, pair-level, all-tie pairs, position diagnostics, the six 3x3 metric-comparison grids); RQ3 (win rates, original vs refactor, reduction vs preference, kinds of change, exceptions); sensitivity (screening, decisive-only, tie-free, experience, corpus filter) |
 | `03_figures.R` | Every figure, one section per report section, then the extra RQ2 robustness analyses with their figures: leave-one-task-out and three-stage cluster bootstrap; who agrees when only one of two metrics does, and commit rate / direction accuracy for the 13 measures; cumulative-link mixed model and ordinal Bradley-Terry (needs the `ordinal` package); forest plot and tie-rate bars; PCA biplot with the survey snippets and the all-tie forest plot |
-| `04_tables_and_export.R` | Report-ready tables as PNG, then `report_numbers.csv`, validation log, figure index, `sessionInfo.txt` and the privacy scan |
+| `04_tables_and_export.R` | Report-ready tables as PNG, then `report_numbers.csv`, validation log, figure index and `sessionInfo.txt` |
 | `figure_takeaways.csv` | The suggested one-sentence takeaway for each figure (written by hand after reading the results; re-read after a re-run) |
 
 Every figure is also written without its title and subtitle to `output/figures_no_titles/<section>/`. The appendix figures from `12a`-`12e` have no title in either version.
@@ -85,10 +85,7 @@ To promote or demote an output, change `suggested_use` (figures) in `scripts/fig
 
 # Survey graphs (`survey_graphs/`)
 
-> **Earlier analysis: its numbers differ from the report.** This section describes an earlier Python analysis. It uses **740 comparisons** (74 respondents), **35 screenshot variants** and produces 35 charts. The report uses **750 comparisons** (75 participants) and **34 snippets**. The differences:
-> - **740 vs 750:** its Qualtrics copy (`qualtrics_raw.csv`) drops one response row whose free-text answer broke the CSV field count, so one respondent (10 comparisons) is missing.
-> - **35 vs 34:** it included `10-V3`, a screenshot that was made but never shown in the live survey.
-> - Nothing in `analysis/report/` is built from this folder. Use the report figures and `report_numbers.csv`.
+> **Earlier analysis, not used by the report.** It covers 35 screenshot variants because it includes `10-V3`, a screenshot that was made but never shown in the survey; the report uses the 34 snippets participants saw.
 
 Run `python survey_analysis.py` from `analysis/survey_graphs/` (needs pandas, numpy, matplotlib, scipy). Regenerates everything in `output/` (35 charts) and
 `tables/` (long-format data + summary CSVs) from the two source files below.
@@ -108,18 +105,14 @@ Run `python survey_analysis.py` from `analysis/survey_graphs/` (needs pandas, nu
 
 ## Known data-quality caveats
 
-1. **1 response row is dropped** from `qualtrics_raw.csv` — one respondent's
-   free-text answer contains an unescaped delimiter that throws off the CSV
-   field count. Rather than risk silently misaligning every column after it,
-   that single row is skipped (printed as a NOTE when the script runs).
-2. Q10 ("balanced" / bracket-matching) only shows 3 of the 6 possible pairs
+1. Q10 ("balanced" / bracket-matching) only shows 3 of the 6 possible pairs
    from its 4 screenshotted versions (`10-V3` was skipped entirely in the
    live survey, confirmed by the survey author) — `QUESTION_META[10]` in
    `survey_analysis.py` only lists `["ORIG", "V1", "V2"]` to match.
    Every question's block→pair mapping (Q1–Q10) was cross-checked against
    `snippets/images/pair_images/` file-naming order and the actual
    screenshot content.
-3. **The metrics lookup is keyed off the PNG filename, not the (corrected)
+2. **The metrics lookup is keyed off the PNG filename, not the (corrected)
    "Metrics ID" label** — this was a real bug caught while building chart 28:
    two screenshots (`02-V3.png`, `05-V4.png`) turned out, on verification, to
    have code identical to another row's baseline, so their "Metrics ID" was
@@ -129,8 +122,8 @@ Run `python survey_analysis.py` from `analysis/survey_graphs/` (needs pandas, nu
    Q5 comparison involving "V4") to `NaN`. `load_metrics()` now derives a
    separate `screenshot_group`/`png_version` pair straight from the PNG
    filename — which is what the survey actually displayed and never gets
-   relabelled — and uses that for the join. Fixed; all 740 comparisons now
-   carry real metric deltas (verify with `tables/long_responses.csv`).
+   relabelled — and uses that for the join. Fixed; every comparison now
+   carries real metric deltas (verify with `tables/long_responses.csv`).
 
 ## What each chart shows
 
