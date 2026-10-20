@@ -1,0 +1,9 @@
+policy: inclusive
+real_submissions (non-preview): 107
+analysed_respondents: 79
+finished: 75
+total_observations: 768
+items: 44
+median_items_per_respondent: 10
+java_screen_perfect: 38
+expert_novice_spearman: 0.619

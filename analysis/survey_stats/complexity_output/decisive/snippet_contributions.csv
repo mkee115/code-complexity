@@ -1,0 +1,87 @@
+"group","problem","snippet","role","item","vs","n","score","score_decisive","n_decisive"
+1,"Letter grade","ORIG","A (lower)","Q1A","V1",7,300,228.6,7
+1,"Letter grade","ORIG","A (lower)","Q1B","V2",6,383.3,283.3,6
+1,"Letter grade","ORIG","A (lower)","Q1C","V3",12,316.7,216.7,12
+1,"Letter grade","V1","B (higher)","Q1A","ORIG",7,100,71.4,7
+1,"Letter grade","V1","A (lower)","Q1D","V2",17,70.6,58.8,17
+1,"Letter grade","V1","A (lower)","Q1E","V3",17,23.5,17.6,17
+1,"Letter grade","V2","B (higher)","Q1B","ORIG",6,16.7,16.7,6
+1,"Letter grade","V2","B (higher)","Q1D","V1",17,329.4,241.2,17
+1,"Letter grade","V2","A (lower)","Q1F","V3",18,27.8,17.6,17
+1,"Letter grade","V3","B (higher)","Q1C","ORIG",12,83.3,83.3,12
+1,"Letter grade","V3","B (higher)","Q1E","V1",17,376.5,282.4,17
+1,"Letter grade","V3","B (higher)","Q1F","V2",18,372.2,282.4,17
+2,"Password check","ORIG","A (lower)","Q2A","V1",13,92.3,76.9,13
+2,"Password check","ORIG","A (lower)","Q2B","V2",13,269.2,192.3,13
+2,"Password check","ORIG","A (lower)","Q2C","V3",14,285.7,207.7,13
+2,"Password check","V1","B (higher)","Q2A","ORIG",13,307.7,223.1,13
+2,"Password check","V1","A (lower)","Q2D","V2",13,276.9,200,13
+2,"Password check","V1","A (lower)","Q2E","V3",13,100,84.6,13
+2,"Password check","V2","B (higher)","Q2B","ORIG",13,130.8,107.7,13
+2,"Password check","V2","B (higher)","Q2D","V1",13,123.1,100,13
+2,"Password check","V2","A (lower)","Q2F","V3",11,190.9,150,10
+2,"Password check","V3","B (higher)","Q2C","ORIG",14,114.3,92.3,13
+2,"Password check","V3","B (higher)","Q2E","V1",13,300,215.4,13
+2,"Password check","V3","B (higher)","Q2F","V2",11,209.1,150,10
+3,"Sum of digits","ORIG","A (lower)","Q3A","V1",25,172,131.8,22
+3,"Sum of digits","ORIG","A (lower)","Q3B","V2",26,107.7,82.6,23
+3,"Sum of digits","V1","B (higher)","Q3A","ORIG",25,228,168.2,22
+3,"Sum of digits","V1","A (lower)","Q3C","V2",26,103.8,80,25
+3,"Sum of digits","V2","B (higher)","Q3B","ORIG",26,292.3,217.4,23
+3,"Sum of digits","V2","B (higher)","Q3C","V1",26,296.2,220,25
+4,"Max in 2D array","ORIG","A (lower)","Q4A","V1",77,196.1,141.1,73
+4,"Max in 2D array","V1","B (higher)","Q4A","ORIG",77,203.9,158.9,73
+5,"Remove duplicates","ORIG","A (lower)","Q5A","V1",8,325,242.9,7
+5,"Remove duplicates","ORIG","A (lower)","Q5B","V2",8,250,200,6
+5,"Remove duplicates","ORIG","A (lower)","Q5C","V3",8,187.5,137.5,8
+5,"Remove duplicates","ORIG","A (lower)","Q5D","V4",6,316.7,233.3,6
+5,"Remove duplicates","V1","B (higher)","Q5A","ORIG",8,75,57.1,7
+5,"Remove duplicates","V1","A (lower)","Q5E","V2",8,187.5,137.5,8
+5,"Remove duplicates","V1","A (lower)","Q5F","V3",8,50,37.5,8
+5,"Remove duplicates","V1","A (lower)","Q5G","V4",8,150,112.5,8
+5,"Remove duplicates","V2","B (higher)","Q5B","ORIG",8,150,100,6
+5,"Remove duplicates","V2","B (higher)","Q5E","V1",8,212.5,162.5,8
+5,"Remove duplicates","V2","A (lower)","Q5H","V3",8,37.5,14.3,7
+5,"Remove duplicates","V2","A (lower)","Q5I","V4",7,0,0,7
+5,"Remove duplicates","V3","B (higher)","Q5C","ORIG",8,212.5,162.5,8
+5,"Remove duplicates","V3","B (higher)","Q5F","V1",8,350,262.5,8
+5,"Remove duplicates","V3","B (higher)","Q5H","V2",8,362.5,285.7,7
+5,"Remove duplicates","V3","A (lower)","Q5J","V4",8,262.5,216.7,6
+5,"Remove duplicates","V4","B (higher)","Q5D","ORIG",6,83.3,66.7,6
+5,"Remove duplicates","V4","B (higher)","Q5G","V1",8,250,187.5,8
+5,"Remove duplicates","V4","B (higher)","Q5I","V2",7,400,300,7
+5,"Remove duplicates","V4","B (higher)","Q5J","V3",8,137.5,83.3,6
+6,"Frequency count","ORIG","A (lower)","Q6A","V1",25,240,177.3,22
+6,"Frequency count","ORIG","A (lower)","Q6B","V2",25,248,180,20
+6,"Frequency count","V1","B (higher)","Q6A","ORIG",25,160,122.7,22
+6,"Frequency count","V1","A (lower)","Q6C","V2",27,118.5,86.4,22
+6,"Frequency count","V2","B (higher)","Q6B","ORIG",25,152,120,20
+6,"Frequency count","V2","B (higher)","Q6C","V1",27,281.5,213.6,22
+7,"Merge sorted arrays","ORIG","A (lower)","Q7A","V1",13,230.8,172.7,11
+7,"Merge sorted arrays","ORIG","A (lower)","Q7B","V2",13,269.2,200,12
+7,"Merge sorted arrays","ORIG","A (lower)","Q7C","V3",13,300,207.7,13
+7,"Merge sorted arrays","V1","B (higher)","Q7A","ORIG",13,169.2,127.3,11
+7,"Merge sorted arrays","V1","A (lower)","Q7D","V2",13,330.8,246.2,13
+7,"Merge sorted arrays","V1","A (lower)","Q7E","V3",12,200,145.5,11
+7,"Merge sorted arrays","V2","B (higher)","Q7B","ORIG",13,130.8,100,12
+7,"Merge sorted arrays","V2","B (higher)","Q7D","V1",13,69.2,53.8,13
+7,"Merge sorted arrays","V3","B (higher)","Q7C","ORIG",13,100,92.3,13
+7,"Merge sorted arrays","V3","B (higher)","Q7E","V1",12,200,154.5,11
+8,"Roman numeral","ORIG","A (lower)","Q8A","V1",25,280,210.5,19
+8,"Roman numeral","ORIG","A (lower)","Q8B","V2",26,215.4,162.5,16
+8,"Roman numeral","V1","B (higher)","Q8A","ORIG",25,120,89.5,19
+8,"Roman numeral","V1","A (lower)","Q8C","V2",26,153.8,111.1,18
+8,"Roman numeral","V2","B (higher)","Q8B","ORIG",26,184.6,137.5,16
+8,"Roman numeral","V2","B (higher)","Q8C","V1",26,246.2,188.9,18
+9,"Binary search","ORIG","A (lower)","Q9A","V1",26,280.8,210.5,19
+9,"Binary search","ORIG","A (lower)","Q9B","V2",26,334.6,242.3,26
+9,"Binary search","V1","B (higher)","Q9A","ORIG",26,119.2,89.5,19
+9,"Binary search","V1","A (lower)","Q9C","V2",25,308,224,25
+9,"Binary search","V2","B (higher)","Q9B","ORIG",26,65.4,57.7,26
+9,"Binary search","V2","B (higher)","Q9C","V1",25,92,76,25
+10,"Balanced brackets","ORIG","A (lower)","Q10A","V1",26,230.8,172.7,22
+10,"Balanced brackets","ORIG","A (lower)","Q10B","V2",26,207.7,150,22
+10,"Balanced brackets","ORIG","A (lower)","Q10C","V3",25,228,163.6,22
+10,"Balanced brackets","V1","B (higher)","Q10A","ORIG",26,169.2,127.3,22
+10,"Balanced brackets","V2","B (higher)","Q10B","ORIG",26,192.3,150,22
+10,"Balanced brackets","V3","B (higher)","Q10C","ORIG",25,172,136.4,22

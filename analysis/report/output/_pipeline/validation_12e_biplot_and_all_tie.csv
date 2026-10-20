@@ -1,0 +1,5 @@
+check,passed,detail,time
+biplot: the PCA reproduces the corpus PC1 share recorded in the corpus script (88.7%),TRUE,0.8873,2026-10-19 15:02
+biplot: the 90% ellipse holds about 90% of the sampled corpus methods,TRUE,0.877,2026-10-19 15:02
+all-tie forest: the seven all-tie pairs are the ones described in the snippet catalogue,TRUE,"Q1C, Q2C, Q5C, Q5D, Q5J, Q6B, Q7C",2026-10-19 15:02
+all-tie forest: pooled counts match the all-tie numbers recorded earlier (61 of 75),TRUE,61 of 75,2026-10-19 15:02

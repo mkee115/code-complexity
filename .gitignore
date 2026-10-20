@@ -5,26 +5,25 @@
 .RDataTmp*
 .Ruserdata
 .Rapp.history
-output/
-graphs/
-data_tables/
-**/*.csv
-analysis/**/*.png
-**/*.txt
 
-# GitHub Token
-.token
-
-# Target
-target/
-.Rproj.user
-.positai
-
-# Track report_analysis contents except RStudio project metadata and file
-!/Cyclomatic Complexity Calculator/report_analysis/
-!/Cyclomatic Complexity Calculator/report_analysis/**
-Cyclomatic Complexity Calculator/report_analysis/.Rproj.user/
-Cyclomatic Complexity Calculator/report_analysis/report_analysis.Rproj
-Cyclomatic Complexity Calculator/report_analysis/data/corpus/cc_data.csv
+# Python
 __pycache__/
 *.pyc
+
+# Maven build output
+target/
+
+# GitHub token for the harvester - never commit
+.token
+
+# Editor / tooling
+.vscode/
+.positai
+.github/modernize/
+.github/java-upgrade/
+
+# Large harvest output (2 GB). Included in the compendium zip, not in git.
+data/corpus/cc_data.csv
+
+# Raw Qualtrics export with IP addresses / locations (the cleaned copy is survey/responses/)
+analysis/survey_stats/700_survey.csv

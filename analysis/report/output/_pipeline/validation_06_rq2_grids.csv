@@ -1,0 +1,15 @@
+check,passed,detail,time
+grid categories: A higher than B means B lower,TRUE,,2026-10-19 14:59
+grid input has 750 responses,TRUE,,2026-10-19 14:59
+grid CC vs CogC: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid CC vs CogC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 428 vs 320 / 428,2026-10-19 14:59
+grid CC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid CC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 404 vs 320 / 404,2026-10-19 14:59
+grid CC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid CC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,320 / 360 vs 320 / 360,2026-10-19 14:59
+grid CogC vs LOC: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid CogC vs LOC: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 404 vs 428 / 404,2026-10-19 14:59
+grid CogC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid CogC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,428 / 360 vs 428 / 360,2026-10-19 14:59
+grid LOC vs MaxNest: cells sum to 750 responses and 44 pairs,TRUE,,2026-10-19 14:59
+grid LOC vs MaxNest: cell agreement counts add up to each metric's overall agreement,TRUE,404 / 360 vs 404 / 360,2026-10-19 14:59

@@ -1,0 +1,3 @@
+test,statistic,p_value,effect_size,effect_type
+Spearman (CC vs LOC),0.6841,0,0.6841,Spearman rho
+Mann-Whitney (CC: <=24 vs >24 LOC),289705565572,0,NA,Cliff's delta (rank-biserial)

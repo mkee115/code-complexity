@@ -1,0 +1,18 @@
+check,passed,detail,time
+agreement for CC matches an independent re-computation,TRUE,320 vs 320,2026-10-19 14:59
+agreement for CogC matches an independent re-computation,TRUE,428 vs 428,2026-10-19 14:59
+agreement for LOC matches an independent re-computation,TRUE,404 vs 404,2026-10-19 14:59
+agreement for MaxNest matches an independent re-computation,TRUE,360 vs 360,2026-10-19 14:59
+kappa for CC matches irr::kappa2,TRUE,,2026-10-19 14:59
+kappa for CogC matches irr::kappa2,TRUE,,2026-10-19 14:59
+kappa for LOC matches irr::kappa2,TRUE,,2026-10-19 14:59
+kappa for MaxNest matches irr::kappa2,TRUE,,2026-10-19 14:59
+decomposition categories are exclusive and sum to 750 for every metric,TRUE,,2026-10-19 14:59
+'both agree' + 'both say no difference' equals overall agreement for every metric,TRUE,,2026-10-19 14:59
+decisive breakdown sums to 675 responses for every metric,TRUE,,2026-10-19 14:59
+tie-status groups partition the 750 responses for every metric,TRUE,,2026-10-19 14:59
+position: V-vs-V comparisons cover 20 pairs,TRUE,20,2026-10-19 14:59
+position: A + B + no-difference counts sum to the responses,TRUE,,2026-10-19 14:59
+common subset: every metric is judged on the same responses and none tie,TRUE,"21 pairs, 343 decisive responses",2026-10-19 14:59
+consensus ceiling is at least as high as the best metric,TRUE,"in-sample 0.697, leave-one-out 0.669, best metric 0.571",2026-10-19 14:59
+clear-pair sensitivity grid reproduces the main result at 75% / 10,TRUE,22 clear pairs; CC ties on 12,2026-10-19 14:59

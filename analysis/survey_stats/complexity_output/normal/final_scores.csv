@@ -1,0 +1,36 @@
+"group","problem","snippet","n_comparisons","total_responses","sum_of_scores","complexity_score","decisive_responses","complexity_score_decisive","rank_in_group","grp_lab","score"
+1,"Letter grade","ORIG",3,25,1000,333.3,25,236,4,"Q1 Letter grade",333.3
+1,"Letter grade","V1",3,41,194.1,64.7,41,43.9,1,"Q1 Letter grade",64.7
+1,"Letter grade","V2",3,41,373.9,124.6,40,112.5,2,"Q1 Letter grade",124.6
+1,"Letter grade","V3",3,47,832,277.3,46,230.5,3,"Q1 Letter grade",277.3
+2,"Password check","ORIG",3,40,647.2,215.7,39,159,3,"Q2 Password check",215.7
+2,"Password check","V1",3,39,684.6,228.2,39,169.2,4,"Q2 Password check",228.2
+2,"Password check","V2",3,37,444.8,148.3,36,116.7,1,"Q2 Password check",148.3
+2,"Password check","V3",3,38,623.4,207.8,36,152.8,2,"Q2 Password check",207.8
+3,"Sum of digits","ORIG",2,51,279.7,139.8,45,106.7,1,"Q3 Sum of digits",139.8
+3,"Sum of digits","V1",2,51,331.8,165.9,47,121.3,2,"Q3 Sum of digits",165.9
+3,"Sum of digits","V2",2,52,588.5,294.2,48,218.8,3,"Q3 Sum of digits",294.2
+4,"Max in 2D array","ORIG",1,77,196.1,196.1,73,141.1,1,"Q4 Max in 2D array",196.1
+4,"Max in 2D array","V1",1,77,203.9,203.9,73,158.9,2,"Q4 Max in 2D array",203.9
+5,"Remove duplicates","ORIG",4,30,1079.2,269.8,27,200,4,"Q5 Remove duplicates",269.8
+5,"Remove duplicates","V1",4,32,462.5,115.6,31,87.1,2,"Q5 Remove duplicates",115.6
+5,"Remove duplicates","V2",4,31,400,100,28,71.4,1,"Q5 Remove duplicates",100
+5,"Remove duplicates","V3",4,32,1187.5,296.9,29,231,5,"Q5 Remove duplicates",296.9
+5,"Remove duplicates","V4",4,29,870.8,217.7,27,166.7,3,"Q5 Remove duplicates",217.7
+6,"Frequency count","ORIG",2,50,488,244,42,178.6,3,"Q6 Frequency count",244
+6,"Frequency count","V1",2,52,278.5,139.2,44,104.6,1,"Q6 Frequency count",139.2
+6,"Frequency count","V2",2,52,433.5,216.8,42,169,2,"Q6 Frequency count",216.8
+7,"Merge sorted arrays","ORIG",3,39,800,266.7,36,194.4,4,"Q7 Merge sorted arrays",266.7
+7,"Merge sorted arrays","V1",3,38,700,233.3,35,177.2,3,"Q7 Merge sorted arrays",233.3
+7,"Merge sorted arrays","V2",2,26,200,100,25,76,1,"Q7 Merge sorted arrays",100
+7,"Merge sorted arrays","V3",2,25,300,150,24,120.8,2,"Q7 Merge sorted arrays",150
+8,"Roman numeral","ORIG",2,51,495.4,247.7,35,188.6,3,"Q8 Roman numeral",247.7
+8,"Roman numeral","V1",2,51,273.8,136.9,37,100,1,"Q8 Roman numeral",136.9
+8,"Roman numeral","V2",2,52,430.8,215.4,34,164.7,2,"Q8 Roman numeral",215.4
+9,"Binary search","ORIG",2,52,615.4,307.7,45,228.9,3,"Q9 Binary search",307.7
+9,"Binary search","V1",2,51,427.2,213.6,44,165.9,2,"Q9 Binary search",213.6
+9,"Binary search","V2",2,51,157.4,78.7,51,66.7,1,"Q9 Binary search",78.7
+10,"Balanced brackets","ORIG",3,77,666.5,222.2,66,162.1,4,"Q10 Balanced brackets",222.2
+10,"Balanced brackets","V1",1,26,169.2,169.2,22,127.3,1,"Q10 Balanced brackets",169.2
+10,"Balanced brackets","V2",1,26,192.3,192.3,22,150,3,"Q10 Balanced brackets",192.3
+10,"Balanced brackets","V3",1,25,172,172,22,136.4,2,"Q10 Balanced brackets",172

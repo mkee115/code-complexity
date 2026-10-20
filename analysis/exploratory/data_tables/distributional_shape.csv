@@ -1,0 +1,7 @@
+metric,skewness,kurtosis,cv
+cc,171.49,58570.196,3.013
+cognitive_complexity,674.906,724953.244,6.141
+loc,141.404,59586.665,2.373
+max_nesting,22.542,2729.291,0.822
+avg_id_words,1.804,10.074,0.339
+total_words,139.811,55659.232,2.712
